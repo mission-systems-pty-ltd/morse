@@ -45,14 +45,21 @@ class SocketRequestManager(RequestManager):
         # back.
         self._results_to_output = {}
 
-        self._server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # remember id/addr associations
+        # this requires different clients to use different ids in their requests
+        # a single client can also use different ids in each request if it likes
+        self._address = {}
+
+        # use UDP rather than TCP
+        # all the TCP code is still in place, we just ignore most of it
+        self._server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
         port_ok = False
         for i in range(MAX_TRIES):
             try:
                 self._server.bind((SERVER_HOST, SERVER_PORT))
-                self._server.listen(1)
+                #self._server.listen(1)
                 port_ok = True
                 break
             except socket.error as msg:
@@ -116,7 +123,8 @@ class SocketRequestManager(RequestManager):
             pass
 
         for i in inputready:
-            if i == self._server:
+            # UDP doesn't "accept"
+            if i == self._server and False:
                 sock, addr = self._server.accept()
 
                 logger.info("Accepted new service connection from " + str(addr))
@@ -124,7 +132,7 @@ class SocketRequestManager(RequestManager):
 
             else:
                 try:
-                    raw = i.recv(4096)
+                    raw, addr = i.recvfrom(4096)
                 except ConnectionResetError as e:
                     import os
                     if os.name == 'nt' and e.errno == 10054:
@@ -154,6 +162,8 @@ class SocketRequestManager(RequestManager):
                             raise MorseRPCInvokationError("Malformed request! ")
 
                         id = id.strip()
+                        # remember the address for this request in case it was asynchronous
+                        self._address[id] = addr
 
                         logger.info("Got '" + req + "' (id = " + id + ") from " + str(i))
 
@@ -207,8 +217,10 @@ class SocketRequestManager(RequestManager):
                                     "Details:" + str(te))
                         response = "%s %s%s" % (r[0], r[1][0], (" " + return_value) if return_value else "")
                         try:
-                            o.send((response + "\n").encode())
+                            o.sendto((response + "\n").encode(), self._address[r[0]])
                             logger.info("Sent back " + response + " to " + str(o))
+                        except KeyError:
+                            logger.warning("I don't seem to have a record of a request from id " + r[0] + ", can't send reply")
                         except socket.error:
                             logger.warning("It seems that a socket client left while I was sending stuff to it. Closing the socket.")
                             o.close()

@@ -39,10 +39,11 @@ class SocketServ(AbstractDatastream):
         self._client_sockets = []
         self._message_size = 4096
 
-        self._server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self._server = socket.socket( socket.AF_INET, socket.SOCK_DGRAM )
         self._server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self._server.bind(('', self.kwargs['port']))
-        self._server.listen(1)
+        #self._server.listen(1)
+        self._address = None
 
         logger.info("Socket Mw Server now listening on port " + str(self.kwargs['port']) + \
                     " for component " + str(self.component_name) + ".")
@@ -89,15 +90,23 @@ class SocketPublisher(SocketServ):
         except socket.error:
             pass
 
+        # TCP establishes a connection, which we see here, as soon as the client starts.
+        # UDP is only seen when something is sent by the client so to receive data from
+        # the server the client needs to do something like:
+        # $ socat - udp:localhost:6000
+        # <cr>
+        # We then receive that data and get the address to which we can start sending data
         if self._server in inputready:
-            sock, _ = self._server.accept()
-            self._client_sockets.append(sock)
+            raw, self._address = self._server.recvfrom( 4096 )
+            #sock, _ = self._server.accept()
+            #self._client_sockets.append(sock)
 
         if outputready:
             message = self.encode()
             for o in outputready:
                 try:
-                    o.send(message)
+                    if self._address is not None:
+                        o.sendto( message, self._address )
                 except socket.error:
                     self.close_socket(o)
 
@@ -121,7 +130,7 @@ class SocketReader(SocketServ):
         got_new_information = False
 
         for i in inputready:
-            if i == self._server:
+            if i == self._server and False:
                 sock, addr = self._server.accept()
                 logger.debug("New client connected to %s datastream" % self.component_name)
                 if self._client_sockets:
@@ -133,7 +142,8 @@ class SocketReader(SocketServ):
                     msg = ""
                     full_msg = False
                     while not full_msg:
-                        msg = i.recv(self._message_size).decode()
+                        msg, addr = i.recvfrom(self._message_size)
+                        msg = msg.decode()
                         logger.debug("received msg %s" % msg)
                         if not msg: # client disconnected
                             self.close_socket(i)
@@ -207,7 +217,7 @@ class SocketDatastreamManager(DatastreamManager):
         # If there is some client, just wait on it
         if self._sync_client:
             logger.debug("Waiting trigger")
-            msg = self._sync_client.recv(2048)
+            msg, addr = self._sync_client.recvfrom(2048)
             now = time.time()
             logger.debug('Synced after %f' % (now - self._last_sync_time))
             self._last_sync_time = now
@@ -261,7 +271,10 @@ class SocketDatastreamManager(DatastreamManager):
         """ Open the port used to communicate by the specified component.
         """
         register_success = False
-        must_inc_base_port = False
+
+        # TCP connections rely on catching the EADDRINUSE error to increment the port number.
+        # That doesn't work for UDP so let's force an increment.
+        must_inc_base_port = True
 
         kwargs = mw_data[3]
 

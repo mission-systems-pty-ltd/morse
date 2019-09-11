@@ -58,7 +58,7 @@ class StreamB(asynchat.async_chat):
     def __init__(self, host='localhost', port=1234, maxlen=100, sock=None):
         self.error = False
         if not sock:
-            sock = socket.socket(family=socket.AF_INET, type=socket.SOCK_STREAM)
+            sock = socket.socket( family=socket.AF_INET, type=socket.SOCK_DGRAM )
             sock.connect( (host, port) )
         self._in_buffer  = b""
         self._in_queue   = deque([], maxlen)
