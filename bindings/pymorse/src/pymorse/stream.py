@@ -68,6 +68,7 @@ class StreamB(asynchat.async_chat):
         # and others undesirable effects of the asyncore.loop thread.
         asynchat.async_chat.__init__(self, sock=sock)
         self.set_terminator(MSG_SEPARATOR)
+        self._sock = sock
 
     def is_up(self):
         """
@@ -82,7 +83,8 @@ class StreamB(asynchat.async_chat):
         else:
             return self.connected
 
-    def subscribe(self, callback):
+    def subscribe(self, callback, init_stream=False):
+        if init_stream: self._sock.send( b"" )
         self._callbacks.append(callback)
 
     def unsubscribe(self, callback):
