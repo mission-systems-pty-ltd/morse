@@ -253,8 +253,6 @@ class Objectserver(morse.core.sensor.Sensor):
 
         # Get every object in the scene
         objects = bpymorse.get_objects()
-        # for object_ in objects:
-        #     logger.warn(object_)
 
         # Are there any queries?
         if len(queue):
@@ -277,10 +275,9 @@ class Objectserver(morse.core.sensor.Sensor):
                         self.prev_queue_size = queue_size
 
                         # Yes: the noun is the object name
-                        # We need to recombine the words in case there are spaces
-                        # obj_name = query[1]
+                        # We need to recombine the words in case there are spaces,
+                        # previously we used the next word "obj_name = query[1]"
                         obj_name = " ".join(query[1:])
-                        # logger.warn(obj_name)
 
                         # Check it exists
                         if obj_name in objects:
