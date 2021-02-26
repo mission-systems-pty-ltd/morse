@@ -275,7 +275,13 @@ class Objectserver(morse.core.sensor.Sensor):
                         self.prev_queue_size = queue_size
 
                         # Yes: the noun is the object name
+<<<<<<< HEAD
                         obj_name = query[1]
+=======
+                        # We need to recombine the words in case there are spaces,
+                        # previously we used the next word "obj_name = query[1]"
+                        obj_name = " ".join(query[1:])
+>>>>>>> 64b9317ce13f2e0c08000c6e3ad8aa4c6a5d85f6
 
                         # Check it exists
                         if obj_name in objects:
