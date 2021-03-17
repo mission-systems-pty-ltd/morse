@@ -10,7 +10,10 @@ import sys
 import subprocess
 
 try:
-    import pymoos
+    try:
+        from pymoos import pymoos
+    except:
+        import pymoos
 except ImportError as error:
     testlogger.error("Could not find pymoos. Is it installed?")
     raise error
