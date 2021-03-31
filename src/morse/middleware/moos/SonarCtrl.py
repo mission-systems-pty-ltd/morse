@@ -5,7 +5,6 @@ try:
     from pymoos import pymoos
 except:
     import pymoos
-
 class sonarReader(MOOSSubscriber):
     """ Read sonar commands and update local data. """
 

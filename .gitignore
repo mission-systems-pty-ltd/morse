@@ -27,5 +27,4 @@ scene.*.blend
 .settings
 .metadata
 
-# VSCode files
 .vscode

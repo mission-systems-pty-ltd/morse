@@ -3,7 +3,6 @@ try:
     from pymoos import pymoos
 except:
     import pymoos
-
 from morse.middleware import AbstractDatastream
 from morse.core import blenderapi
 
