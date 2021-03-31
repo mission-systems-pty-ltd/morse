@@ -676,3 +676,21 @@ class FLS(SensorCreator):
         SensorCreator.__init__(self, name)
 
  
+class MultiStaticSonar(SensorCreator):
+    _classpath  = "morse.sensors.MultiStaticSonar.MultiStaticSonar"
+    _short_desc = "Acoustic modem transducer"
+    _blendname  = "modem"
+
+    def __init__(self, name=None):
+        SensorCreator.__init__(self, name)
+        self.append_meshes(['modem'])
+
+class SoccerBall(AbstractComponent):
+    _classpath  = "morse.sensors.multiStaticReceiver.SoccerBall"
+    _short_desc = "Acoustic receiver to be added to the soccerballs"
+    _blendname  = "modem"
+
+    def __init__(self, name = None):
+       AbstractComponent.__init__(self, name)
+       self.append_meshes(['modem'])
+
