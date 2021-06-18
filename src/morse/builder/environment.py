@@ -42,6 +42,7 @@ class Environment(AbstractComponent):
             problem with your simulation, and report it to the Morse project.
         """
         AbstractComponent.__init__(self, category = 'environments', filename = filename)
+        print("INITIALIZED ABSTRACT COMPONENT!")
         if main_scene:
             base_scene = bpymorse.get_context_scene().name
             self.append_scenes()
@@ -87,6 +88,7 @@ class Environment(AbstractComponent):
         self.set_camera_clip()
 
         self.set_gravity()
+        print("Gravity set!!!\n")
 
     def is_internal_camera(self, camera):
         return not self._multinode_configured or \
@@ -297,6 +299,7 @@ class Environment(AbstractComponent):
         Should always be called at the very end of the Builder script. It will
         finalise the building process and write the configuration files.
         """
+        print("Running environment create!!\n\n\n")
         # Invoke special methods of component that must take place *after* renaming
         for component in AbstractComponent.components:
             if hasattr(component, "after_renaming"):
@@ -386,6 +389,7 @@ class Environment(AbstractComponent):
         if 'time_management' not in self._bpy_object.game.properties.keys():
             self.properties(time_management = TimeStrategies.BestEffort)
 
+        print("At fixedmode!\n\n")
         if self.fastmode:
             # SINGLETEXTURE support has been removed between 2.69 and
             # 2.70. Handle properly the case where it is not defined
@@ -398,7 +402,8 @@ class Environment(AbstractComponent):
         elif not self.is_material_mode_custom:
             # make sure OpenGL shading language shaders (GLSL) is the
             # material mode to use for rendering
-            self.set_material_mode('GLSL')
+            # self.set_material_mode('GLSL')
+            pass
 
         # Set the unit system to use for button display (in edit mode) to metric
         bpymorse.get_context_scene().unit_settings.system = 'METRIC'
@@ -442,6 +447,7 @@ class Environment(AbstractComponent):
         self._created = True
         # in case we are in edit mode, do not exit on error with CLI
         sys.excepthook = sys.__excepthook__ # Standard Python excepthook
+        print("FINISHED CREATING ENVIRONMENT")
 
     def set_horizon_color(self, color=(0.05, 0.22, 0.4)):
         """ Set the horizon color
