@@ -1,10 +1,5 @@
 import logging; logger = logging.getLogger("morse." + __name__)
-# See if ros2 is available first.
-try:
-    import rclpy
-except:
-    import rospy
-from geometry_msgs.msg import Vector3, Quaternion, Pose, Twist
+from geometry_msgs.msg import Vector3, Quaternion, Pose, Twist, Point
 from nav_msgs.msg import Odometry
 from morse.middleware.ros import ROSPublisherTF, mathutils
 
@@ -45,15 +40,20 @@ class OdometryPublisher(ROSPublisherTF):
 
     def get_orientation(self):
         """ Get the orientation from the local_data and return a quaternion """
+        rotation = Quaternion()
         euler = mathutils.Euler((self.data['roll'],
                                  self.data['pitch'],
                                  self.data['yaw']))
         quaternion = euler.to_quaternion()
-        return quaternion
+        rotation.x = quaternion.x
+        rotation.y = quaternion.y
+        rotation.z = quaternion.z
+        rotation.w = quaternion.w
+        return rotation
 
     def get_position(self):
-        """ Get the position from the local_data and return a ROS Vector3 """
-        position = Vector3()
+        """ Get the position from the local_data and return a ROS Point """
+        position = Point()
         position.x = self.data['x']
         position.y = self.data['y']
         position.z = self.data['z']
@@ -76,3 +76,64 @@ class OdometryPublisher(ROSPublisherTF):
         twist.angular.y = self.data['wy']
         twist.angular.z = self.data['wz']
         return twist
+
+# # ROS 2
+
+# std_msgs/msg/Header header
+# string child_frame_id
+# geometry_msgs/msg/PoseWithCovariance pose
+#     geometry_msgs/msg/Pose pose
+#         geometry_msgs/msg/Point position
+#             double x
+#             double y
+#             double z
+#         geometry_msgs/msg/Quaternion orientation
+#             double x
+#             double y
+#             double z
+#             double w
+#     double[36] covariance
+# geometry_msgs/msg/TwistWithCovariance twist
+#     geometry_msgs/msg/Twist twist
+#         geometry_msgs/msg/Vector3 linear
+#             double x
+#             double y
+#             double z
+#         geometry_msgs/msg/Vector3 angular
+#             double x
+#             double y
+#             double z
+#     double[36] covariance
+
+
+
+# # ROS 1
+# std_msgs/Header header
+# string child_frame_id
+# geometry_msgs/PoseWithCovariance pose
+#     geometry_msgs/Pose pose
+#         geometry_msgs/Point position
+#             float64 x
+#             float64 y
+#             float64 z
+#         geometry_msgs/Quaternion orientation
+#             float64 x
+#             float64 y
+#             float64 z
+#             float64 w
+#     float64[36] covariance
+# geometry_msgs/TwistWithCovariance twist
+#     geometry_msgs/Twist twist
+#         geometry_msgs/Vector3 linear
+#             float64 x
+#             float64 y
+#             float64 z
+#         geometry_msgs/Vector3 angular
+#             float64 x
+#             float64 y
+#             float64 z
+#     float64[36] covariance
+
+
+
+

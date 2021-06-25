@@ -1,36 +1,21 @@
 import logging; logger = logging.getLogger("morse.ros")
 import re
 
-# See if ros2 is available first.
+
 try:
     import rclpy
-    USING_ROS2 = True
+    from rclpy.node import Node as RosNode
+
 except ImportError as error:
-    logger.error("Could not find ROS2. Defaulting to ROS1")
-    try:
-        import roslib
-        import rospy
-    except ImportError as error:
-        logger.error("Could not find ROS. source setup.[ba]sh ?")
-        logger.error("Please follow the installation instructions at:\n"
-            "http://www.openrobots.org/morse/doc/latest/user/installation/mw/ros.html")
-        raise error
+    logger.error("Could not find ROS2. source setup.[ba]sh ?")
+    logger.error("Please follow the installation instructions at:\n"
+        "http://www.openrobots.org/morse/doc/latest/user/installation/mw/ros.html")
+    raise error
 
-
-# These should be the same for ROS 1 and ROS 2: 
 from std_msgs.msg import String, Header
 from geometry_msgs.msg import TransformStamped
-
-
-# genpy does not seem to work in ROS2
-# I DONT UNDERSTAD THE TF SERIALIZATION - SO I HAVE IGNORED IT
-# from morse.middleware.ros.tfMessage import tfMessage
-
-
-
-
-
 from morse.middleware import AbstractDatastream
+
 from morse.core.blenderapi import persistantstorage
 
 try:
@@ -49,27 +34,6 @@ class AbstractROS(AbstractDatastream):
     """ Base class for all ROS Publishers and Subscribers """
     ros_class = Header # default
 
-    # ROS1 / 2 HANDLERS
-    def get_rosversion(self):
-        try:
-            import rclpy
-            self.rosversion = 2
-        except:
-            import rospy
-            self.rosversion = 1
-
-    def init_ros_node(self, name):
-        if self.rosversion == 2:
-            try:
-                rclpy.init()    # This should only ever be called once!
-            except:
-                pass            # Assume it has been called before... This is pretty bad practice
-        elif self.rosversion == 1:
-            rospy.init_node(name, disable_signals=True)
-        else:
-            logger.error("Could not find ROS2. Defaulting to ROS1")
-            raise error
-            
     @classproperty
     def _type_name(cls):
         # returns the standard ROS message name from its Python class
@@ -87,9 +51,12 @@ class AbstractROS(AbstractDatastream):
         if 'node_instance' in morse_ps:
             name = 'morse_%s' % morse_ps.node_instance.node_name
         
-        self.init_ros_node()
-
-        logger.info("ROS node %s initialized %s" % (name, self) )
+        try:
+            rclpy.init()
+        except:
+            # THIS PROBS ISN'T THE BEST PRACTICE...
+            pass
+        logger.info("ROS2 node %s initialized %s" % (name, self) )
         self.topic = None
 
         if 'topic' in self.kwargs:
@@ -111,7 +78,7 @@ class AbstractROS(AbstractDatastream):
         logger.info("ROS datastream finalize %s"%self)
 
 
-class ROSPublisher(AbstractROS):
+class ROSPublisher(AbstractROS, RosNode):
     """ Base class for all ROS Publishers """
     default_frame_id = 'USE_TOPIC_NAME'
 
@@ -123,7 +90,12 @@ class ROSPublisher(AbstractROS):
         # do not create a topic if no ros_class set (for TF publish only)
         if self.ros_class != Header:
             # Generate a publisher for the component
-            self.topic = rospy.Publisher(topic_name, self.ros_class, queue_size=self.determine_queue_size())
+            RosNode.__init__(self, "topic_name")
+            self.topic = self.create_publisher(self.ros_class, topic_name, self.determine_queue_size())
+            # self.topic = self.create_publisher(self.ros_class, topic_name, self.determine_queue_size())
+
+            # self.topic = self.Publisher(topic_name, self.ros_class, queue_size=self.determine_queue_size())
+        
         if self.default_frame_id is 'USE_TOPIC_NAME': # morse convention
             self.frame_id = self.kwargs.get('frame_id', self.topic_name)
         else: # default_frame_id was overloaded in subclass
@@ -141,13 +113,12 @@ class ROSPublisher(AbstractROS):
     def get_ros_header(self):
         header = Header()
         header.stamp = self.get_time()
-        header.seq = self.sequence
         # http://www.ros.org/wiki/geometry/CoordinateFrameConventions#Multi_Robot_Support
         header.frame_id = self.frame_id
         return header
 
     def get_time(self):
-        return rospy.Time.from_sec(self.data['timestamp'])
+        return self.get_clock().now().to_msg()
 
     # Generic publish method
     def publish(self, message):
@@ -155,6 +126,80 @@ class ROSPublisher(AbstractROS):
         """
         self.topic.publish(message)
         self.sequence += 1
+
+class ROSPublisherTF(ROSPublisher):
+    """ Base class for all ROS Publishers with TF support """
+    topic_tf = None
+
+    def initialize(self):
+        ROSPublisher.initialize(self)
+        if not ROSPublisherTF.topic_tf:
+            RosNode.__init__(self, "topic_name")
+            ROSPublisherTF.topic_tf = self.create_publisher(TransformStamped, "/tf", self.determine_queue_size())
+
+    def finalize(self):
+        ROSPublisher.finalize(self)
+        ROSPublisherTF.topic_tf.unregister()
+
+    def get_robot_transform(self):
+        """ Get the transformation relative to the robot origin
+
+        Return the local position, orientation and scale of this components
+        """
+        rel_pos = self.component_instance.sensor_to_robot_position_3d()
+        return rel_pos.translation, rel_pos.rotation
+
+    def publish_with_robot_transform(self, message):
+        self.publish(message)
+        self.send_transform_robot(message.header.stamp, message.header.frame_id)
+
+    def send_transform_robot(self, time=None, child=None, parent=None):
+        """ Send the transformation relative to the robot
+
+        :param time: default now
+        :param child: default topic_name or 'frame_id' in kwargs
+        :param parent: default 'base_link' or 'parent_frame_id' in kwargs
+        """
+        translation, rotation = self.get_robot_transform()
+        if not time:
+            time = self.get_time()
+        if not child:
+            # our frame_id (component frame)
+            child = self.frame_id
+        if not parent:
+            # get parent frame_id (aka. the robot)
+            parent = self.kwargs.get('parent_frame_id', 'base_link')
+        #rospy.loginfo("t:%s,r:%s"%(str(translation), str(rotation)))
+        # send the transformation
+        self.sendTransform(translation, rotation, time, child, parent)
+    
+    # TF publish method
+    def publish_tf(self, message):
+        """ Publish the TF data on the rostopic
+        """
+        ROSPublisherTF.topic_tf.publish(message)
+
+    def sendTransform(self, translation, rotation, time, child, parent):
+        """
+        :param translation: the translation of the transformtion as geometry_msgs/Vector3
+        :param rotation: the rotation of the transformation as a geometry_msgs/Quaternion
+        :param time: the time of the transformation, as a rospy.Time()
+        :param child: child frame in tf, string
+        :param parent: parent frame in tf, string
+
+        Broadcast the transformation from tf frame child to parent on ROS topic ``"/tf"``.
+        """
+
+        t = TransformStamped()
+        t.header.frame_id = parent
+        t.header.stamp = time
+        t.child_frame_id = child
+        t.transform.translation.x = translation.x
+        t.transform.translation.y = translation.y
+        t.transform.translation.z = translation.z
+        t.transform.rotation = rotation
+        # tfm = tfMessage([t]) # <<< WHY IS THIS NEEDED AT ALL???? I REALLY DON'T UNDERSTAND  
+        self.publish_tf(t)
 
 
 class ROSSubscriber(AbstractROS):
@@ -165,12 +210,6 @@ class ROSSubscriber(AbstractROS):
         self.message = None
         # Generate a subscriber for the component
         self.topic = rospy.Subscriber(self.topic_name, self.ros_class, self.callback)
-        print("____________________________________________________________________________")
-        print("____________________________________________________________________________")
-        print("____________________________________________________________________________")
-        print("____________________________________________________________________________")
-        print("____________________________________________________________________________")
-        print("____________________________________________________________________________")
         logger.info('ROS subscriber initialized for %s'%self)
 
     def callback(self, message):
@@ -200,6 +239,13 @@ class ROSSubscriber(AbstractROS):
 #
 # Example (String)
 #
+class StringPublisher():
+    """ Publish a string containing a printable representation of the local data. """
+    ros_class = String
+
+    def default(self, ci='unused'):
+        self.publish(repr(self.data))
+
 
 class StringPublisher(ROSPublisher):
     """ Publish a string containing a printable representation of the local data. """

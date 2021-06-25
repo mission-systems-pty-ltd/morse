@@ -140,13 +140,12 @@ class MorseTestCase(unittest.TestCase):
 
     def wait_initialization(self):
         """ Wait until Morse is initialized """
+
         testlogger.info("Waiting for MORSE to initialize... (timeout: %s sec)" % \
                         BLENDER_INITIALIZATION_TIMEOUT)
-
         with open(self.logfile_name) as log:
             lines = follow(log)
             for line in lines:
-                print(line)
                 if  ("[ERROR][MORSE]" in line) or ("INITIALIZATION ERROR" in line):
                     testlogger.error("Error during MORSE initialization! Check "
                                      "the log file.")
@@ -223,7 +222,6 @@ class MorseTestCase(unittest.TestCase):
         t.join(BLENDER_INITIALIZATION_TIMEOUT)
         
         if self.morse_initialized:
-            
             self.pid = self._extract_pid()
             testlogger.info("MORSE successfully initialized with PID %s" % self.pid)
         else:
@@ -345,6 +343,7 @@ class MorseBuilderFailureTestCase(MorseTestCase):
 
     def wait_initialization(self):
         """ Wait until Morse is initialized """
+
         testlogger.info("Waiting for MORSE to parse the scene... (timeout: %s sec)" % \
                         BLENDER_INITIALIZATION_TIMEOUT)
         # we assume we will correctly detect Builder script issue, so wait_initialization
