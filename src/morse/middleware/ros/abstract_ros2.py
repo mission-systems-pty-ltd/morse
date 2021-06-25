@@ -51,11 +51,11 @@ class AbstractROS(AbstractDatastream):
         if 'node_instance' in morse_ps:
             name = 'morse_%s' % morse_ps.node_instance.node_name
         
-        try:
+        if not rclpy.ok():
             rclpy.init()
-        except:
-            # THIS PROBS ISN'T THE BEST PRACTICE...
-            pass
+        else:
+            print("rclpy already running. No need to initialize again")
+        
         logger.info("ROS2 node %s initialized %s" % (name, self) )
         self.topic = None
 
