@@ -1,5 +1,5 @@
 import logging; logger = logging.getLogger("morse." + __name__)
-from geometry_msgs.msg import Pose, PoseStamped, PoseWithCovarianceStamped, Vector3, Quaternion
+from geometry_msgs.msg import Pose, PoseStamped, PoseWithCovarianceStamped, Vector3, Quaternion, Point
 from morse.middleware.ros import ROSPublisher, ROSPublisherTF, mathutils
 
 def get_orientation(self):
@@ -26,7 +26,7 @@ def get_position(self):
     """ Get the position from the local_data
     and return a ROS geometry_msgs.Vector3
     """
-    position = Vector3()
+    position = Point()
     if 'position' in self.data:
         position.x = self.data['position'][0]
         position.y = self.data['position'][1]
