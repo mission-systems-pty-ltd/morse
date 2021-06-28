@@ -144,7 +144,8 @@ class AbstractComponent(object):
             obj.matrix_parent_inverse.identity()
             # make sure the object is visible in the viewport
             # otherwise it can prevent from updating its properties
-            obj.hide = False
+            # obj.hide = False  # UPBGE3 MOD
+            obj.hide_set(False) # UPBGE3 MOD
         self._bpy_object = obj # bpy object
 
     def append(self, obj, child = None, level=1):

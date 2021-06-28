@@ -81,13 +81,16 @@ class Environment(AbstractComponent):
         bpymorse.deselect_all()
         bpymorse.add_morse_empty()
         obj = bpymorse.get_context_object()
+        print("I HERE")
         obj.name = 'MORSE.Properties'
+
         self.set_blender_object(obj)
         # Init. camera's properties
         self.set_camera_speed()
         self.set_camera_clip()
 
         self.set_gravity()
+
         print("Gravity set!!!\n")
 
     def is_internal_camera(self, camera):

@@ -10,7 +10,7 @@ fake = False
 
 # running in Blender?
 # Note: Run blender-app.exe when blender v2.75 in Window 7
-if os.path.basename(sys.executable) in ['blender', 'blender.exe', 'blender-app.exe']:
+try:
     import bpy
     try:
         import bge
@@ -18,9 +18,10 @@ if os.path.basename(sys.executable) in ['blender', 'blender.exe', 'blender-app.e
         # Can fail if we are in Blender but not yet in the GameEngine,
         # typically at 'Builder' stage.
         fake = True
-else:
+except:
     print("WARNING: MORSE is running outside Blender! (sys.executable == '%s')" % sys.executable)
     fake = True
+    
 
 from morse.core import mathutils
 import logging

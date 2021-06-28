@@ -7,12 +7,15 @@ import logging
 
 logger = logging.getLogger('morse')
 
-bpy = None
 
+# UPBGE3 MOD
+# LOOKS LIKE BPY DOES NOT NEED TO BE IMPORTED
+bpy = None
 try:
     import bpy
 except ImportError:
     print("WARNING: MORSE is running outside Blender! (no bpy)")
+# UPBGE3 MOD
 
 def empty_method(*args, **kwargs):
     print(args, kwargs)
