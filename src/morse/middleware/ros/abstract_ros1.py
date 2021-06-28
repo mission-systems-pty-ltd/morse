@@ -236,14 +236,6 @@ class ROSSubscriber(AbstractROS):
 #
 # Example (String)
 #
-class StringPublisher():
-    """ Publish a string containing a printable representation of the local data. """
-    ros_class = String
-
-    def default(self, ci='unused'):
-        self.publish(repr(self.data))
-
-
 class StringPublisher(ROSPublisher):
     """ Publish a string containing a printable representation of the local data. """
     ros_class = String
