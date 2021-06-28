@@ -1,4 +1,3 @@
-import rospy
 from rosgraph_msgs.msg import Clock
 from morse.middleware.ros import ROSPublisher
 
@@ -12,5 +11,4 @@ class ClockPublisher(ROSPublisher):
     def default(self, ci='unused'):
         msg = Clock()
         msg.clock = self.get_time()
-
         self.publish(msg)
