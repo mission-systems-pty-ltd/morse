@@ -7,10 +7,15 @@ class ImuPublisher(ROSPublisher):
     default_frame_id = '/imu'
 
     def default(self, ci='unused'):
+        # pass
         imu = Imu()
         imu.header = self.get_ros_header()
 
-        imu.orientation = self.component_instance.bge_object.worldOrientation.to_quaternion()
+        quaternion = self.component_instance.bge_object.worldOrientation.to_quaternion()
+        imu.orientation.x = quaternion.x 
+        imu.orientation.y = quaternion.y
+        imu.orientation.z = quaternion.z
+        imu.orientation.w = quaternion.w 
 
         imu.angular_velocity.x = self.data['angular_velocity'][0]
         imu.angular_velocity.y = self.data['angular_velocity'][1]
