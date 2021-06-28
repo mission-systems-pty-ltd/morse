@@ -7,11 +7,11 @@ import sys
 import os
 
 # running in Blender?
-# Note: Run blender-app.exe when blender v2.75 in Window 7
-if os.path.basename(sys.executable) not in ['blender', 'blender.exe', 'blender-app.exe']:
-    print("WARNING: MORSE is running outside Blender! "
-          "(sys.executable != blender)")
-
+try:
+    import bpy
+    from mathutils import Matrix, Vector, Euler, Quaternion
+except:
+    print("WARNING: MORSE is running outside Blender!")
     def Matrix(*args):
         return None
     def Vector(*args):
@@ -20,6 +20,3 @@ if os.path.basename(sys.executable) not in ['blender', 'blender.exe', 'blender-a
         return None
     def Quaternion(*args):
         return None
-else:
-    from mathutils import Matrix, Vector, Euler, Quaternion
-
