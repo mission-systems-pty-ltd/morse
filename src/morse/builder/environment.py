@@ -350,10 +350,12 @@ class Environment(AbstractComponent):
         # Create a new scene for each camera, with specific render resolution
         # Must be done at the end of the builder script, after renaming
         # and before adding 'Scene_Script_Holder'
-        self._cfg_camera_scene()
+        self._cfg_camera_scene() 
 
         # Create a new scene for the MORSE_LOGIC (Scene_Script_Holder, CameraFP)
-        scene = bpymorse.set_active_scene('S.MORSE_LOGIC')
+        # scene = bpymorse.set_active_scene('S.MORSE_LOGIC')
+        import bpy
+        scene =  bpy.data.scenes["S.MORSE_LOGIC"]
         scene.game_settings.physics_engine = 'BULLET'
         scene.game_settings.physics_step_sub = self._physics_step_sub
         # set simulation view resolution (4:3)
@@ -389,8 +391,9 @@ class Environment(AbstractComponent):
         self.properties(environment_file = str(self._environment_file))
 
         # Default time management
-        if 'time_management' not in self._bpy_object.game.properties.keys():
-            self.properties(time_management = TimeStrategies.BestEffort)
+        if 'time_management' not in self._bpy_object.game.properties.keys(): # UPBGE HACK
+            # self.properties(time_management = TimeStrategies.FixedSimulationStep)     # UPBGE HACK
+            self.properties(time_management = TimeStrategies.BestEffort)     # UPBGE HACK
 
         print("At fixedmode!\n\n")
         if self.fastmode:
@@ -427,10 +430,13 @@ class Environment(AbstractComponent):
         camera_fp.data.lens = self._focal_length # set focal length in mm
         # Make CameraFP the active camera
         bpymorse.deselect_all()
-        camera_fp.select = True
-        bpymorse.get_context_scene().objects.active = camera_fp
+        # UPBGE HACK
+        # SCENES have changed so the way this camera is operating no longer works.
+        # 
+        # camera_fp.select = True                                 # UPBGE HACK
+        # bpymorse.get_context_scene().objects.active = camera_fp # UPBGE HACK
         # Set default camera
-        bpymorse.get_context_scene().camera = camera_fp
+        # bpymorse.get_context_scene().camera = camera_fp         # UPBGE HACK
         # Set viewport to Camera
         bpymorse.set_viewport_perspective()
 

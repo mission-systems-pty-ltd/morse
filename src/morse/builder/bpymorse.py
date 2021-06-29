@@ -201,16 +201,18 @@ def get_scene(name_or_id):
         return None
 
 def set_active_scene(name_or_id):
-    if bpy:
-        scene = get_scene(name_or_id)
-        if scene:
-            bpy.data.screens['Default'].scene = scene
-            bpy.context.screen.scene = scene
-            return scene
-        else:
-            return None
-    else:
-        return None
+    print("SCENES DO NOT EXIST ANYMORE ")
+    return None
+    # if bpy:
+    #    scene = get_scene(name_or_id)
+    #    if scene:
+    #        bpy.data.screens['Default'].scene = scene
+    #     #    bpy.context.screen.scene = scene
+    #        return scene
+    #    else:
+    #        return None
+    # else:
+    #    return None
 
 def get_last_scene():
     return get_scene(-1)
@@ -218,8 +220,8 @@ def get_last_scene():
 def select_only(obj):
     if bpy:
         deselect_all()
-        obj.select = True
-        bpy.context.scene.objects.active = obj
+        obj.select_set(True)
+        bpy.context.view_layer.objects.active = obj
 
 def delete(objects):
     if not bpy:
@@ -369,6 +371,7 @@ def properties(obj, **kwargs):
 
     """
     for key in kwargs.keys():
+        print("PROPERTY: ", key)
         if key in obj.game.properties.keys():
             _property_set(obj, key, kwargs[key])
         else:
