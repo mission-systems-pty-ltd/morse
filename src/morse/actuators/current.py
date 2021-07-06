@@ -5,11 +5,10 @@ import morse.core.actuator
 from morse.core.services import service, async_service, interruptible
 from morse.core import status
 from morse.helpers.components import add_data, add_property
-from math import radians, degrees, pi, sin
+from math import radians, degrees, pi
 from morse.core import blenderapi
 from morse.core.mathutils import *
 import random
-from time import process_time
 
 __author__     = "David Battle"
 __copyright__  = "Copyright 2019, Mission Systems Pty Ltd"
@@ -58,8 +57,7 @@ class Current(morse.core.actuator.Actuator):
         current_speed = random.gauss(self._current_speed, self._turbulence)
 
         # Instantaneous current vector
-        t = process_time()
-        current_world = current_speed * sin(t) * self.current_vec_world
+        current_world = current_speed * self.current_vec_world
 
         # Store current property
         self.current['vec'] = current_world
