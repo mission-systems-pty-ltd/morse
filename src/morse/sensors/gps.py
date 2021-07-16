@@ -149,7 +149,7 @@ class GPS(morse.core.sensor.Sensor):
         logger.info('%s initialization' % obj.name)
         # Call the constructor of the parent class
         morse.core.sensor.Sensor.__init__(self, obj, parent)
-
+        self.startup_time = time.time()
         logger.info('Component initialized, runs at %.2f Hz', self.frequency)
 
 
@@ -186,6 +186,11 @@ class RawGPS(GPS):
         self.v = [0.0, 0.0, 0.0]
 
         self.coord_converter = CoordinateConverter.instance()
+
+        # Initialise the odom position
+        self.last_pos = numpy.matrix(self.position_3d.translation)
+        self.odom_pos = numpy.matrix(self.position_3d.translation)
+
     
     def default_action(self):
         """
@@ -204,8 +209,88 @@ class RawGPS(GPS):
           http://www.lsgi.polyu.edu.hk/staff/zl.li/Vol_5_2/09-baki-3.pdf
         """
 
-        #current position
-        xt = numpy.matrix(self.position_3d.translation)
+        # METHOD 1:
+        # Resulted in noisy path but no drift!
+        # # Keep track of an 'odometry' position
+        current_pos = numpy.matrix(self.position_3d.translation)
+        # dx = current_pos - self.odom_pos
+        dx = current_pos - self.last_pos
+        self.last_pos = current_pos
+        
+        # drift_speed = 0.5 #(m/s)
+        # drift_per_tick = drift_speed / self.frequency
+        # bias = numpy.random.normal(0.0, 0.03, 3)
+        noise = numpy.random.normal(0.01, 0.03, 3)
+        # print(noise)
+        # print(noise[0])
+        # print(self.odom_pos[0,0])
+        self.odom_pos[0,0] = self.odom_pos[0,0] + dx[0,0] + noise[0]
+        self.odom_pos[0,1] = self.odom_pos[0,1] + dx[0,1] + noise[1]
+        self.odom_pos[0,2] = current_pos[0,2]   # don't add noise to the GPS altitude   
+        print(self.odom_pos)
+        
+        now = time.time()
+        mercy_period = 35
+        if(  now < self.startup_time + mercy_period):
+            print("Mercy period: start, ", self.startup_time)
+            print("Mercy period: end, ", self.startup_time + mercy_period)
+            print("Mercy period: now, ", now)
+            print("Mercy period")
+            noise = numpy.random.normal(0.0, 0.00, 3)
+            self.odom_pos = numpy.matrix(self.position_3d.translation)
+        xt = self.odom_pos
+
+
+
+        # # METHOD 2:
+        # current_pos = numpy.matrix(self.position_3d.translation)
+        # # vel is m/s, add noise to the velocity measurements
+        # dx = self.v[0]/float(self.frequency) #+ numpy.random.normal(0.00000, 0.00000001, 1)
+        # dy = self.v[1]/float(self.frequency) #+ numpy.random.normal(0.00000, 0.00000001, 1)
+        # print("dx: ", dx)
+        # print("dx: ", dx)
+        # print("dy: ", dy)
+        # print("dy: ", dy)
+        # # dz = self.v[2]/self.frequency ignore
+        # # integrate the velocity to get a position 
+        # self.odom_pos[0,0] = self.odom_pos[0,0] + dx
+        # self.odom_pos[0,1] = self.odom_pos[0,1] + dy
+        # self.odom_pos[0,2] = current_pos[0,2]   # don't add noise to the GPS altitude   
+        # xt = self.odom_pos
+        # print("Position: ", self.odom_pos)
+
+
+
+        # METHOD 3:
+        # current_pos = numpy.matrix(self.position_3d.translation)
+        # dx = current_pos - self.last_pos
+        # noise = numpy.random.normal(0.003, 0.03, 3)
+
+        # now = time.time()
+        # mercy_period = 15
+        # constant_offset = 60
+        # if(  now < self.startup_time + mercy_period):
+        #     print("Mercy period: start, ", self.startup_time)
+        #     print("Mercy period: end, ", self.startup_time + mercy_period)
+        #     print("Mercy period: now, ", now)
+        #     print("Mercy period")
+        #     constant_offset = 0.0
+        # print("constant_offset: ", constant_offset/self.frequency)
+        # self.odom_pos[0,0] = self.odom_pos[0,0] + dx[0,0] + constant_offset/self.frequency
+        # self.odom_pos[0,1] = self.odom_pos[0,1] + dx[0,1] + constant_offset/self.frequency
+        # self.odom_pos[0,2] = current_pos[0,2]   # don't add noise to the GPS altitude   
+        # xt = self.odom_pos
+        # print(self.odom_pos)
+
+        # x = self.position_3d.x
+        # y = self.position_3d.y
+        # z = self.position_3d.z
+        # self.local_data['x'] = float(x)
+        # self.local_data['y'] = float(y)
+        # self.local_data['z'] = float(z) 
+
+        # # Current position
+        # xt = numpy.matrix(self.position_3d.translation)   # THIS HAS BEEN CHANGED TO ADD DRIFT
         ltp = self.coord_converter.blender_to_ltp(xt)
         if self.pltp is not None:
             v = (ltp - self.pltp) * self.frequency
