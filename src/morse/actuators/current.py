@@ -29,6 +29,8 @@ class Current(morse.core.actuator.Actuator):
     add_property('_current_speed', 0, 'Current_Speed', 'float', 'Current speed in m/s')
     add_property('_current_dir',   0,   'Current_Dir', 'float', 'Bearing from which current is coming in deg')
     add_property('_turbulence',    0,    'Turbulence', 'float', 'Current std deviation in m/s')
+    add_property('_oscillating',False,   'Oscillating', 'bool',  'True for oscillating current.')
+    add_property('_oscillation_period', 10, 'Oscillation_Period', 'float', 'Oscillation period in seconds.')
 
     def __init__(self, obj, parent=None):
         logger.info("%s initialization" % obj.name)
@@ -50,6 +52,9 @@ class Current(morse.core.actuator.Actuator):
         logger.info('Current speed is %.1f m/s', self._current_speed)
         logger.info('Current direction is from %.1f degrees', self._current_dir)
         logger.info('Current variance is %.1f m/s', self._turbulence)
+        logger.info('Current is oscillating (true/false): %d', self._oscillating)
+        if(self._oscillating):
+            logger.info('Current oscillation period: %.2f sec',self._oscillation_period)
         logger.info('Component initialized, runs at %.2f Hz', self.frequency)
 
     def default_action(self):
@@ -58,8 +63,12 @@ class Current(morse.core.actuator.Actuator):
         current_speed = random.gauss(self._current_speed, self._turbulence)
 
         # Instantaneous current vector
-        t = process_time()
-        current_world = current_speed * sin(t) * self.current_vec_world
+        if self._oscillating:
+            # Instantaneous current vector
+            t = process_time()
+            current_world = current_speed * sin(2*pi*t/self._oscillation_period) * self.current_vec_world
+        else:
+            current_world = current_speed * self.current_vec_world
 
         # Store current property
         self.current['vec'] = current_world
