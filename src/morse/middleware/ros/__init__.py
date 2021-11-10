@@ -1,6 +1,7 @@
 
 try:
     from .abstract_ros2 import *
+    print("Importing ROS 2")
 except:
-    print("ROS2 IMPORT FAILED_______________________")
     from .abstract_ros1 import *
+    print("Importing ROS 1")

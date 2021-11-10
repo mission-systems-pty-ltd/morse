@@ -1,7 +1,5 @@
-import logging; logger = logging.getLogger("morse.ros")
+import logging; logger = logging.getLogger("morse.ros2")
 import re
-
-
 try:
     import rclpy
     from rclpy.node import Node as RosNode
@@ -15,7 +13,6 @@ except ImportError as error:
 from std_msgs.msg import String, Header
 from geometry_msgs.msg import TransformStamped
 from morse.middleware import AbstractDatastream
-
 from morse.core.blenderapi import persistantstorage
 
 try:
@@ -90,7 +87,8 @@ class ROSPublisher(AbstractROS, RosNode):
         # do not create a topic if no ros_class set (for TF publish only)
         if self.ros_class != Header:
             # Generate a publisher for the component
-            RosNode.__init__(self, "topic_name")
+            node_name = topic_name.replace('/', '_')
+            RosNode.__init__(self, node_name+"_publisher")
             self.topic = self.create_publisher(self.ros_class, topic_name, self.determine_queue_size())
             # self.topic = self.create_publisher(self.ros_class, topic_name, self.determine_queue_size())
 
@@ -202,14 +200,19 @@ class ROSPublisherTF(ROSPublisher):
         self.publish_tf(t)
 
 
-class ROSSubscriber(AbstractROS):
+class ROSSubscriber(AbstractROS, RosNode):
+
     """ Base class for all ROS Subscribers """
 
     def initialize(self):
         AbstractROS.initialize(self)
         self.message = None
         # Generate a subscriber for the component
-        self.topic = rospy.Subscriber(self.topic_name, self.ros_class, self.callback)
+        # self.topic = rospy.Subscriber(self.topic_name, self.ros_class, self.callback)
+        node_name = self.topic_name.replace('/', '_')
+        RosNode.__init__(self, node_name+"_subscriber")
+        self.topic = self.create_subscription(self.ros_class, self.topic_name, self.callback, 10)
+
         logger.info('ROS subscriber initialized for %s'%self)
 
     def callback(self, message):
@@ -218,6 +221,7 @@ class ROSSubscriber(AbstractROS):
 
     def default(self, ci='unused'):
         # If a new message has been received
+        rclpy.spin_once(self, timeout_sec=0.001)
         if self.message:
             # Update local_data
             self.update(self.message)

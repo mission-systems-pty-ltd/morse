@@ -1,9 +1,9 @@
-import logging; logger = logging.getLogger("morse.ros")
+import logging; logger = logging.getLogger("morse.ros1")
 import re
 try:
     import roslib
 except ImportError as error:
-    logger.error("Could not find ROS. source setup.[ba]sh ?")
+    logger.error("Could not find ROS 1. source setup.[ba]sh ?")
     logger.error("Please follow the installation instructions at:\n"
         "http://www.openrobots.org/morse/doc/latest/user/installation/mw/ros.html")
     raise error
@@ -118,7 +118,7 @@ class ROSPublisher(AbstractROS):
         self.topic.publish(message)
         self.sequence += 1
 
-
+ 
 class ROSPublisherTF(ROSPublisher):
     """ Base class for all ROS Publishers with TF support """
     topic_tf = None
