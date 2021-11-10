@@ -48,6 +48,7 @@ MORSE_MODIFIER_DICT = {
     'NED': {
         'morse.sensors.pose.Pose': "morse.modifiers.ned.CoordinatesToNED",
         'morse.sensors.gps.GPS': "morse.modifiers.ned.CoordinatesToNED",
+        'morse.sensors.odometry.Odometry': "morse.modifiers.ned.PoseToNED",
         'morse.sensors.gyroscope.Gyroscope': "morse.modifiers.ned.AnglesToNED",
         'morse.actuators.destination.Destination': "morse.modifiers.ned.CoordinatesFromNED",
         'morse.actuators.waypoint.Waypoint': "morse.modifiers.ned.CoordinatesFromNED",
@@ -211,6 +212,7 @@ MORSE_DATASTREAM_DICT = {
             "yarp": INTERFACE_DEFAULT_OUT,
             "yarp_json": INTERFACE_DEFAULT_OUT,
             "text": INTERFACE_DEFAULT_OUT,
+            "moos": 'morse.middleware.moos.gps.GPSRawNotifier'
             },
         "extended": {
             "socket": INTERFACE_DEFAULT_OUT,

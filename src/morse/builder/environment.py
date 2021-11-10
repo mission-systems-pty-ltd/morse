@@ -466,10 +466,29 @@ class Environment(AbstractComponent):
 
         :param color: (0.0, 0.0, 0.0) < (R, B, G) < (1.0, 1.0, 1.0)
                       default: dark grey (0.05, 0.05, 0.05)
+        
+        (Modified by William Talbot 23/07/21)
         """
-        # Set the color at the horizon to dark azure
-        bpymorse.get_context_scene().world.horizon_color = color
+        # Set the ambient color
+        bpymorse.get_context_scene().world.ambient_color = color
 
+    def enable_environment_light(self, value=True):
+        """ Enables or disables environment light
+
+        (Added by William Talbot 23/07/21)
+        """
+        if isinstance(value, bool):
+            bpymorse.get_context_scene().world.light_settings.use_environment_light = value
+    
+    def set_environment_light_settings(self, **settings):
+        """ Sets the environment light settings for the scene
+        """
+        if 'environment_energy' in settings:
+            bpymorse.get_context_scene().world.light_settings.environment_energy = settings['environment_energy']
+        if 'environment_color' in settings:
+            bpymorse.get_context_scene().world.light_settings.environment_color = settings['environment_color']
+        if 'enable' in settings:
+            self.enable_environment_light(settings['enable'])
 
     def enable_mist(self,value=True):
         """ Enables or disables mist
@@ -841,7 +860,16 @@ class Environment(AbstractComponent):
         """
         self.properties(use_relative_time = relative_time)
 
+    def use_display_lists(self, display_lists=True):
+        """ Use display lists to speed up rendering by keeping geometry on the GPU """
+        bpymorse.get_context_scene().game_settings.use_display_lists = display_lists
 
+    def use_material_caching(self, material_caching=True):
+        """ Cache materials in the converter (this is faster, but can cause problems
+        with older Singletexture and Multitexture games).
+        
+        WARNING: Turning off material caching may hang morse."""
+        bpymorse.get_context_scene().game_settings.use_material_caching = material_caching
 
     def __del__(self):
         """ Call the create method if the user has not explicitly called it """
