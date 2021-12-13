@@ -19,7 +19,6 @@ __status__     = "Draft"
 
 class SoccerBall(AbstractComponent):
 
-    print("made it here")
     # define here the data fields exported by your sensor
     # format is: field name, default initial value, type, description
     add_data('node_pose', '', 'string', 'Position and orientation of node')
