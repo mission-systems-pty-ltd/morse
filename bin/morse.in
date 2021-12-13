@@ -1,4 +1,5 @@
 #! @PYTHON_EXECUTABLE@
+#! /usr/bin/python3
 import sys
 import os
 import platform
@@ -11,16 +12,14 @@ except ImportError:
     log_handler = logging.StreamHandler()
 
 logger = logging.getLogger('morse')
-
 formatter = logging.Formatter("* %(message)s\n")
 log_handler.setFormatter(formatter)
 
 logger.addHandler(log_handler)
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 ##
-
 try:
-    sys.path.append("@PYTHON_INSTDIR@")
+    sys.path.append("/usr/local/lib/python3/dist-packages")
     from morse.version import VERSION
     from morse.environments import Environment
     from morse.core.exceptions import MorseEnvironmentError
@@ -87,10 +86,16 @@ def check_blender_version(blender_path):
         version_str = subprocess.Popen(
                                 [blender_path, '--version'],
                                 stdout=subprocess.PIPE).communicate()[0]
+
+                                        
         for line in version_str.splitlines():
             line = line.decode().strip()
             if line.startswith("Blender"):
-                version = line.split()[1] + '.' + line.split()[3][:-1]
+                # TODO: Remove the old line, this does ignore older versions sub number tho :/
+                # version = line.split()[1] + '.' + line.split()[3][:-1]
+                version = re.findall("([\.0-9]*)", line)
+                version = [x for x in version if x]
+                version = version[0]
                 break
     except OSError:
         return None
@@ -141,13 +146,14 @@ def check_blender_python_version(blender_path):
         tmpF.close()
         os.unlink (tmpF.name)
 
-def check_default_scene(prefix):
+def check_default_scene(prefix): 
 
     global default_scene_abspath
     #Check morse_default.blend is found
     default_scene_abspath = os.path.join(os.path.normpath(prefix), os.path.normpath(DEFAULT_SCENE_PATH))
 
-    #logger.info("Looking for the MORSE default scene here: " + default_scene_abspath)
+    logger.info("Looking for the MORSE default scene here: " + default_scene_abspath)
+    logger.error("asdf")
 
     if not os.path.exists(default_scene_abspath):
         raise MorseError(default_scene_abspath)
@@ -164,7 +170,7 @@ def set_prefixes(silent = False):
 
     loglevel = logger.getEffectiveLevel()
     if silent:
-        logger.setLevel(logging.WARNING)
+        logger.setLevel(logging.DEBUG)
 
     ###########################################################################
     #Check platform
@@ -196,6 +202,7 @@ def set_prefixes(silent = False):
     try:
         prefix = os.environ['MORSE_ROOT']
         logger.info("$MORSE_ROOT environment variable is set. Checking for default scene...")
+
 
         check_default_scene(prefix)
         logger.info("Default scene found. The prefix seems ok. Using it.")
@@ -550,7 +557,7 @@ def add_component(args):
 def prelaunch():
     logger.info(version())
     try:
-        logger.setLevel(logging.WARNING)
+        logger.setLevel(logging.DEBUG)
         logger.info("Checking up your environment...\n")
         check_setup()
     except MorseError as e:
@@ -651,6 +658,7 @@ def launch_simulator(scene=None, script=None, node_name=None, geometry=None,
         exec_args += ["-P", script]
 
     exec_args += other_params
+    print( exec_args )
     os.execle(*exec_args)
 
 def do_check(args):
