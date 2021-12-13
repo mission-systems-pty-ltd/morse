@@ -25,7 +25,9 @@ class RangeSensor(morse.core.sensor.Sensor):
         # Call the constructor of the parent class
         morse.core.sensor.Sensor.__init__(self, obj, parent)
         # Do here sensor specific initializations        
-        self.sensor  = parent.bge_object.children[self.sensor_obj]
+        children  = parent.bge_object.children
+        self.sensor   = next(c for c in children if self.sensor_obj in c.name)
+
         # Set the name for the sensor so that multiple sensors can have unique topics in middleware
         lidar_name = self.sensor.name.upper()
         self.local_data['name'] = lidar_name.replace(".","_")
