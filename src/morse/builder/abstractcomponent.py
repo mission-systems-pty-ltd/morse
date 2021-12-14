@@ -1,4 +1,5 @@
 import logging; logger = logging.getLogger("morsebuilder." + __name__)
+import os; print("File: ", os.path.basename(__file__), flush=True)
 import os
 import pprint
 import copy
@@ -305,8 +306,12 @@ class AbstractComponent(object):
         :param objects: if specified, look for the child in this list of bpy Objects
         :param recursive: (default: True) if true, search for the child recursively
         """
+        print("objects are as follows: \n " )
+        print("objects: ", objects)
+        print("name: ", name)
         if objects is None:
             objects = self._bpy_object.children
+            print("objects now: ", objects)
         for obj in objects:
             if obj.name == name:
                 return obj
@@ -793,7 +798,7 @@ class AbstractComponent(object):
         Display the profile of the component on the viewport in percent.
         As Blender would for framerate and other debug-properties.
         """
-        if self._category is not 'sensors':
+        if self._category != 'sensors':
             logger.warning("profile currently supports only sensors (%s)"%self)
         for key in ["profile", "profile_action", "profile_modifiers",
                     "profile_datastreams"]:

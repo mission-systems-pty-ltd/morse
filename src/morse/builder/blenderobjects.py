@@ -1,3 +1,4 @@
+import os; print("File: ", os.path.basename(__file__), flush=True)
 import math
 from morse.builder.abstractcomponent import AbstractComponent
 from morse.builder import bpymorse
@@ -67,7 +68,7 @@ class Spot(AbstractComponent):
         self.set_blender_object(obj)
         # Emit in +X
         self.rotate(y=-math.pi/2)
-        if lamp_type is 'SPOT':
+        if lamp_type == 'SPOT':
             spot = bpymorse.get_last_lamp()
             spot.spot_size = math.pi / 2
             spot.distance = 10

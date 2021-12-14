@@ -1,4 +1,6 @@
-import logging; logger = logging.getLogger("morse." + __name__)
+import logging; logger = logging.getLogger("morse." + __name__); logger.setLevel(logging.INFO)
+import os; logger.info(os.path.basename(__file__))
+
 from abc import ABCMeta, abstractmethod
 from collections import OrderedDict
 from morse.core.abstractobject import AbstractObject

@@ -1,7 +1,7 @@
 import logging; logger = logging.getLogger("morsebuilder." + __name__)
 from morse.builder import AbstractComponent, bpymorse
 from morse.core.exceptions import *
-
+import os; print("File: ", os.path.basename(__file__), flush=True)
 class ComponentCreator(AbstractComponent):
     _classpath = None
     _blendname = None

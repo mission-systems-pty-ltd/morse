@@ -1,4 +1,5 @@
 import logging; logger = logging.getLogger("morsebuilder." + __name__)
+import os; print("File: ", os.path.basename(__file__), flush=True)
 from morse.builder.creator import ComponentCreator, ActuatorCreator
 from morse.builder.blenderobjects import *
 from morse.core.exceptions import MorseBuilderError

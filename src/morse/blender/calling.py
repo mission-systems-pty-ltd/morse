@@ -1,6 +1,6 @@
-import logging; logger = logging.getLogger("morse." + __name__)
-import os
-
+import logging; logger = logging.getLogger("morse." + __name__); logger.setLevel(logging.INFO)
+import os; logger.info(os.path.basename(__file__))
+import os; print("File: ", os.path.basename(__file__), flush=True)
 from morse.core import blenderapi
 
 """ Generic Python Module to be called by all MORSE components.

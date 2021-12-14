@@ -25,6 +25,7 @@ MORSE_MODIFIER_DICT:
 Associate a modifier function to a component.
 """
 import os
+import os; print("File: ", os.path.basename(__file__), flush=True)
 
 MORSE_COMPONENTS = os.path.join(os.getenv('MORSE_ROOT', '/usr/local'),
                                 'share', 'morse', 'data')

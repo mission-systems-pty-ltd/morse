@@ -1,3 +1,4 @@
+import os; print("File: ", os.path.basename(__file__), flush=True)
 import logging; logger = logging.getLogger("morsebuilder." + __name__)
 import sys
 import math

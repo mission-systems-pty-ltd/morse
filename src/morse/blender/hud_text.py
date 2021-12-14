@@ -1,3 +1,6 @@
+import logging; logger = logging.getLogger("morse." + __name__); logger.setLevel(logging.INFO)
+import os; logger.info(os.path.basename(__file__))
+import os; print("File: ", os.path.basename(__file__), flush=True)
 def change_text(contr):
     """ Set the desired text in the HUD """
     obj = contr.owner

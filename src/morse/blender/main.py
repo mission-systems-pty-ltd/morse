@@ -1,4 +1,6 @@
-import logging; logger = logging.getLogger("morse." + __name__)
+import logging; logger = logging.getLogger("morse." + __name__); logger.setLevel(logging.INFO)
+import os; logger.info(os.path.basename(__file__))
+print("File: ", os.path.basename(__file__), flush=True)
 from morse.helpers.morse_logging import SECTION, ENDSECTION
 import sys
 import os
@@ -25,6 +27,8 @@ from morse.core.zone import ZoneManager
 
 # Override the default Python exception handler
 def morse_excepthook(*args, **kwargs):
+    print("I ASSUME WE GOT HERE \n\n\n\n\n")
+
     logger.error("[ERROR][MORSE] Uncaught exception, quit Blender.", exc_info = tuple(args))
     # call default python exception hook
     # on Ubuntu/Python3.4 sys.excepthook is overriden by `apport_excepthook`
@@ -65,6 +69,7 @@ def no_op():
     pass
 
 def _associate_child_to_robot(obj, robot_instance, unset_default):
+    print("I ASSUME WE GOT HERE \n\n\n\n\n")
     """ Reference the link of all obj to their associated robot_instance.
         If it is an external robot_instance, unset default_action
     """
@@ -113,6 +118,7 @@ def _associate_child_to_robot(obj, robot_instance, unset_default):
 
 # Create a list of the robots in the scene
 def create_dictionaries ():
+    print("I ASSUME WE GOT HERE \n\n\n\n\n")
     """Creation of a list of all the robots and components in the scene.
        Uses the properties of the objects to determine what they are."""
 
@@ -251,6 +257,7 @@ def create_dictionaries ():
 
 
 def check_dictionaries():
+    print("I ASSUME WE GOT HERE \n\n\n\n\n")
     """ Print the contents of the robot and component dictionaries."""
     logger.info ("")
     logger.info("------------------------------------")
@@ -297,6 +304,7 @@ def check_dictionaries():
     logger.info ("")
 
 def load_datastream_manager(datastream_name):
+    print("I ASSUME WE GOT HERE \n\n\n\n\n")
     datastream_instance = persistantstorage.stream_managers.get(datastream_name, None)
     if not datastream_instance:
         kwargs = component_config.stream_manager.get(datastream_name, {})
@@ -321,6 +329,7 @@ def load_datastream_manager(datastream_name):
     return datastream_instance
 
 def link_datastreams():
+    print("I ASSUME WE GOT HERE \n\n\n\n\n")
     """ Read the configuration script (inside the .blend file)
         and assign the correct datastream and options to each component. """
     try:
@@ -372,6 +381,7 @@ def link_datastreams():
 
 
 def link_services():
+    print("I ASSUME WE GOT HERE \n\n\n\n\n")
     """ Read the configuration script (inside the .blend file)
         and assign the correct service handlers and options to each component.
     """
@@ -419,6 +429,7 @@ def link_services():
 
 
 def load_overlays():
+    print("I ASSUME WE GOT HERE \n\n\n\n\n")
     """ Read and initialize overlays from the configuration script.
     """
 
@@ -456,6 +467,7 @@ def load_overlays():
 
 
 def add_modifiers():
+    print("I ASSUME WE GOT HERE \n\n\n\n\n")
     """ Read the configuration script (inside the .blend file)
         and assign the correct data modifiers to each component. """
     try:
@@ -489,6 +501,7 @@ def add_modifiers():
     return True
 
 def init_multinode():
+    print("I ASSUME WE GOT HERE \n\n\n\n\n")
     """
     Initializes the MORSE node in a Multinode configuration.
     """
@@ -530,6 +543,7 @@ def init_multinode():
 
 class MorseSyncProcess:
     def __init__(self):
+        print("PATH I ASSUME WE GOT HERE \n\n\n\n\n")
         args = ['morse_sync', '-p', str(1.0/morse.core.blenderapi.getfrequency())]
         socket_manager = 'morse.middleware.socket_datastream.SocketDatastreamManager'
         socket_properties = component_config.stream_manager[socket_manager]
@@ -548,6 +562,7 @@ class MorseSyncProcess:
         self.proc.communicate(b"quit", timeout = None)
 
 def init(contr):
+    print("I ASSUME WE GOT HERE \n\n\n\n\n")
     """ General initialization of MORSE
 
     Here, all components, modifiers and middlewares are initialized.
@@ -616,6 +631,7 @@ def init(contr):
     #bge.logic.setPhysicsTicRate(60.0)
 
 def init_logging():
+    print("I ASSUME WE GOT HERE \n\n\n\n\n")
     from morse.core.ansistrm import ColorizingStreamHandler
 
     if "with-colors" in sys.argv:
@@ -648,6 +664,7 @@ def init_logging():
     logger.addHandler(ch)
 
 def init_supervision_services():
+    print("I ASSUME WE GOT HERE \n\n\n\n\n")
     """ This method first loads the socket service manager, map the
     virtual 'simulation' component to it, loads any other request
     manager mapped to the 'simulation' component and register all
@@ -706,6 +723,7 @@ def init_supervision_services():
 
 
 def simulation_main(contr):
+    print("I ASSUME WE GOT HERE \n\n\n\n\n")
     """ This method is called at every simulation step.
 
     We do here all homeworks to manage the simulation at whole.
@@ -742,6 +760,7 @@ def simulation_main(contr):
 
 
 def switch_camera(contr):
+    print("I ASSUME WE GOT HERE \n\n\n\n\n")
     """ Cycle through the cameras in the scene during the game.
     """
     sensor = contr.sensors['F9_KEY']
@@ -759,6 +778,7 @@ def switch_camera(contr):
 
 
 def close_all(contr):
+    print("I ASSUME WE GOT HERE \n\n\n\n\n")
     """ Close the open communication channels from middlewares
     Call the destructors of all component instances. This should also call
     the methods to close middlewares
@@ -794,6 +814,7 @@ def close_all(contr):
 
 
 def finish(contr):
+    print("I ASSUME WE GOT HERE \n\n\n\n\n")
     """ Normal exit from the Game Engine, when pressing ESC key """
     sensor = contr.sensors['ESC_KEY']
 
@@ -805,6 +826,7 @@ def finish(contr):
 
 
 def restart(contr):
+    print("I ASSUME WE GOT HERE \n\n\n\n\n")
     """ Call the Game Engine restart funcionality * DOES NOT WORK * """
     sensor = contr.sensors['F11_KEY']
 
@@ -818,6 +840,7 @@ def restart(contr):
 
 
 def quit(contr):
+    print("I ASSUME WE GOT HERE \n\n\n\n\n")
     """ Exit graciously from the simulation """
     logger.log(ENDSECTION, 'EXITING SIMULATION')
 
@@ -826,6 +849,7 @@ def quit(contr):
 
 
 def reset_objects(contr):
+    print("I ASSUME WE GOT HERE \n\n\n\n\n")
     """ Place all objects in the initial position
 
     Restore the position and rotation of objects and robots

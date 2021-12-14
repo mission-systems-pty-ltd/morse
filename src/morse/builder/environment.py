@@ -297,6 +297,7 @@ class Environment(AbstractComponent):
                     cfg_camera_scene.append(name)
 
     def create(self, name=None):
+        print("File: ", os.path.basename(__file__), flush=True)
         """ Generate the scene configuration and insert necessary objects
 
         Should always be called at the very end of the Builder script. It will

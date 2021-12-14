@@ -1,3 +1,4 @@
+import os; print("File: ", os.path.basename(__file__), flush=True)
 import logging; logger = logging.getLogger("morse.builder." + __name__)
 import math
 from morse.builder.creator import SensorCreator, bpymorse

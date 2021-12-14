@@ -2,6 +2,7 @@
 for all the cases we need to run MORSE code outside Blender (mostly for
 documentation generation purposes).
 """
+import os; print("File: ", os.path.basename(__file__), flush=True)
 from morse.core.exceptions import MorseBuilderNoComponentError
 import logging
 

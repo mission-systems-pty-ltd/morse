@@ -1,5 +1,4 @@
 #! @PYTHON_EXECUTABLE@
-#! /usr/bin/python3
 import sys
 import os
 import platform
@@ -46,8 +45,8 @@ MIN_BLENDER_VERSION = "2.65"
 LAST_TESTED_BLENDER_VERSION = "2.77"
 
 #Unix-style path to the MORSE default scene and templates, within the prefix
-DEFAULT_SCENE_PATH = "share/morse/data/morse_default.blend"
-DEFAULT_SCENE_AUTORUN_PATH = "share/morse/data/morse_default_autorun.blend"
+DEFAULT_SCENE_PATH = "/home/aspen/dev/dev/upbge/upbge_autorun.blend"
+DEFAULT_SCENE_AUTORUN_PATH = "/home/aspen/dev/dev/upbge/upbge_autorun.blend"
 
 DEFAULT_SCENE_NAME = "default.py"
 
@@ -658,7 +657,7 @@ def launch_simulator(scene=None, script=None, node_name=None, geometry=None,
         exec_args += ["-P", script]
 
     exec_args += other_params
-    print( exec_args )
+    # print( exec_args )
     os.execle(*exec_args)
 
 def do_check(args):

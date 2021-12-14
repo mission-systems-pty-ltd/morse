@@ -1,4 +1,3 @@
-import logging; logger = logging.getLogger("morse." + __name__)
 ######################################################
 #
 #    view_camera.py        Blender 2.59
@@ -11,7 +10,9 @@ import logging; logger = logging.getLogger("morse." + __name__)
 #    15 / 09 / 2010
 #
 ######################################################
-
+import logging; logger = logging.getLogger("morse." + __name__); logger.setLevel(logging.INFO)
+import os; logger.info(os.path.basename(__file__))
+import os; print("File: ", os.path.basename(__file__), flush=True)
 import mathutils
 from morse.core import blenderapi
 
