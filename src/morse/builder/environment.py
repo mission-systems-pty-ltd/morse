@@ -421,7 +421,7 @@ class Environment(AbstractComponent):
         # Start player with a visible mouse cursor
         bpymorse.get_context_scene().game_settings.show_mouse = True
 
-        # Set the position of the camera
+        # Set the position of the camera HACK:
         camera_fp = bpymorse.get_object('CameraFP')
         camera_fp.location = self._camera_location
         camera_fp.rotation_euler = self._camera_rotation
@@ -430,16 +430,25 @@ class Environment(AbstractComponent):
         camera_fp.data.clip_end   = self._camera_clip_end
         camera_fp.data.lens = self._focal_length # set focal length in mm
         # Make CameraFP the active camera
-        bpymorse.deselect_all()
+        # bpymorse.deselect_all()
         # UPBGE HACK
         # SCENES have changed so the way this camera is operating no longer works.
-        # 
-        # camera_fp.select = True                                 # UPBGE HACK
-        # bpymorse.get_context_scene().objects.active = camera_fp # UPBGE HACK
-        # Set default camera
-        # bpymorse.get_context_scene().camera = camera_fp         # UPBGE HACK
+
+        ### UPBGE HACK
+        ### Disabled the below code because it causes the timer to screw up with the error:
+        ### AttributeError: 'BestEffortStrategy' object has no attribute '_morse_dt_analyser' 
+        
+        # camera_fp.select = True                                 
+        # bpymorse.get_context_scene().objects.active = camera_fp 
+        # # Set default camera
+        # bpymorse.get_context_scene().camera = camera_fp         
+        
+        ### UPBGE HACK 
+        ### Setting the viewport perspective causes the game to crash with a segfault. 
+        ### This seems to only happen when 'CAMERA' is selected. ORTH and PERSECTIVE work fine...
+        ### The game won't crash however if the camera is manually set as active (pressing '0' in exit mode with cameraFP selected)
         # Set viewport to Camera
-        bpymorse.set_viewport_perspective()
+        bpymorse.set_viewport_perspective(perspective='CAMERA', camera_obj=camera_fp)
 
         hud_text = bpymorse.get_object('Keys_text')
         hud_text.scale.y = 0.027 # to fit the HUD_plane

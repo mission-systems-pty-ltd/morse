@@ -422,7 +422,7 @@ def set_viewport(viewport_shade='WIREFRAME', clip_end=1000):
                     space.viewport_shade = viewport_shade
                     space.clip_end = clip_end
 
-def set_viewport_perspective(perspective='CAMERA'):
+def set_viewport_perspective(perspective='CAMERA', camera_obj=None):
     """ Set the default view view_perspective
 
     Equivalent to ``bpy.ops.view3d.viewnumpad`` with good context.
@@ -435,6 +435,8 @@ def set_viewport_perspective(perspective='CAMERA'):
         if area.type == 'VIEW_3D':
             for space in area.spaces:
                 if space.type == 'VIEW_3D':
+                    if camera_obj is not None:
+                        space.camera = camera_obj
                     space.region_3d.view_perspective = perspective
 
 def fullscreen(fullscreen=True, desktop=True):
