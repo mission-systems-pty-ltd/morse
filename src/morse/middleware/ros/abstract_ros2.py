@@ -71,7 +71,8 @@ class AbstractROS(AbstractDatastream):
         """ Cleaning """
         # Unregister the topic if one exists
         if self.topic:
-            self.topic.unregister()
+            self.topic.destroy()
+            # self.topic.unregister() # There is no unregister topic in ROS2, destry node will end the node instead. 
         logger.info("ROS datastream finalize %s"%self)
 
 
