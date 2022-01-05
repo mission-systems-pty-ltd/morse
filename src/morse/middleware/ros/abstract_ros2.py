@@ -72,7 +72,6 @@ class AbstractROS(AbstractDatastream):
         # Unregister the topic if one exists
         if self.topic:
             self.topic.destroy()
-            # self.topic.unregister() # There is no unregister topic in ROS2, destry node will end the node instead. 
         logger.info("ROS datastream finalize %s"%self)
 
 
@@ -132,13 +131,13 @@ class ROSPublisherTF(ROSPublisher):
 
     def initialize(self):
         ROSPublisher.initialize(self)
-        if not ROSPublisherTF.topic_tf:
+        if not self.topic_tf:
             RosNode.__init__(self, "topic_name")
-            ROSPublisherTF.topic_tf = self.create_publisher(TransformStamped, "/tf", self.determine_queue_size())
+            self.topic_tf = self.create_publisher(TransformStamped, "/tf", self.determine_queue_size())
 
     def finalize(self):
         ROSPublisher.finalize(self)
-        ROSPublisherTF.topic_tf.unregister()
+        self.topic_tf.destroy()            
 
     def get_robot_transform(self):
         """ Get the transformation relative to the robot origin
@@ -176,7 +175,7 @@ class ROSPublisherTF(ROSPublisher):
     def publish_tf(self, message):
         """ Publish the TF data on the rostopic
         """
-        ROSPublisherTF.topic_tf.publish(message)
+        self.topic_tf.publish(message)
 
     def sendTransform(self, translation, rotation, time, child, parent):
         """
