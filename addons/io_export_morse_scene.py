@@ -32,6 +32,7 @@ morse_types = {
     "robots": "Robot",
     "sensors": "Sensor",
     "actuators": "Actuator",
+    #"feedback_actuators": "FeedbackActuator", #TODO
     "middleware": "Middleware",
     "modifiers": "Modifier",
 }

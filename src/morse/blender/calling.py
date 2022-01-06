@@ -56,3 +56,7 @@ def sensor_action(contr):
 def actuator_action(contr):
     """ Call the 'action' method of the correct actuator. """
     component_action(contr)
+
+def feedback_actuator_action(contr):
+    """ Call the 'action' method of the correct feedback_actuator. """
+    component_action(contr)

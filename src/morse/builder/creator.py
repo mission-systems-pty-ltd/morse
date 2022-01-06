@@ -119,7 +119,7 @@ class SensorCreator(ComponentCreator):
                                   blendfile = self.__class__._blendname, 
                                   make_morseable = make_morseable)
 
-
+ 
 class ActuatorCreator(ComponentCreator):
 
     def __init__(self, name = None,
@@ -134,6 +134,25 @@ class ActuatorCreator(ComponentCreator):
         ComponentCreator.__init__(self, 
                                 name, 
                                 'actuators', 
+                                action, 
+                                blendfile,
+                                blendobject,
+                                make_morseable)
+
+class FeedbackActuatorCreator(ComponentCreator):
+
+    def __init__(self, name = None,
+                       action = ComponentCreator.APPEND_EMPTY,
+                       blendfile = None,
+                       blendobject = None,
+                       make_morseable = True):
+
+        if not blendfile:
+            blendfile = self.__class__._blendname
+
+        ComponentCreator.__init__(self, 
+                                name, 
+                                'feedback_actuators', 
                                 action, 
                                 blendfile,
                                 blendobject,

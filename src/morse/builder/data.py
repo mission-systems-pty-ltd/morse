@@ -403,7 +403,11 @@ MORSE_DATASTREAM_DICT = {
             #"pocolibs": 'morse.middleware.pocolibs.sensors.viam.ViamPoster'
             }
         },
-
+    "morse.feedbackactuators.motor_and_encoder.MotorAndEncoder": {
+        "default": {
+            "socket": INTERFACE_DEFAULT_IN,
+            }
+        },
     "morse.actuators.armature.Armature": {
         "default": {
             "socket": INTERFACE_DEFAULT_IN,
