@@ -1,11 +1,6 @@
 ![MORSE logo](doc/media/morse-logo.png)
 
-# MISSION SYSTEMS INTERNAL
-Not to be redistributed.
-Mission systems additions should include a copyright notice in the header.
-
-#TODO
-Add a git hook to look for missing Mission Systems copyright notices.
+# MISSION SYSTEMS MORSE FORK
 
 MORSE: the Modular Open Robots Simulator Engine
 ===============================================
