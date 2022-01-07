@@ -48,79 +48,74 @@ class FeedbackActuator(Sensor, Actuator, morse.core.object.Object):
     # I was hoping to just run Actuator.action() & Sensor.action() but
     # That would call default action twice every tick :/
     def action(self):
-        logger.info("Running feedback actuator action")
-        print("running feedback actuator action")
-        # print(self)
-        # print(dir(self))
-        # self.default_action()
-        Actuator.action(self)
-        Sensor.action(self)
+        # Actuator.action(self)
+        # Sensor.action(self)
 
-        # """ Call the action functions that have been added to the list. """
-        # # Do nothing if this component has been deactivated
-        # if not self._active:
-        #     return
+        """ Call the action functions that have been added to the list. """
+        # Do nothing if this component has been deactivated
+        if not self._active:
+            return
 
-        # if not self.periodic_call():
-        #     return
+        if not self.periodic_call():
+            return
 
-        # # Update the component's position in the world
-        # self.position_3d.update(self.bge_object)
+        # Update the component's position in the world
+        self.position_3d.update(self.bge_object)
 
-        # self.local_data['timestamp'] = self.robot_parent.gettime()
-        # if logger.isEnabledFor(logging.DEBUG):
-        #     self.local_data['simulator_time'] = time.time()
+        self.local_data['timestamp'] = self.robot_parent.gettime()
+        if logger.isEnabledFor(logging.DEBUG):
+            self.local_data['simulator_time'] = time.time()
 
-        # received = False
-        # status = False
+        received = False
+        status = False
 
 
-        # # First the input functions
-        # for function in self.input_functions:
-        #     status = function(self)
-        #     received = received or status
+        # First the input functions
+        for function in self.input_functions:
+            status = function(self)
+            received = received or status
 
-        # if received:
-        #     # Data modification functions
-        #     for function in self.input_modifiers:
-        #         function()
+        if received:
+            # Data modification functions
+            for function in self.input_modifiers:
+                function()
 
-        # # record the time before performing the default action for profiling
-        # if self.profile:
-        #     time_before_action = time.time()
+        # record the time before performing the default action for profiling
+        if self.profile:
+            time_before_action = time.time()
 
-        # # Call the regular action function of the component
-        # self.default_action()
+        # Call the regular action function of the component
+        self.default_action()
 
-        # # record the time before calling modifiers for profiling
-        # if self.profile:
-        #     time_before_modifiers = time.time()
+        # record the time before calling modifiers for profiling
+        if self.profile:
+            time_before_modifiers = time.time()
 
-        # # Data modification functions
-        # for function in self.output_modifiers:
-        #     function()
+        # Data modification functions
+        for function in self.output_modifiers:
+            function()
 
-        # # record the time before calling datastreams for profiling
-        # if self.profile:
-        #     time_before_datastreams = time.time()
+        # record the time before calling datastreams for profiling
+        if self.profile:
+            time_before_datastreams = time.time()
 
-        # # Lastly output functions
-        # for function in self.output_functions:
-        #     function(self)
+        # Lastly output functions
+        for function in self.output_functions:
+            function(self)
 
-        # # profiling
-        # if self.profile:
-        #     time_now = time.time()
-        #     self.time["profile"] += time_now - time_before_action
-        #     self.time["profile_action"] += time_before_modifiers - time_before_action
-        #     self.time["profile_modifiers"] += time_before_datastreams - time_before_modifiers
-        #     self.time["profile_datastreams"] += time_now - time_before_datastreams
-        #     morse_time = time_now - self.time_start
-        #     for key in self.profile:
-        #         ratio = self.time[key] / morse_time
-        #         # format the display
-        #         self.bge_object[key] = "%4.1f%% %s"% (100.0 * ratio, '█' * int(10 * ratio))
-        #     if morse_time > 1: # re-init mean every sec
-        #         for key in self.profile:
-        #             self.time[key] = 0.0
-        #         self.time_start = time.time()
+        # profiling
+        if self.profile:
+            time_now = time.time()
+            self.time["profile"] += time_now - time_before_action
+            self.time["profile_action"] += time_before_modifiers - time_before_action
+            self.time["profile_modifiers"] += time_before_datastreams - time_before_modifiers
+            self.time["profile_datastreams"] += time_now - time_before_datastreams
+            morse_time = time_now - self.time_start
+            for key in self.profile:
+                ratio = self.time[key] / morse_time
+                # format the display
+                self.bge_object[key] = "%4.1f%% %s"% (100.0 * ratio, '█' * int(10 * ratio))
+            if morse_time > 1: # re-init mean every sec
+                for key in self.profile:
+                    self.time[key] = 0.0
+                self.time_start = time.time()
