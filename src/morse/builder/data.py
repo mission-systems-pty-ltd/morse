@@ -408,6 +408,11 @@ MORSE_DATASTREAM_DICT = {
             "socket": INTERFACE_DEFAULT_IN,
             }
         },
+    "morse.feedbackactuators.MotionVWDiffFeedback.MotionVWDiffFeedback": {
+        "default": {
+            "socket": INTERFACE_DEFAULT_IN,
+            }
+        },        
     "morse.actuators.armature.Armature": {
         "default": {
             "socket": INTERFACE_DEFAULT_IN,

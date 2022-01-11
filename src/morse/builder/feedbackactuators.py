@@ -11,3 +11,12 @@ class MotorAndEncoder(FeedbackActuatorCreator):
     def __init__(self, name=None):
         FeedbackActuatorCreator.__init__(self, name)
 
+ 
+class MotionVWDiffFeedback(FeedbackActuatorCreator):
+    _classpath = "morse.feedbackactuators.MotionVWDiffFeedback.MotionVWDiffFeedback"
+    _blendname = "MotionVWDiffFeedback"
+    
+    def __init__(self, name=None):
+        FeedbackActuatorCreator.__init__(self, name)
+
+ 
