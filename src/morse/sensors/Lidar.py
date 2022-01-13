@@ -1,7 +1,7 @@
 import logging; logger = logging.getLogger("morse." + __name__)
 from morse.middleware.moos import MOOSNotifier
 import morse.core.sensor
-from morse.helpers.components import add_data, add_property
+from morse.helpers.components import add_data, add_property, add_level
 from morse.core.mathutils import *
 from morse.sensors.ObjectServer import create_trigger_msg
 from math import radians, pi
@@ -16,16 +16,35 @@ class Lidar(morse.core.sensor.Sensor):
 
     # define here the data fields exported by your sensor
     # format is: field name, default initial value, type, description
+    add_level("simple", None, doc = "Simple Lidar: Defaults to a puck style beam pattern.",  default = True)    
+    add_level("OS116", "morse.sensors.Lidar.Lidar", doc = "OS1-16 beam pattern ouster.")
+    add_level("OS164", "morse.sensors.Lidar.OS116", doc = "OS1-64 lidar beam pattern.")
+
     add_data('lidar_name',     '', 'string', 'Name of this lidar device')
     add_data('lidar_status', 'ON', 'string', 'Status of this lidar device - ON/OFF')
     add_data('launch_trigger',   '',   'string', 'Information for a radar beam launch')
 
-    add_property('azimuth_width',   360.0, 'azimuth_width',   'float', 'Lidar beam width in degrees')
-    add_property('elevation_width', 180.0, 'elevation_width', 'float', 'Lidar beam height in degrees')
-    add_property('azimuth_beams',   360,   'azimuth_beams',   'int',   'Number of lidar beams in azimuth direction')
-    add_property('elevation_beams', 180,   'elevation_beams', 'int',   'Number of lidar beams in elevation direction')
-    add_property('distance_noise',  0.0,   'distance_noise',  'float', 'Distance noise in metres (1 std dev)')
-    add_property('max_range',       100.0, 'max_range',       'float', 'Lidar range in m')
+    add_property('azimuth_width',   360.0, 'azimuth_width',   'float', 'Lidar beam width in degrees', level = "simple")
+    add_property('elevation_width', 180.0, 'elevation_width', 'float', 'Lidar beam height in degrees', level = "simple")
+    add_property('azimuth_beams',   360,   'azimuth_beams',   'int',   'Number of lidar beams in azimuth direction', level = "simple")
+    add_property('elevation_beams', 180,   'elevation_beams', 'int',   'Number of lidar beams in elevation direction', level = "simple")
+    add_property('distance_noise',  0.0,   'distance_noise',  'float', 'Distance noise in metres (1 std dev)', level = "simple")
+    add_property('max_range',       100.0, 'max_range',       'float', 'Lidar range in m', level = "simple")
+
+    add_property('azimuth_width',   360.0, 'azimuth_width',   'float', 'Lidar beam width in degrees', level = "OS116")
+    add_property('elevation_width', 33.2, 'elevation_width', 'float', 'Lidar beam height in degrees', level = "OS116")
+    add_property('azimuth_beams',   512,   'azimuth_beams',   'int',   'Number of lidar beams in azimuth direction', level = "OS116")
+    add_property('elevation_beams', 16,   'elevation_beams', 'int',   'Number of lidar beams in elevation direction', level = "OS116")
+    add_property('distance_noise',  0.03,   'distance_noise',  'float', 'Distance noise in metres (1 std dev)', level = "OS116")
+    add_property('max_range',       120, 'max_range',       'float', 'Lidar range in m', level = "OS116")
+
+    add_property('azimuth_width',   360.0, 'azimuth_width',   'float', 'Lidar beam width in degrees', level = "OS164")
+    add_property('elevation_width', 33.2, 'elevation_width', 'float', 'Lidar beam height in degrees', level = "OS164")
+    add_property('azimuth_beams',   512,   'azimuth_beams',   'int',   'Number of lidar beams in azimuth direction', level = "OS164")
+    add_property('elevation_beams', 64,   'elevation_beams', 'int',   'Number of lidar beams in elevation direction', level = "OS164")
+    add_property('distance_noise',  0.03,   'distance_noise',  'float', 'Distance noise in metres (1 std dev)', level = "OS164")
+    add_property('max_range',       120, 'max_range',       'float', 'Lidar range in m', level = "OS164")
+
     add_property('send_json',       True,  'send_json',       'bool',  'Send small messages as json')
 
     def __init__(self, obj, parent=None):
@@ -99,6 +118,20 @@ class Lidar(morse.core.sensor.Sensor):
             self.local_data['launch_trigger'].elevationFov = pi * self.elevation_width / 180.0
             self.local_data['launch_trigger'].elevationFov = self.distance_noise
 
+
+class OS116(Lidar):
+    def __init__():
+        ### Checks here
+        Lidar.__init__()
+
+    def default():
+        # Lidar.default()
+        
+
+
+
+
+# TODO: This should be in the middleware folder...
 class LidarNotifier(MOOSNotifier):
     """ Notify Lidar """
 

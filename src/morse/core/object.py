@@ -172,7 +172,7 @@ class Object(AbstractObject):
         all_properties = self.fetch_properties()
 
         for name, details in all_properties.items():
-            default_value, _, _, python_name = details
+            default_value, _, _, python_name, _ = details
             val = default_value
 
             try:

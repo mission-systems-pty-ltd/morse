@@ -60,7 +60,7 @@ def add_data(name, default_value, type = "", doc = "(no documentation available 
         level = [level]
     _set_cls_value('_data_fields', name, (default_value, type, doc, level))
 
-def add_property(python_name, default_value, name, type = "", doc = "(no documentation available yet)"):
+def add_property(python_name, default_value, name, type = "", doc = "(no documentation available yet)", level = "all"):
     """ Add a property to the current class of component
 
     :param python_name: name of the Python variable. It will be
@@ -73,5 +73,6 @@ def add_property(python_name, default_value, name, type = "", doc = "(no documen
     :param type: type of the property, for documentation
     :param doc: description of the property.
     """
-
-    _set_cls_value('_properties', name, (default_value, type, doc, python_name))
+    if isinstance(level, str) and level is not "all":
+        level = [level]
+    _set_cls_value('_properties', name, (default_value, type, doc, python_name, level))
