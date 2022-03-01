@@ -46,18 +46,9 @@ class Bf21(GroundRobot):
         self.append(self.dvl)
 
         self.gps = GPS()
-<<<<<<< HEAD
-        self.append(self.gps)
-
-
-
-
-
-=======
         self.gps.level('raw')
         self.append(self.gps)
 
->>>>>>> master
     ###################################
     # Comms functions
     ###################################
@@ -81,10 +72,7 @@ class Bf21(GroundRobot):
 
         self.gps.add_stream('moos',
             moos_host=moos_host, moos_port=moos_port, moos_name=moos_name)
-<<<<<<< HEAD
-=======
             # GPSRawNotifier
->>>>>>> master
 
     def set_ros(self, namespace=""):
         

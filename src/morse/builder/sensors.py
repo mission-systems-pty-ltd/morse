@@ -822,8 +822,6 @@ class Optixcamera(SensorCreator):
         SensorCreator.__init__(self, name)
         # May need to include a .blend file at some point
 
-<<<<<<< HEAD
-=======
 class CameraSim(SensorCreator):
     _classpath = "morse.sensors.CameraSim.CameraSim"
     _blendname = "camera"
@@ -832,7 +830,6 @@ class CameraSim(SensorCreator):
         SensorCreator.__init__(self, name)
         self.append_meshes(None, 'sensors/camera.blend')
 
->>>>>>> master
 class DVL(SensorCreator):
     _classpath = "morse.sensors.Dvl.DVL"
     _blendname = "DVL"
@@ -851,10 +848,6 @@ class Sonar(SensorCreator):
         SensorCreator.__init__(self, name)
         self.append_meshes(None,'beam')
  
-<<<<<<< HEAD
-=======
-
->>>>>>> master
 class FLS(SensorCreator):
     _classpath = "morse.sensors.Fls.FLS"
     _short_desc = "Forward looking sonar"
@@ -863,8 +856,6 @@ class FLS(SensorCreator):
     def __init__(self, name=None):
         SensorCreator.__init__(self, name)
 
-<<<<<<< HEAD
-=======
 class RangeSensor(SensorCreator):
     _classpath = "morse.sensors.range_sensor.RangeSensor"
     _short_desc = "Range sensor"
@@ -872,7 +863,6 @@ class RangeSensor(SensorCreator):
 
     def __init__(self, name=None):
         SensorCreator.__init__(self, name)
->>>>>>> master
  
 class MultiStaticSonar(SensorCreator):
     _classpath  = "morse.sensors.MultiStaticSonar.MultiStaticSonar"
