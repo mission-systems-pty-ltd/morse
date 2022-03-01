@@ -1,16 +1,11 @@
 import logging; logger = logging.getLogger("morse." + __name__)
-
+from morse.middleware.moos import MOOSNotifier
 import morse.core.sensor
-
-from morse.core.services import service, async_service
-from morse.core import status
 from morse.helpers.components import add_data, add_property
 from morse.core.mathutils import *
+from morse.sensors.ObjectServer import create_trigger_msg
 from math import radians, pi
-import numpy as np
 import json
-
-from morse.core import blenderapi
 
 class Lidar(morse.core.sensor.Sensor):
     """Write here the general documentation of your sensor.
@@ -21,17 +16,17 @@ class Lidar(morse.core.sensor.Sensor):
 
     # define here the data fields exported by your sensor
     # format is: field name, default initial value, type, description
-    add_data('lidar_pose',     '', 'string', 'Position and orientation of Lidar beam')
-    add_data('lidar_view',     '', 'string', 'Position and orientation of lidar view')
     add_data('lidar_name',     '', 'string', 'Name of this lidar device')
     add_data('lidar_status', 'ON', 'string', 'Status of this lidar device - ON/OFF')
+    add_data('launch_trigger',   '',   'string', 'Information for a radar beam launch')
 
-    add_property('azimuth_width',   100.0, 'Beam_width_azimuth',     'float', 'Lidar beam width in degrees')
-    add_property('elevation_width', 40.0,  'Beam_width_elevation',   'float', 'Lidar beam height in degrees')
-    add_property('azimuth_beams',   100,   'Number_beams_azimuth',   'int',   'Number of lidar beams in azimuth direction')
-    add_property('elevation_beams', 40,    'Number_beams_elevation', 'int',   'Number of lidar beams in elevation direction')
-    add_property('lidar_type',      0,     'Lidar_type',             'int',   'Integer value specifying the lidar type')
-    add_property('max_range',       100.0, 'Max_range',              'float', 'Lidar range in m')
+    add_property('azimuth_width',   360.0, 'azimuth_width',   'float', 'Lidar beam width in degrees')
+    add_property('elevation_width', 180.0, 'elevation_width', 'float', 'Lidar beam height in degrees')
+    add_property('azimuth_beams',   360,   'azimuth_beams',   'int',   'Number of lidar beams in azimuth direction')
+    add_property('elevation_beams', 180,   'elevation_beams', 'int',   'Number of lidar beams in elevation direction')
+    add_property('distance_noise',  0.0,   'distance_noise',  'float', 'Distance noise in metres (1 std dev)')
+    add_property('max_range',       100.0, 'max_range',       'float', 'Lidar range in m')
+    add_property('send_json',       True,  'send_json',       'bool',  'Send small messages as json')
 
     def __init__(self, obj, parent=None):
         logger.info("%s initialization" % obj.name)
@@ -80,49 +75,40 @@ class Lidar(morse.core.sensor.Sensor):
 
         if self.local_data['lidar_status'] == 'OFF':
             return # No data if lidar is OFF
+        
+        pos = self.bge_object.worldPosition
+        rotation = self.bge_object.worldOrientation.copy()
+            
+        if self.send_json:
+            self.local_data['launch_trigger'] = {}
+            self.local_data['launch_trigger']['launch_trigger'] = create_trigger_msg(pos, rotation, self.azimuth_beams,
+                                                                                    self.elevation_beams, 1, True)
+            self.local_data['launch_trigger']['max_range'] = self.max_range
+            self.local_data['launch_trigger']['azimuth_fov'] = pi * self.azimuth_width / 180.0
+            self.local_data['launch_trigger']['elevation_fov'] = pi * self.elevation_width / 180.0
+            self.local_data['launch_trigger']['distance_noise'] = self.distance_noise
+        else:
+            import sys
+            sys.path.extend(["/usr/local/share", "/usr/local/share/lidarsim"])
+            import lidarsim_capnp as lidarsim
+            self.local_data['launch_trigger'] = lidarsim.LidarsimLaunchTrigger.new_message()
+            self.local_data['launch_trigger'].launchTrigger = create_trigger_msg(pos, rotation, self.azimuth_beams,
+                                                                                 self.elevation_beams, 1, False)
+            self.local_data['launch_trigger'].maxRange = self.max_range
+            self.local_data['launch_trigger'].azimuthFov = pi * self.azimuth_width / 180.0
+            self.local_data['launch_trigger'].elevationFov = pi * self.elevation_width / 180.0
+            self.local_data['launch_trigger'].distanceNoise = self.distance_noise
 
-        # Lidar pose
-        lidar_pos = self.bge_object.worldPosition
-        lidar_mat = self.bge_object.worldOrientation
+class LidarNotifier(MOOSNotifier):
+    """ Notify Lidar """
 
-        lidar_pose = {
-           'lidar_name' : self.local_data['lidar_name'],
-           'max_range'  : self.max_range,
-           'azim_width' : self.azimuth_width,
-           'elev_width' : self.elevation_width,
-           'azim_beams' : self.azimuth_beams,
-           'elev_beams' : self.elevation_beams,
-           'lidar_type' : self.lidar_type,
-           'pos'        : list(lidar_pos),
-           'X'          : list(lidar_mat.col[1]),
-           'Y'          : list(lidar_mat.col[2]),
-           'Z'          : list(lidar_mat.col[0]),
-        }
+    def default(self, ci = 'unused'):
+        launch_trigger = self.data['launch_trigger']
+        msg_name = self.data['lidar_name'] + '_TRIGGER'
+        if isinstance(launch_trigger, dict):
+            self.notify(msg_name, json.dumps(launch_trigger))
+        else:
+            self._comms.notify_binary(msg_name, launch_trigger.to_bytes())
 
-        # Ray trace with the current lidar beam pose
-        self.local_data['lidar_pose'] = json.dumps(lidar_pose)
-
-        # Figure out which camera is active and
-        # publish its position and view vector.
-        camera = self.scene.active_camera
-        pos = camera.worldPosition
-        mat = camera.worldOrientation
-
-        X = list(mat.col[0])
-        Y = list(mat.col[1])
-        Z = list(mat.col[2])
-
-        # Z-axes reversed for some reason...
-        Z = [-z for z in Z]
-
-        lidar_view = {
-           'camera' : camera.name, 
-           'pos'    : list(pos),
-           'X'      : X,
-           'Y'      : Y,
-           'Z'      : Z,
-        }
-
-        # Point cloud view will be active camera view
-        self.local_data['lidar_view'] = json.dumps(lidar_view)
-
+    def update_morse_data(self):
+        logger.debug('lidarNotifier.update_morse_data() called.')
