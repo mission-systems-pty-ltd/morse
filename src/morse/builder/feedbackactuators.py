@@ -19,4 +19,10 @@ class MotionVWDiffFeedback(FeedbackActuatorCreator):
     def __init__(self, name=None):
         FeedbackActuatorCreator.__init__(self, name)
 
- 
+class ForceVWDrive(FeedbackActuatorCreator):
+    _classpath = "morse.feedbackactuators.force_driven_vw_drive.ForceVWDrive"
+    _blendname = "ForceVWDrive"
+    
+    def __init__(self, name=None):
+        FeedbackActuatorCreator.__init__(self, name)
+
