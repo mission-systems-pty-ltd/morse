@@ -43,8 +43,6 @@ class IntegratedToNED(OdometryFrameModifier):
             self.data['yaw']   = -self.data['yaw'] + radians(90)
             self.data['yaw'] = self.constrain_angle(self.data['yaw'])
 
-            print(self.data['yaw'])
-
             self.data['vx'] =  self.data['vx']
             self.data['vy'] = -self.data['vy']
             self.data['vz'] = -self.data['vz']
