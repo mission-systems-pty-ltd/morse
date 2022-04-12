@@ -58,8 +58,8 @@ class ForceVWDrive(morse.core.feedbackactuator.FeedbackActuator):
         vx = self.local_data["v"]
         vw = self.local_data["w"]        
 
-        print("v: ", vx)
-        print("w: ", vw)
+        # print("v: ", vx)
+        # print("w: ", vw)
 
         # Another formula for computing left and right wheel speeds:
         # http://www.uta.edu/utari/acs/jmireles/Robotics/KinematicsMobileRobots.pdf
@@ -88,8 +88,8 @@ class ForceVWDrive(morse.core.feedbackactuator.FeedbackActuator):
                 self.robot.applyImpulse(self.robot.position, (0.0, 0.0, 0.000001))
             self._stopped = False
 
-        print("vel: ", vel)
-        print("angular_vel: ", angular_vel)
+        # print("vel: ", vel)
+        # print("angular_vel: ", angular_vel)
 
         computed_vx = self.pid_v.update(vel)
         computed_vw = self.pid_w.update(angular_vel)
@@ -107,8 +107,8 @@ class ForceVWDrive(morse.core.feedbackactuator.FeedbackActuator):
         if (abs(v_ws_r) > self.wheel_f_limit): 
             v_ws_r = math.copysign(self.wheel_f_limit, v_ws_r)
 
-        print("v_ws_l: ", v_ws_l, " Error: ", self.pid_v._last_error, " integrator: ", self.pid_v._integrator)
-        print("v_ws_r: ", v_ws_r, " Error: ", self.pid_w._last_error, " integrator: ", self.pid_w._integrator)
+        # print("v_ws_l: ", v_ws_l, " Error: ", self.pid_v._last_error, " integrator: ", self.pid_v._integrator)
+        # print("v_ws_r: ", v_ws_r, " Error: ", self.pid_w._last_error, " integrator: ", self.pid_w._integrator)
 
         vehicle.applyEngineForce( v_ws_r / 2.0, self.wheels["FR"] )
         vehicle.applyEngineForce( v_ws_r / 2.0, self.wheels["RR"] )
