@@ -30,7 +30,6 @@ class Tracker(morse.core.actuator.Actuator):
 
         # Get every bge object in the scene
         self.objs = blenderapi.scene().objects
-        
     
         # Get the water surface object
         try:
@@ -45,7 +44,10 @@ class Tracker(morse.core.actuator.Actuator):
             self.target_idx = 0
             self.set_target() 
 
-
+        # Useful if you want the camera to stay in the same position relative to a robot
+        self.camera_locked = False
+        self.prev_target_pos = self.target_obj.worldPosition
+        self.locked_relative_position = self.get_relative_camera_position()
 
         logger.info('Component initialized, runs at %.2f Hz', self.frequency)
 
@@ -66,33 +68,38 @@ class Tracker(morse.core.actuator.Actuator):
             return # Not ready yet!
 
         # # Loop through the game objects to choose which one to track
+        keyboard = blenderapi.keyboard()
+        is_actived = blenderapi.input_just_activated()
         if self.multiple_targets:
-            keyboard = blenderapi.keyboard()
-            is_actived = blenderapi.input_just_activated()
-            
             if keyboard.events[blenderapi.LEFTARROWKEY] == is_actived:
                 self.set_target("prev")
             if keyboard.events[blenderapi.RIGHTARROWKEY] == is_actived:
                 self.set_target("next")
+        
+        if keyboard.events[blenderapi.LKEY] == is_actived:
+            self.toggle_locked_camera()
 
-        # Figure out which camera is active and
-        # publish its position and view vector.
-        camera = self.scene.active_camera
-        pos = camera.worldPosition
-        mat = camera.worldOrientation
+        if self.camera_locked:
+            self.scene.active_camera.worldPosition = self.target_obj.worldPosition + self.locked_relative_position
+        else:
+            # Figure out which camera is active and
+            # publish its position and view vector.
+            camera = self.scene.active_camera
+            pos = camera.worldPosition
+            mat = camera.worldOrientation
 
-        # Get target object position
-        target = self.target_obj.worldPosition
-        speed = self.target_obj.worldLinearVelocity.length
+            # Get target object position
+            target = self.target_obj.worldPosition
+            speed = self.target_obj.worldLinearVelocity.length
 
-        direction = target - pos
-        distance = direction.length
-        rot_quat = direction.to_track_quat('-Z', 'Y')
+            direction = target - pos
+            distance = direction.length
+            rot_quat = direction.to_track_quat('-Z', 'Y')
 
-        camera.worldOrientation = rot_quat
+            camera.worldOrientation = rot_quat
 
-        if distance > self.standoff:
-            camera.worldPosition += delta_t * speed * direction/direction.length
+            if distance > self.standoff:
+                camera.worldPosition += delta_t * speed * direction/direction.length
 
 
 
@@ -107,7 +114,6 @@ class Tracker(morse.core.actuator.Actuator):
             if self.target_idx > (self.num_targets-1):
                 self.target_idx = 0
             self.target_obj = self.objs[ self.targets["robots"][ self.target_idx ] ] #objs[self.target]
-
             self.update_camera_position()
 
         elif key == "prev":
@@ -116,18 +122,31 @@ class Tracker(morse.core.actuator.Actuator):
             if self.target_idx < 0:
                 self.target_idx = self.num_targets-1
             self.target_obj = self.objs[ self.targets["robots"][ self.target_idx ] ] #objs[self.target]
-
             self.update_camera_position()
         else: 
             print("Error getting next target")
-
 
     def update_camera_position(self):
         # Move the camera so that it has the same offset to the new robot
         # that it had to the old robot
         self.prev_target_pos = self.prev_target_obj.worldPosition
-        camera_pos = self.scene.active_camera.worldPosition
-        relative_position = camera_pos - self.prev_target_pos
-
         new_target_pos = self.target_obj.worldPosition
-        self.scene.active_camera.worldPosition = new_target_pos + relative_position
+
+        if self.camera_locked:
+            self.scene.active_camera.worldPosition = new_target_pos + self.locked_relative_position
+        else:
+            relative_position = self.get_relative_camera_position()        
+            self.scene.active_camera.worldPosition = new_target_pos + relative_position
+
+    def get_relative_camera_position(self):
+        camera_pos = self.scene.active_camera.worldPosition
+        relative_position = camera_pos - self.target_obj.worldPosition
+        return relative_position
+
+    def toggle_locked_camera(self):
+        self.camera_locked = not self.camera_locked 
+        self.locked_relative_position = self.get_relative_camera_position()
+        if self.camera_locked:
+            print("Camera position locked, press 'L' to unlock.")
+        else:
+            print("Camera position unlocked, press 'L' to lock.")
