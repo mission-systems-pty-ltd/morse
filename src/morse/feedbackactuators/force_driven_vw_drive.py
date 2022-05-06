@@ -19,7 +19,7 @@ class ForceVWDrive(morse.core.feedbackactuator.FeedbackActuator):
     add_data('brake', 0.0, "float", 'The force applied to the brake. It opposes to the force.')
 
     add_property('kp_v',      800.0,   'kp_v',       'float', 'PID linear velocity proportional gain')
-    add_property('ki_v',      1.0,     'ki_v',       'float', 'PID linear velocity integral gain')
+    add_property('ki_v',      1.0,     'ki_v',       'float', 'PID linear velocity integral gain') 
     add_property('kd_v',      100.0,   'kd_v',       'float', 'PID linear velocity differential gain')
     add_property('i_limit_v', 1000.0,  'i_limit_v',  'float', 'PID linear velocity integrator limit')
 
@@ -55,19 +55,19 @@ class ForceVWDrive(morse.core.feedbackactuator.FeedbackActuator):
         if delta_t == 0:
             return
 
-        vx = self.local_data["v"]
-        vw = self.local_data["w"]        
+        vx = self.local_data["v"] / 2.0
+        vw = self.local_data["w"] / 2.0        
 
         # print("v: ", vx)
         # print("w: ", vw)
 
         # Another formula for computing left and right wheel speeds:
         # http://www.uta.edu/utari/acs/jmireles/Robotics/KinematicsMobileRobots.pdf
-        v_ws_l = vx - (self.track_width / 2.0) * vw
-        v_ws_r = vx + (self.track_width / 2.0) * vw
+        v_ws_l = vx - (self.track_width / 2.0) * vw 
+        v_ws_r = vx + (self.track_width / 2.0) * vw 
         # convert to angular speeds
-        w_ws_l =   -1.0 * v_ws_l / self.wheel_radius
-        w_ws_r =   -1.0 * v_ws_r / self.wheel_radius
+        w_ws_l = -1.0 * v_ws_l / self.wheel_radius
+        w_ws_r = -1.0 * v_ws_r / self.wheel_radius
 
         """ Apply (steer, force) to the parent robot. """
         vehicle = self.robot_parent.vehicle
