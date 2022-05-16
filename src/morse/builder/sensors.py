@@ -883,3 +883,11 @@ class SoccerBall(AbstractComponent):
        AbstractComponent.__init__(self, name)
        self.append_meshes(['modem'])
 
+
+class GenericTarget(SensorCreator):
+    _classpath = "morse.sensors.generic_target.GenericTarget"
+    _short_desc = "Tracks all objects in a scene with a target property."
+    _blendname = "GenericTarget"
+
+    def __init__(self, name=None):
+        SensorCreator.__init__(self, name)
