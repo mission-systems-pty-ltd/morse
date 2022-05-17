@@ -12,18 +12,6 @@ class GenericTarget(morse.core.sensor.Sensor):
     _name = "GenericTarget"
 
     add_data('targets', None, "json", 'List of all targets in the scene')    
-    # add_data('x', 0.0, "float",
-    #          'x coordinate of the sensor, in world coordinate, in meter')
-    # add_data('y', 0.0, "float",
-    #          'y coordinate of the sensor, in world coordinate, in meter')
-    # add_data('z', 0.0, "float",
-    #          'z coordinate of the sensor, in world coordinate, in meter')
-    # add_data('yaw', 0.0, "float",
-    #          'rotation around the Z axis of the sensor, in radian')
-    # add_data('pitch', 0.0, "float",
-    #          'rotation around the Y axis of the sensor, in radian')
-    # add_data('roll', 0.0, "float",
-    #          'rotation around the X axis of the sensor, in radian')
 
     def __init__(self, obj, parent=None):
         """ Constructor method.
@@ -53,17 +41,11 @@ class GenericTarget(morse.core.sensor.Sensor):
 
 
     def default_action(self):
-        """ Get the x, y, z, yaw, pitch and roll of the blender object. """
-        
         for target in self.target_objects:
             position = {}
             position['x'] = target.localPosition.x 
             position['y'] = target.localPosition.y 
             position['z'] = target.localPosition.z
-            # type = {}
-            # type['type']
             self.local_data['targets'][target.name] = {}
             self.local_data['targets'][target.name]['position'] = position
-            self.local_data['targets'][target.name]['type'] = target['target']
-
-        # print(self.local_data['targets'])
+            self.local_data['targets'][target.name]['label'] = target['target']
