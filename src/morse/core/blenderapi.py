@@ -43,6 +43,7 @@ IKEY = None
 JKEY = None
 KKEY = None
 LKEY = None
+MKEY = None
 NKEY = None
 OKEY = None
 QKEY = None
@@ -83,6 +84,7 @@ if not fake:
     JKEY = bge.events.JKEY
     KKEY = bge.events.KKEY
     LKEY = bge.events.LKEY
+    MKEY = bge.events.MKEY
     NKEY = bge.events.NKEY
     OKEY = bge.events.OKEY
     QKEY = bge.events.QKEY
