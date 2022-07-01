@@ -9,6 +9,60 @@ from morse.core import blenderapi
 from morse.core.mathutils import *
 import time 
 
+def keyboard_key_from_string(key_string):
+    if (key_string == "A"):
+        return blenderapi.AKEY
+    elif (key_string == "B"):
+        return blenderapi.BKEY
+    elif (key_string == "C"):
+        return blenderapi.CKEY
+    elif (key_string == "D"):
+        return blenderapi.DKEY
+    elif (key_string == "E"):
+        return blenderapi.EKEY
+    elif (key_string == "F"):
+        return blenderapi.FKEY
+    elif (key_string == "G"):
+        return blenderapi.GKEY
+    elif (key_string == "H"):
+        return blenderapi.HKEY
+    elif (key_string == "I"):
+        return blenderapi.IKEY
+    elif (key_string == "J"):
+        return blenderapi.JKEY
+    elif (key_string == "K"):
+        return blenderapi.KKEY
+    elif (key_string == "L"):
+        return blenderapi.LKEY
+    elif (key_string == "M"):
+        return blenderapi.MKEY
+    elif (key_string == "N"):
+        return blenderapi.NKEY
+    elif (key_string == "O"):
+        return blenderapi.OKEY
+    elif (key_string == "P"):
+        return blenderapi.PKEY
+    elif (key_string == "Q"):
+        return blenderapi.QKEY
+    elif (key_string == "R"):
+        return blenderapi.RKEY
+    elif (key_string == "S"):
+        return blenderapi.SKEY
+    elif (key_string == "T"):
+        return blenderapi.TKEY
+    elif (key_string == "U"):
+        return blenderapi.UKEY
+    elif (key_string == "V"):
+        return blenderapi.VKEY
+    elif (key_string == "W"):
+        return blenderapi.WKEY
+    elif (key_string == "X"):
+        return blenderapi.XKEY
+    elif (key_string == "Y"):
+        return blenderapi.YKEY
+    elif (key_string == "Z"):
+        return blenderapi.ZKEY
+
 class Tracker(morse.core.actuator.Actuator):
     """Write here the general documentation of your actuator.
     It will appear in the generated online documentation.
@@ -20,6 +74,7 @@ class Tracker(morse.core.actuator.Actuator):
     # format is: field name, initial value, type, description
     add_property('target',  ['robot'], 'Target',   'string', 'Target object for camera tracker')
     add_property('standoff', 10,    'Standoff', 'float',  'Standoff distance for camera tracker')
+    add_property('lock_cam_key', "L",    'lock_cam_key', 'String',  'Keyboard key to lock/unlock the camera position')
 
     def __init__(self, obj, parent=None ):
         logger.info("%s initialization" % obj.name)
@@ -43,6 +98,8 @@ class Tracker(morse.core.actuator.Actuator):
         if self.multiple_targets:
             self.target_idx = 0
             self.set_target() 
+
+        self.lock_key = keyboard_key_from_string(self.lock_cam_key)
 
         # Useful if you want the camera to stay in the same position relative to a robot
         self.camera_locked = False
@@ -76,7 +133,7 @@ class Tracker(morse.core.actuator.Actuator):
             if keyboard.events[blenderapi.RIGHTARROWKEY] == is_actived:
                 self.set_target("next")
         
-        if keyboard.events[blenderapi.LKEY] == is_actived:
+        if keyboard.events[self.lock_key] == is_actived:
             self.toggle_locked_camera()
 
         if self.camera_locked:
@@ -147,6 +204,6 @@ class Tracker(morse.core.actuator.Actuator):
         self.camera_locked = not self.camera_locked 
         self.locked_relative_position = self.get_relative_camera_position()
         if self.camera_locked:
-            print("Camera position locked, press 'L' to unlock.")
+            print("Camera position locked, press '"+self.lock_cam_key+"' to unlock.")
         else:
-            print("Camera position unlocked, press 'L' to lock.")
+            print("Camera position unlocked, press '"+self.lock_cam_key+"' to lock.")
