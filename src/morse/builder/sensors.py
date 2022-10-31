@@ -695,18 +695,19 @@ class OS1(SensorCreator):
     _blendname  = "lidar"
     _name = "OS1 Lidar"
 
-    def __init__(self, name="os1", channels=16, horizontal_beams=512, frequency=10):
+    def __init__(self, name="os1", generation=1, channels=16, horizontal_beams=512, frequency=10):
         SensorCreator.__init__(self, name)
         self.append_meshes(['lidar'])
 
         # Check that the lidar has a valid configuration
+        assert(generation == 1 or generation == 2)
         assert(channels == 16 or channels == 32 or channels == 64 or channels == 128)
         assert(horizontal_beams == 512 or horizontal_beams == 1024 or horizontal_beams == 2048)
         assert(frequency == 10 or frequency == 20)
 
         # Set properties
         self.properties(azimuth_width = 360)
-        if channels == 128:
+        if generation == 2 or channels == 128:
             self.properties(elevation_width = 45)
         else:
             self.properties(elevation_width = 33.2)
