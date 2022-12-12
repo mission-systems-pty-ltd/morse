@@ -14,6 +14,8 @@ from std_msgs.msg import String, Header
 from geometry_msgs.msg import TransformStamped
 from morse.middleware import AbstractDatastream
 from morse.core.blenderapi import persistantstorage
+from tf2_ros import TransformBroadcaster
+from tf2_ros import StaticTransformBroadcaster
 
 try:
     import mathutils
@@ -127,17 +129,25 @@ class ROSPublisher(AbstractROS, RosNode):
 
 class ROSPublisherTF(ROSPublisher):
     """ Base class for all ROS Publishers with TF support """
-    topic_tf = None
+    broadcaster = None
 
-    def initialize(self):
+    def initialize(self, type="dynamic"):
+        self.type = type
+        self.transform_sent = False
         ROSPublisher.initialize(self)
-        if not self.topic_tf:
+        if not self.broadcaster:
             RosNode.__init__(self, "topic_name")
-            self.topic_tf = self.create_publisher(TransformStamped, "/tf", self.determine_queue_size())
+            if self.type == "static":
+                self.broadcaster = StaticTransformBroadcaster(self)
+            elif self.type == "dynamic":
+                self.broadcaster = TransformBroadcaster(self)
+            else:
+                logger.error("ERROR. Invalid transform type. Must be either Static or Dynamic.")
+                raise error
 
     def finalize(self):
         ROSPublisher.finalize(self)
-        self.topic_tf.destroy()            
+        self.broadcaster.destroy()            
 
     def get_robot_transform(self):
         """ Get the transformation relative to the robot origin
@@ -149,7 +159,10 @@ class ROSPublisherTF(ROSPublisher):
 
     def publish_with_robot_transform(self, message):
         self.publish(message)
-        self.send_transform_robot(message.header.stamp, message.header.frame_id)
+        
+        if (not self.transform_sent==True or self.type == "dynamic"):
+            self.send_transform_robot(message.header.stamp, message.header.frame_id)
+            self.transform_sent = True
 
     def send_transform_robot(self, time=None, child=None, parent=None):
         """ Send the transformation relative to the robot
@@ -175,7 +188,7 @@ class ROSPublisherTF(ROSPublisher):
     def publish_tf(self, message):
         """ Publish the TF data on the rostopic
         """
-        self.topic_tf.publish(message)
+        self.broadcaster.sendTransform(message)
 
     def sendTransform(self, translation, rotation, time, child, parent):
         """
