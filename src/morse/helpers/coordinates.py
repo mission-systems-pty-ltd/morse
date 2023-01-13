@@ -49,7 +49,8 @@ class CoordinateConverter:
                     CoordinateConverter(latitude, longitude, altitude, 
                                         angle_against_east)
             except KeyError as e:
-                logger.error("Missing environment parameter %s\n", e)
+                logger.error("\033[0;31m Missing environment parameter %s\u001b[0m", e)
+                logger.error("\033[0;31m Maybe try adding env.properties(latitude = X, longitude = X, altitude = X) to your launch file.")
 
         return CoordinateConverter._instance
 

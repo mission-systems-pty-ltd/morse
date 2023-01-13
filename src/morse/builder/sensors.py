@@ -620,7 +620,55 @@ class Airspeed(SensorCreator):
 
 
 # ----------------- Mission systems additions -----------------------
-#
+
+class TeleportingCamera(VideoCamera):
+    _classpath  = "morse.sensors.video_camera.TeleportingCamera"
+    _short_desc = "Teleporting Camera"
+    _blendname  = "camera"
+    _name = "teleporting camera"
+
+    def __init__(self, name=None):
+        super().__init__(name=name)
+
+# Shortcut class to make a Teleporting ROS camera
+class TeleportingROSCamera(TeleportingCamera):
+    _short_desc = "Teleporting ROS Camera"
+    _name = "teleporting ROS camera"
+
+    # Note that from image_topic_base, the image will be "<image_topic_base>/image" and camera info will be
+    # "<image_topic_base>/camera_info"
+    def __init__(self, name=None, pose_topic='/morse/teleporting_camera/pose', \
+                 image_topic_base='/morse/teleporting_camera', image_frame_id='morse_teleporting_camera', \
+                 parent_frame_id='map'):
+        super().__init__(name=name)
+        if not image_frame_id:
+            image_frame_id = 'morse_teleporting_camera'
+        self.add_stream('ros', 'morse.middleware.ros.video_camera.TeleportingCameraPublisher', \
+                        topic=image_topic_base, frame_id=image_frame_id, parent_frame_id=parent_frame_id)
+        self.add_stream('ros', 'morse.middleware.ros.read_pose.PoseToQueueReader', topic=pose_topic)
+
+class TeleportingSemanticCamera(SemanticCamera):
+    _classpath  = "morse.sensors.semantic_camera.TeleportingSemanticCamera"
+    _short_desc = "Teleporting Semantic Camera"
+    _blendname  = "camera"
+    _name = "teleporting semantic camera"
+
+    def __init__(self, name=None):
+        super().__init__(name=name)
+
+# Shortcut class to make a Teleporting ROS camera
+class TeleportingROSSemanticCamera(TeleportingSemanticCamera):
+    _short_desc = "Teleporting ROS Semantic Camera"
+    _name = "teleporting ROS semantic camera"
+
+    def __init__(self, name=None, pose_topic='/morse/teleporting_semantic_camera/pose',
+            objects_topic='/morse/teleporting_semantic_camera/objects', frame_id='morse_teleporting_semantic_camera',
+            parent_frame_id='map'):
+        super().__init__(name=name)
+        self.add_stream('ros', 'morse.middleware.ros.semantic_camera.TeleportingSemanticCameraPublisher', \
+                        topic=objects_topic, frame_id=frame_id, parent_frame_id=parent_frame_id)
+        self.add_stream('ros', 'morse.middleware.ros.read_pose.PoseToQueueReader', topic=pose_topic)
+
 class Lidar(SensorCreator):
     _classpath  = "morse.sensors.Lidar.Lidar"
     _short_desc = "Configurable lidar beam"
@@ -632,14 +680,142 @@ class Lidar(SensorCreator):
         #self.append_meshes(None,'vertiia_sim/sensors/lidar.blend')
         self.append_meshes(['lidar'])
 
+class Radar(SensorCreator):
+    _classpath = "morse.sensors.Radar.Radar"
+    _short_desc = "Configurable radar beam"
+    _blendname  = "beam"
+    _name = "Radar"
+
+    def __init__(self, name=None):
+        SensorCreator.__init__(self, name)
+        self.append_meshes(None, 'sensors/beam.blend')
+
+class OS1(SensorCreator):
+    _classpath  = "morse.sensors.Lidar.Lidar"
+    _short_desc = "Ouster 1 Lidar"
+    _blendname  = "lidar"
+    _name = "OS1 Lidar"
+
+    def __init__(self, name="os1", generation=1, channels=16, horizontal_beams=512, frequency=10):
+        SensorCreator.__init__(self, name)
+        self.append_meshes(['lidar'])
+
+        # Check that the lidar has a valid configuration
+        assert(generation == 1 or generation == 2)
+        assert(channels == 16 or channels == 32 or channels == 64 or channels == 128)
+        assert(horizontal_beams == 512 or horizontal_beams == 1024 or horizontal_beams == 2048)
+        assert(frequency == 10 or frequency == 20)
+
+        # Set properties
+        self.properties(azimuth_width = 360)
+        if generation == 2 or channels == 128:
+            self.properties(elevation_width = 45)
+        else:
+            self.properties(elevation_width = 33.2)
+        self.properties(azimuth_beams = horizontal_beams)
+        self.properties(elevation_beams = channels)
+        self.properties(max_range = 120)
+        # OS1 sensors have variable distance noise and accuracy depending on target type and distance,
+        # which is not yet supported by the object server. From the OS1 manual:
+        # Range Accuracy:
+        #   <5 cm for lambertian targets, <10 cm for retroreflectors
+        # Range Repeatability (1 sigma / standard deviation):
+        #   0.8 - 2 m: ± 3 cm; 2 - 20 m: ± 1.5 cm; 20 - 60 m ± 3 cm; >60 m: ± 10 cm
+        self.properties(distance_noise = 0.03)
+        self.frequency(frequency)
+
+class Jaguar(SensorCreator):
+    _classpath  = "morse.sensors.Lidar.Lidar"
+    _short_desc = "Jaguar 65/100 Lidar"
+    _blendname  = "lidar"
+    _name = "Jaguar Lidar"
+
+    def __init__(self, name="jaguar", horizontal_fov=65):
+        SensorCreator.__init__(self, name)
+        self.append_meshes(['lidar'])
+
+        # Check that the lidar has a valid configuration
+        assert(horizontal_fov == 65 or horizontal_fov == 100)
+
+        # Set properties (according to Jaguar Manual which has slight discrepancies compared to the product information)
+        self.properties(azimuth_width = horizontal_fov)
+        self.properties(elevation_width = 40)
+        if horizontal_fov == 65:
+            self.properties(azimuth_beams = horizontal_fov / 0.10)
+        elif horizontal_fov == 100:
+            self.properties(azimuth_beams = horizontal_fov / 0.20)
+        else:
+            raise ValueError("Jaguar misconfiguration occured!")
+        self.properties(elevation_beams = 300)
+        # The 10% lambertian figure is used instead of the absolute max range
+        self.properties(max_range = 200)
+        # The manual lists precision as < 3cm and product info indicates precision (1 sigma) as < 3cm
+        self.properties(distance_noise = 0.03)
+        self.frequency(10)
+
+class EchoFlight(SensorCreator):
+    _classpath = "morse.sensors.Radar.Radar"
+    _short_desc = "Echodyne EchoFlight Radar"
+    _blendname  = "beam"
+    _name = "EchoFlight"
+
+    def __init__(self, name="echoflight", azimuth_beams=600, elevation_beams=400, frequency=10):
+        SensorCreator.__init__(self, name)
+        self.append_meshes(None, 'sensors/xbeam.blend')
+
+        # Check that the beam counts are in the same ratio as the FOV
+        # assert(azimuth_beams / elevation_beams == 120.0 / 80.0)
+
+        # Set properties in accordance with echoflight characteristics
+        self.properties(azimuth_width = 120.0)
+        self.properties(elevation_width = 80.0)
+        self.properties(max_range = 3000.0)
+        self.properties(azim_beams = azimuth_beams)
+        self.properties(elev_beams = elevation_beams)
+        self.frequency(frequency)
+
+class GMSLCamera(SensorCreator):
+    _classpath = "morse.sensors.CameraSim.CameraSim"
+    _short_desc = "Leopard Imaging LI-IMX390-GMSL2 Camera"
+    _blendname = "camera"
+    _name = "GMSL Camera"
+
+    def __init__(self, name="gmsl_camera", version="060H", width_pixels=1937, height_pixels=1217, frequency=30):
+        SensorCreator.__init__(self, name)
+        self.append_meshes(None, 'sensors/camera.blend')
+
+        # Check for a valid configuration
+        assert(version == "060H" or version == "120H" or version == "200H")
+        assert(width_pixels <= 1937 and height_pixels <= 1217)
+
+        # Set properties (according to LI-IMX390-GMSL2 datasheet)
+        self.properties(image_width  = width_pixels)
+        self.properties(image_height = height_pixels)
+        if version == "060H":
+            self.properties(horizontal_fov_deg = 60.6)
+            self.properties(vertical_fov_deg   = 36.1)
+        elif version == "120H":
+            self.properties(horizontal_fov_deg = 122.0)
+            self.properties(vertical_fov_deg   =  74.0)
+        elif version == "200H":
+            self.properties(horizontal_fov_deg = 200.0)
+            self.properties(vertical_fov_deg   = 200.0)
+        self.frequency(frequency)
+
 class Objectserver(SensorCreator):
     _classpath = "morse.sensors.ObjectServer.Objectserver"
     _blendname = ""
 
     def __init__(self, name=None):
         SensorCreator.__init__(self, name)
- 
 
+class ObjectserverDeprecated(SensorCreator):
+    _classpath = "morse.sensors.ObjectServer_deprecated.ObjectserverDeprecated"
+    _blendname = ""
+
+    def __init__(self, name=None):
+        SensorCreator.__init__(self, name)
+        
 class Optixcamera(SensorCreator):
     _classpath = "morse.sensors.OptixCamera.Optixcamera"
     _blendname = "OptixCamera"
@@ -650,11 +826,11 @@ class Optixcamera(SensorCreator):
 
 class CameraSim(SensorCreator):
     _classpath = "morse.sensors.CameraSim.CameraSim"
-    _blendname = "CameraSim"
+    _blendname = "camera"
 
     def __init__(self, name=None):
         SensorCreator.__init__(self, name)
-        # May need to include a .blend file at some point
+        self.append_meshes(None, 'sensors/camera.blend')
 
 class DVL(SensorCreator):
     _classpath = "morse.sensors.Dvl.DVL"
@@ -683,6 +859,13 @@ class FLS(SensorCreator):
     def __init__(self, name=None):
         SensorCreator.__init__(self, name)
 
+class RangeSensor(SensorCreator):
+    _classpath = "morse.sensors.range_sensor.RangeSensor"
+    _short_desc = "Range sensor"
+    _blendname = "RangeSensor"
+
+    def __init__(self, name=None):
+        SensorCreator.__init__(self, name)
  
 class MultiStaticSonar(SensorCreator):
     _classpath  = "morse.sensors.MultiStaticSonar.MultiStaticSonar"
@@ -702,3 +885,11 @@ class SoccerBall(AbstractComponent):
        AbstractComponent.__init__(self, name)
        self.append_meshes(['modem'])
 
+
+class GenericTarget(SensorCreator):
+    _classpath = "morse.sensors.generic_target.GenericTarget"
+    _short_desc = "Tracks all objects in a scene with a target property."
+    _blendname = "GenericTarget"
+
+    def __init__(self, name=None):
+        SensorCreator.__init__(self, name)

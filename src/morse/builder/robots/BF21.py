@@ -13,7 +13,7 @@ class Bf21(GroundRobot):
     """
     A template robot model for BF21, with an articulated tailcone.
     """
-    def __init__(self, name = None, debug = True, timewarp = 1):
+    def __init__(self, name = None):
 
         # BF21.blend is located in the data/robots directory
         GroundRobot.__init__(self, 'BF21', name)
@@ -23,75 +23,73 @@ class Bf21(GroundRobot):
         # Actuator components
         ###################################
 
-    #     # AUV hydrodynamics
-    #     self.control = Hydrodynamics()
-    #     self.append(self.control) 
+        # AUV hydrodynamics
+        self.control = Hydrodynamics()
+        self.append(self.control) 
 
-    #     ###################################
-    #     # Sensor components
-    #     ###################################
+        ###################################
+        # Sensor components
+        ###################################
 
-    #     self.pose = Pose() 
-    #     self.append(self.pose)
-    #     self.pose.alter('','morse.modifiers.PoseMod.Bluefin21PoseModifier')
+        self.pose = Pose() 
+        self.append(self.pose)
+        self.pose.alter('','morse.modifiers.PoseMod.Bluefin21PoseModifier')
             
-    #     self.imu = IMU()
-    #     self.append(self.imu)
-    #     self.imu.alter('','morse.modifiers.IMUMod.Bluefin21IMUModifier')
+        self.imu = IMU()
+        self.append(self.imu)
+        self.imu.alter('','morse.modifiers.IMUMod.Bluefin21IMUModifier')
 
-    #     self.bat = Battery()
-    #     self.append(self.bat)
+        self.bat = Battery()
+        self.append(self.bat)
 
-    #     self.dvl = DVL()
-    #     self.append(self.dvl)
+        self.dvl = DVL()
+        self.append(self.dvl)
 
-    #     self.gps = GPS()
-    #     self.append(self.gps)
+        self.gps = GPS()
+        self.gps.level('raw')
+        self.append(self.gps)
 
+    ###################################
+    # Comms functions
+    ###################################
+    # This function sets the communications streams for various devices
+    def set_moos(self, moos_host='127.0.0.1', moos_port=9000, moos_name='iMorse'):
 
+        self.control.add_stream('moos','morse.middleware.moos.thruster.TailconeCtrlReader',
+            moos_host=moos_host, moos_port=moos_port, moos_name=moos_name)
 
+        self.pose.add_stream('moos',
+            moos_host=moos_host, moos_port=moos_port, moos_name=moos_name)
 
+        self.imu.add_stream('moos',
+            moos_host=moos_host, moos_port=moos_port, moos_name=moos_name)
 
-    # ###################################
-    # # Comms functions
-    # ###################################
-    # # This function sets the communications streams for various devices
-    # def set_moos(self, moos_host='127.0.0.1', moos_port=9000, moos_name='iMorse'):
+        self.bat.add_stream('moos',
+            moos_host=moos_host, moos_port=moos_port, moos_name=moos_name)
 
-    #     self.control.add_stream('moos','morse.middleware.moos.thruster.TailconeCtrlReader',
-    #         moos_host=moos_host, moos_port=moos_port, moos_name=moos_name)
+        self.dvl.add_stream('moos','morse.middleware.moos.DVLCtrl.DVLNotifier',
+            moos_host=moos_host, moos_port=moos_port, moos_name=moos_name)
 
-    #     self.pose.add_stream('moos',
-    #         moos_host=moos_host, moos_port=moos_port, moos_name=moos_name)
+        self.gps.add_stream('moos',
+            moos_host=moos_host, moos_port=moos_port, moos_name=moos_name)
+            # GPSRawNotifier
 
-    #     self.imu.add_stream('moos',
-    #         moos_host=moos_host, moos_port=moos_port, moos_name=moos_name)
-
-    #     self.bat.add_stream('moos',
-    #         moos_host=moos_host, moos_port=moos_port, moos_name=moos_name)
-
-    #     self.dvl.add_stream('moos','morse.middleware.moos.DVLCtrl.DVLNotifier',
-    #         moos_host=moos_host, moos_port=moos_port, moos_name=moos_name)
-
-    #     self.gps.add_stream('moos',
-    #         moos_host=moos_host, moos_port=moos_port, moos_name=moos_name)
-
-    # def set_ros(self, namespace=""):
+    def set_ros(self, namespace=""):
         
-    #     self.gps.add_stream('ros', 
-    #         frame_id=namespace+self.name+"gps_frame" )
-    #     self.imu.add_stream('ros', 
-    #         frame_id=namespace+self.name+"imu_frame" )
-    #     self.control.add_stream('ros')
+        self.gps.add_stream('ros', 
+            frame_id=namespace+self.name+"gps_frame" )
+        self.imu.add_stream('ros', 
+            frame_id=namespace+self.name+"imu_frame" )
+        self.control.add_stream('ros')
 
 
 
-    # # This function sets the frequencies of some devices
-    # def frequency(self, frequency=None):
-    #     GroundRobot.frequency(frequency)
-    #     self.control.frequency(frequency)
-    #     self.pose.frequency(frequency)
-    #     self.imu.frequency(frequency)
-    #     self.dvl.frequency(frequency)
-    #     self.gps.frequency(1)
-    #     self.bat.frequency(1)
+    # This function sets the frequencies of some devices
+    def frequency(self, frequency=None):
+        GroundRobot.frequency(frequency)
+        self.control.frequency(frequency)
+        self.pose.frequency(frequency)
+        self.imu.frequency(frequency)
+        self.dvl.frequency(frequency)
+        self.gps.frequency(1)
+        self.bat.frequency(1)

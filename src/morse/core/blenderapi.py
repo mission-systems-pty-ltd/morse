@@ -7,12 +7,12 @@ import sys
 import os
 
 fake = False
-
+bpy = None
 # running in Blender?
 # Note: Run blender-app.exe when blender v2.75 in Window 7
 try:
     import bpy
-    try:
+    try: 
         import bge
     except ImportError:
         # Can fail if we are in Blender but not yet in the GameEngine,
@@ -21,7 +21,6 @@ try:
 except:
     print("WARNING: MORSE is running outside Blender! (sys.executable == '%s')" % sys.executable)
     fake = True
-    
 
 from morse.core import mathutils
 import logging
@@ -45,6 +44,7 @@ IKEY = None
 JKEY = None
 KKEY = None
 LKEY = None
+MKEY = None
 NKEY = None
 OKEY = None
 QKEY = None
@@ -85,6 +85,7 @@ if not fake:
     JKEY = bge.events.JKEY
     KKEY = bge.events.KKEY
     LKEY = bge.events.LKEY
+    MKEY = bge.events.MKEY
     NKEY = bge.events.NKEY
     OKEY = bge.events.OKEY
     QKEY = bge.events.QKEY

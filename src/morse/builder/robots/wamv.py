@@ -34,44 +34,43 @@ class Wamv(GroundRobot):
         GroundRobot.__init__(self, 'robots/wamv.blend',name,blender_object_name='platform_boundary')
         self.properties(classpath = "morse.robots.wamv.Wamv")
 
-        print("I ASSUME WE GOT HERE \n\n\n\n\n")
-
         ###################################
         # Actuators
         ###################################
 
         # Hydrodynamic forces
-        # self.dynamics = WamVHydrodynamics()
-        # self.append(self.dynamics)
+        self.dynamics = WamVHydrodynamics()
+        self.append(self.dynamics)
 
-        # # Fixed differential thrusters
-        # self.control = Fixedthrusters()
-        # self.append(self.control)
+        # Fixed differential thrusters
+        self.control = Fixedthrusters()
+        self.append(self.control)
 
-        # ###################################
-        # # Sensors
-        # ###################################
+        ###################################
+        # Sensors
+        ###################################
 
-        # self.pose = Pose()
-        # self.append(self.pose)
-        # self.pose.alter('','morse.modifiers.PoseMod.WamVPoseModifier')
+        self.pose = Pose()
+        self.append(self.pose)
+        self.pose.alter('','morse.modifiers.PoseMod.WamVPoseModifier')
 
-        # self.imu = IMU()
-        # self.append(self.imu)
-        # self.imu.alter('','morse.modifiers.IMUMod.WamVIMUModifier')
+        self.imu = IMU()
+        self.append(self.imu)
+        self.imu.alter('','morse.modifiers.IMUMod.WamVIMUModifier')
 
-        # self.dvl = DVL()
-        # self.append(self.dvl)
+        self.dvl = DVL()
+        self.append(self.dvl)
 
-        # self.gps = GPS()
-        # self.append(self.gps)
+        self.gps = GPS()
+        self.gps.level('raw')
+        self.append(self.gps)
 
-        # self.bat = Battery()
-        # self.append(self.bat)
-        # self.bat.frequency(1)
+        self.bat = Battery()
+        self.append(self.bat)
+        self.bat.frequency(1)
 
-        # self.odom = Odometry()
-        # self.append(self.odom)
+        self.odom = Odometry()
+        self.append(self.odom)
 
 
         # NOTE: Adding cameras makes the GLSL water renderer flash annoyingly!
@@ -89,46 +88,46 @@ class Wamv(GroundRobot):
         # self.side_camera.rotate(-1.6,-.2,0)
 
     # This function sets the communications streams for various devices
-    # def set_moos(self, moos_host='127.0.0.1', moos_port=9000, moos_name='iMorse'):
+    def set_moos(self, moos_host='127.0.0.1', moos_port=9000, moos_name='iMorse'):
 
-    #     self.control.add_stream('moos','morse.middleware.moos.thruster.FixedCtrlReader',
-    #         moos_host=moos_host, moos_port=moos_port, moos_name=moos_name)
+        self.control.add_stream('moos','morse.middleware.moos.thruster.FixedCtrlReader',
+            moos_host=moos_host, moos_port=moos_port, moos_name=moos_name)
 
-    #     self.dvl.add_stream('moos','morse.middleware.moos.DVLCtrl.DVLNotifier',
-    #         moos_host=moos_host, moos_port=moos_port, moos_name=moos_name)
+        self.dvl.add_stream('moos','morse.middleware.moos.DVLCtrl.DVLNotifier',
+            moos_host=moos_host, moos_port=moos_port, moos_name=moos_name)
         
-    #     self.gps.add_stream('moos',
-    #         moos_host=moos_host, moos_port=moos_port, moos_name=moos_name)
+        self.gps.add_stream('moos',
+            moos_host=moos_host, moos_port=moos_port, moos_name=moos_name)
 
-    #     self.pose.add_stream('moos',
-    #         moos_host=moos_host, moos_port=moos_port, moos_name=moos_name)
+        self.pose.add_stream('moos',
+            moos_host=moos_host, moos_port=moos_port, moos_name=moos_name)
 
-    #     self.imu.add_stream('moos',
-    #         moos_host=moos_host, moos_port=moos_port, moos_name=moos_name)
+        self.imu.add_stream('moos',
+            moos_host=moos_host, moos_port=moos_port, moos_name=moos_name)
 
-    #     self.bat.add_stream('moos',
-    #         moos_host=moos_host, moos_port=moos_port, moos_name=moos_name)
+        self.bat.add_stream('moos',
+            moos_host=moos_host, moos_port=moos_port, moos_name=moos_name)
 
-    #     self.odom.add_stream('moos',
-    #         moos_host=moos_host, moos_port=moos_port, moos_name=moos_name)
+        self.odom.add_stream('moos',
+            moos_host=moos_host, moos_port=moos_port, moos_name=moos_name)
 
-    # def set_ros(self, namespace=""):
+    def set_ros(self, namespace=""):
 
-    #     self.gps.add_stream('ros', 
-    #         frame_id=namespace+self.name+"gps_frame" )
-    #     self.imu.add_stream('ros', 
-    #         frame_id=namespace+self.name+"imu_frame" )
-    #     self.odom.add_stream('ros', 
-    #         frame_id=namespace+self.name+"odom_frame" )
-    #     self.control.add_stream('ros')
+        self.gps.add_stream('ros', 
+            frame_id=namespace+self.name+"gps_frame" )
+        self.imu.add_stream('ros', 
+            frame_id=namespace+self.name+"imu_frame" )
+        self.odom.add_stream('ros', 
+            frame_id=namespace+self.name+"odom_frame" )
+        self.control.add_stream('ros')
 
-    # # This function sets the frequencies of some devices
-    # def frequency(self, frequency=None):
-    #     GroundRobot.frequency(frequency)
-    #     self.control.frequency(frequency)
-    #     self.dynamics.frequency(frequency)
-    #     self.imu.frequency(frequency)
-    #     self.pose.frequency(frequency)
-    #     self.dvl.frequency(frequency)
-    #     self.pose.frequency(frequency)
-    #     self.gps.frequency(frequency)
+    # This function sets the frequencies of some devices
+    def frequency(self, frequency=None):
+        GroundRobot.frequency(frequency)
+        self.control.frequency(frequency)
+        self.dynamics.frequency(frequency)
+        self.imu.frequency(frequency)
+        self.pose.frequency(frequency)
+        self.dvl.frequency(frequency)
+        self.pose.frequency(frequency)
+        self.gps.frequency(frequency)

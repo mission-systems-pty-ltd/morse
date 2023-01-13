@@ -596,7 +596,8 @@ class AbstractComponent(object):
         :param calling_module: Module called each simulation cycle.
                                enum in ['calling.sensor_action',
                                         'calling.actuator_action',
-                                        'calling.robot_action']
+                                        'calling.robot_action',
+                                        'calling.feedback_actuator_action']
 
         """
         if not calling_module:
@@ -608,6 +609,8 @@ class AbstractComponent(object):
             self.properties(Component_Tag = True, classpath = 'morse.core.sensor.Sensor')
         elif calling_module == 'calling.actuator_action':
             self.properties(Component_Tag = True, classpath = 'morse.core.actuator.Actuator')
+        elif calling_module == 'calling.feedback_actuator_action':
+            self.properties(Component_Tag = True, classpath = 'morse.core.feedbackactuator.FeedbackActuator')
         else:
             logger.warning(self.name + ": unknown category: " + calling_module)
 

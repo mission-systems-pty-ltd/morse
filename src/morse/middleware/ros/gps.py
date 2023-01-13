@@ -7,6 +7,7 @@ class NavSatFixPublisher(ROSPublisher):
 
     def default(self, ci='unused'):
         gps = NavSatFix()
+
         gps.header = self.get_ros_header()
 
         gps.latitude = self.data['x']
@@ -14,6 +15,10 @@ class NavSatFixPublisher(ROSPublisher):
         gps.altitude = self.data['z']
 
         self.publish(gps)
+
+
+        
+
 
 class NavSatFixRawPublisher(ROSPublisher):
     """ Publish the GPS position of the robot. """

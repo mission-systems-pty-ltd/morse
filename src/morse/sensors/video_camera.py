@@ -5,6 +5,7 @@ from morse.core import mathutils
 import morse.sensors.camera
 from morse.helpers.components import add_data
 import copy
+from queue import Queue
 
 BLENDER_HORIZONTAL_APERTURE = 32.0
 
@@ -13,30 +14,6 @@ class VideoCamera(morse.sensors.camera.Camera):
     This sensor emulates a single video camera. It generates a series of
     RGBA images.  Images are encoded as binary char arrays, with 4 bytes
     per pixel.
-
-    Camera calibration matrix
-    -------------------------
-
-    The camera configuration parameters implicitly define a geometric camera in
-    blender units. Knowing that the **cam_focal** attribute is a value that
-    represents the distance in Blender unit at which the largest image dimension is
-    32.0 Blender units, the camera intrinsic calibration matrix is defined as
-
-    +--------------+-------------+---------+
-    | **alpha_u**  |      0      | **u_0** |
-    +--------------+-------------+---------+
-    |       0      | **alpha_v** | **v_0** |
-    +--------------+-------------+---------+
-    |       0      |      0      |    1    |
-    +--------------+-------------+---------+
-
-    where:
-
-    - **alpha_u** == **alpha_v** = **cam_width** . **cam_focal** / 32 (we suppose
-      here that **cam_width** > **cam_height**. If not, then use **cam_height** in
-      the formula)
-    - **u_0** = **cam_width** / 2
-    - **v_0** = **cam_height** / 2
 
     See also :doc:`../sensors/camera` for generic informations about Morse cameras.
     """
@@ -48,8 +25,6 @@ class VideoCamera(morse.sensors.camera.Camera):
            "The data captured by the camera, stored as a Python Buffer \
             class  object. The data is of size ``(cam_width * cam_height * 4)``\
             bytes. The image is stored as RGBA.")
-    add_data('intrinsic_matrix', 'none', 'mat3<float>',
-        "The intrinsic calibration matrix, stored as a 3x3 row major Matrix.")
 
     def __init__(self, obj, parent=None):
         """ Constructor method.
@@ -63,17 +38,6 @@ class VideoCamera(morse.sensors.camera.Camera):
 
         # Prepare the exportable data of this sensor
         self.local_data['image'] = ''
-
-        # Prepare the intrinsic matrix for this camera.
-        # Note that the matrix is stored in row major
-        intrinsic = mathutils.Matrix.Identity(3)
-        alpha_u = self.image_width  * \
-                  self.image_focal / BLENDER_HORIZONTAL_APERTURE
-        intrinsic[0][0] = alpha_u
-        intrinsic[1][1] = alpha_u
-        intrinsic[0][2] = self.image_width / 2.0
-        intrinsic[1][2] = self.image_height / 2.0
-        self.local_data['intrinsic_matrix'] = intrinsic
 
         self.capturing = False
         self._n = -1
@@ -109,7 +73,6 @@ class VideoCamera(morse.sensors.camera.Camera):
             # Call the action of the parent class
             morse.sensors.camera.Camera.default_action(self)
 
-
             self.robot_pose = copy.copy(self.robot_parent.position_3d)
             # Fill in the exportable data
             # NOTE: Blender returns the image as a binary string
@@ -123,3 +86,44 @@ class VideoCamera(morse.sensors.camera.Camera):
                     self.completed(status.SUCCESS)
         else:
             self.capturing = False
+
+class TeleportingCamera(VideoCamera):
+    """
+    This sensor is a repositionable camera that produces images according to poses that come from an external stream.
+
+    Currently supports ROS with:
+     - morse.middleware.ros.video_camera.TeleportingCameraPublisher
+     - morse.middleware.ros.read_pose.PoseToQueueReader
+    """
+
+    _name = "TeleportingCamera"
+    _short_desc = "Teleporting (Repositionable) camera"
+
+    add_data('pose_queue', Queue(), 'queue', "Queue of poses to capture from. A pose is a 4x4 matrix given by worldTransform")
+    add_data('new_image', False, 'boolean', 'True if there is new data to publish')
+
+    def __init__(self, obj, parent=None):
+        logger.info('%s initialization' % obj.name)
+        VideoCamera.__init__(self, obj, parent)
+
+        # Start the video camera with 1 pose in queue so that the camera video setup is called
+        self.local_data['pose_queue'].put(mathutils.Matrix.Identity(4))
+
+        # Boolean to indicate if a trigger should occur (see default action)
+        self.trigger = False
+
+    # Note that setting the bge)object worldTransform then calling the video camera default action does not work, but
+    # will update the pose for the next image not the current image. So we process the queue with a slight (1 tick)
+    # delay, i.e. the default action sets up the correct pose for the next default action.
+    def default_action(self):
+        if self.trigger:
+            # Acquire the data
+            VideoCamera.default_action(self)
+            self.local_data['new_image'] = True
+
+        if self.local_data['pose_queue'].empty():
+            self.trigger = False
+        else:
+            self.trigger = True
+            # Set the pose (popping the pose off the queue in the process)
+            self.bge_object.worldTransform = self.local_data['pose_queue'].get()

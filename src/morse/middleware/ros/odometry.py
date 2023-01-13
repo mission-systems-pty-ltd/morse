@@ -1,6 +1,5 @@
 import logging; logger = logging.getLogger("morse." + __name__)
-import rospy
-from geometry_msgs.msg import Vector3, Quaternion, Pose, Twist
+from geometry_msgs.msg import Vector3, Quaternion, Pose, Twist, Point
 from nav_msgs.msg import Odometry
 from morse.middleware.ros import ROSPublisherTF, mathutils
 
@@ -41,15 +40,20 @@ class OdometryPublisher(ROSPublisherTF):
 
     def get_orientation(self):
         """ Get the orientation from the local_data and return a quaternion """
+        rotation = Quaternion()
         euler = mathutils.Euler((self.data['roll'],
                                  self.data['pitch'],
                                  self.data['yaw']))
         quaternion = euler.to_quaternion()
-        return quaternion
+        rotation.x = quaternion.x
+        rotation.y = quaternion.y
+        rotation.z = quaternion.z
+        rotation.w = quaternion.w
+        return rotation
 
     def get_position(self):
-        """ Get the position from the local_data and return a ROS Vector3 """
-        position = Vector3()
+        """ Get the position from the local_data and return a ROS Point """
+        position = Point()
         position.x = self.data['x']
         position.y = self.data['y']
         position.z = self.data['z']

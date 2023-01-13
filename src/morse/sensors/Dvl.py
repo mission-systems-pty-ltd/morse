@@ -14,11 +14,14 @@ class DVL(morse.core.sensor.Sensor):
     # define here the data fields exported by your sensor
     # format is: field name, default initial value, type, description
     add_data('Bx',0.0, "float", 'Surge velocity in body frame')
-    add_data('By',0.0, "float", 'Sway velocity in body frame')
+    add_data('By',0.0, "float", 'Sway  velocity in body frame')
     add_data('Bz',0.0, "float", 'Heave velocity in body frame')
     add_data('Wx',0.0, "float", 'Surge velocity in inertial frame')
-    add_data('Wy',0.0, "float", 'Sway velocity in inertial frame')
+    add_data('Wy',0.0, "float", 'Sway  velocity in inertial frame')
     add_data('Wz',0.0, "float", 'Heave velocity in inertial frame')
+    add_data('Bu',0.0, "float", 'Roll in body frame')
+    add_data('Bv',0.0, "float", 'Pitch in body frame')
+    add_data('Bw',0.0, "float", 'Yaw in body frame')
     add_data('heading',0.0, "float", 'Compass heading in degrees')
     add_data('depth',0.0, "float", 'Depth in m (increasing downwards)')
     add_data('z', 0.0, "float", 'Distance to bottom')
@@ -58,6 +61,12 @@ class DVL(morse.core.sensor.Sensor):
         self.local_data['Bx'] = BodyVel.x # Surge
         self.local_data['By'] = BodyVel.y # Sway
         self.local_data['Bz'] = BodyVel.z # Heave
+
+        # Angular velocity in body frame
+        BodyAngVel = robot.bge_object.getAngularVelocity(True)
+        self.local_data['Bu'] = BodyAngVel.x # Heave
+        self.local_data['Bv'] = BodyAngVel.y # Heave
+        self.local_data['Bw'] = BodyAngVel.z # Heave
 
         # Instantaneous yaw of vehicle with 'Y' axis pointing North
         yaw_degrees = degrees(self.position_3d.yaw)-90.0
