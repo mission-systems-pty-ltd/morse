@@ -11,14 +11,16 @@ except ImportError:
     log_handler = logging.StreamHandler()
 
 logger = logging.getLogger('morse')
+
 formatter = logging.Formatter("* %(message)s\n")
 log_handler.setFormatter(formatter)
 
 logger.addHandler(log_handler)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 ##
+
 try:
-    sys.path.append("/usr/local/lib/python3/dist-packages")
+    sys.path.append("@PYTHON_INSTDIR@")
     from morse.version import VERSION
     from morse.environments import Environment
     from morse.core.exceptions import MorseEnvironmentError
@@ -31,6 +33,7 @@ import shutil
 import glob
 import re
 import tempfile
+from pkg_resources import parse_version
 
 try:
     import configparser
@@ -44,7 +47,7 @@ MIN_BLENDER_VERSION = "2.65"
 #Blender version must be smaller than...
 LAST_TESTED_BLENDER_VERSION = "2.77"
 
-#Unix-style path to the MORSE default scene and templates, within the prefix
+#Unix-style path to the MORSsE default scene and templates, within the prefix
 DEFAULT_SCENE_PATH = "share/morse/data/morse_default.blend"
 DEFAULT_SCENE_AUTORUN_PATH = "share/morse/data/morse_default_autorun.blend"
 
@@ -85,17 +88,12 @@ def check_blender_version(blender_path):
         version_str = subprocess.Popen(
                                 [blender_path, '--version'],
                                 stdout=subprocess.PIPE).communicate()[0]
-
-                                        
         for line in version_str.splitlines():
             line = line.decode().strip()
             if line.startswith("Blender"):
-                # TODO: Remove the old line, this does ignore older versions sub number tho :/
-                # version = line.split()[1] + '.' + line.split()[3][:-1]
-                version = re.findall("([\.0-9]*)", line)
-                version = [x for x in version if x]
-                version = version[0]
-                break
+                match = re.search(r"(\d+)\.(\d+)\.(\d+)", line)
+                if match:
+                    version = f"{match.group(1)}.{match.group(2)}.{match.group(3)}"
     except OSError:
         return None
 
@@ -107,10 +105,16 @@ def check_blender_version(blender_path):
 
     logger.info("Checking version of " + blender_path + "... Found v." + version)
 
-    if version.split('.') < MIN_BLENDER_VERSION.split('.'):
+    parsed_version = parse_version( version )
+    min_version = parse_version(MIN_BLENDER_VERSION)
+    last_tested = parse_version(LAST_TESTED_BLENDER_VERSION)
+    if parsed_version < min_version:
+        print(f"ERROR {parsed_version} is less than the minimum version: {min_version}")
+        logger.error("Version %s of Blender is below the minimum version" % version)
         return False
-    if version.split('.') > LAST_TESTED_BLENDER_VERSION.split('.'):
+    if parsed_version > last_tested:
         logger.warning("Version %s of Blender is untested but should work" % version)
+
     return version
 
 def check_blender_python_version(blender_path):
@@ -145,14 +149,13 @@ def check_blender_python_version(blender_path):
         tmpF.close()
         os.unlink (tmpF.name)
 
-def check_default_scene(prefix): 
+def check_default_scene(prefix):
 
     global default_scene_abspath
     #Check morse_default.blend is found
     default_scene_abspath = os.path.join(os.path.normpath(prefix), os.path.normpath(DEFAULT_SCENE_PATH))
 
-    logger.info("Looking for the MORSE default scene here: " + default_scene_abspath)
-    logger.error("asdf")
+    #logger.info("Looking for the MORSE default scene here: " + default_scene_abspath)
 
     if not os.path.exists(default_scene_abspath):
         raise MorseError(default_scene_abspath)
@@ -169,7 +172,7 @@ def set_prefixes(silent = False):
 
     loglevel = logger.getEffectiveLevel()
     if silent:
-        logger.setLevel(logging.DEBUG)
+        logger.setLevel(logging.WARNING)
 
     ###########################################################################
     #Check platform
@@ -201,7 +204,6 @@ def set_prefixes(silent = False):
     try:
         prefix = os.environ['MORSE_ROOT']
         logger.info("$MORSE_ROOT environment variable is set. Checking for default scene...")
-
 
         check_default_scene(prefix)
         logger.info("Default scene found. The prefix seems ok. Using it.")
@@ -313,8 +315,8 @@ def check_setup():
                    " but MORSE has been compiled for Python " + \
                    our_python_version + "! Check your MORSE build configuration"
                    " or the selected Blender version.")
-            if 'MORSE_SILENT_PYTHON_CHECK' not in os.environ:
-                raise MorseError("Bad Python version")
+            #if 'MORSE_SILENT_PYTHON_CHECK' not in os.environ:
+            #    raise MorseError("Bad Python version")
         else:
             logger.info("Blender and Morse are using Python " + \
             python_version + ". Alright.")
@@ -556,7 +558,7 @@ def add_component(args):
 def prelaunch():
     logger.info(version())
     try:
-        logger.setLevel(logging.DEBUG)
+        logger.setLevel(logging.WARNING)
         logger.info("Checking up your environment...\n")
         check_setup()
     except MorseError as e:
@@ -657,7 +659,6 @@ def launch_simulator(scene=None, script=None, node_name=None, geometry=None,
         exec_args += ["-P", script]
 
     exec_args += other_params
-    # print( exec_args )
     os.execle(*exec_args)
 
 def do_check(args):
