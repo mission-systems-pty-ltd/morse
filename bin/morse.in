@@ -569,7 +569,7 @@ def prelaunch():
         logger.error("Your environment is not yet correctly setup to run MORSE!\n" +\
         "Please fix it with above information.\n" +\
         "You can also run 'morse check' for more details.")
-        sys.exit()
+        sys.exit(1)
 
 def launch_simulator(scene=None, script=None, node_name=None, geometry=None,
         noaudio = False, script_options = []):
@@ -672,7 +672,7 @@ def do_check(args):
     except MorseError as e:
         logger.error(e.value)
         logger.error("Your environment is not correctly setup to run MORSE!")
-        sys.exit()
+        sys.exit(1)
     logger.info("Your environment is correctly setup to run MORSE.")
 
 
