@@ -15,10 +15,10 @@ class Mesh(AbstractComponent):
         obj.game.physics_type = 'NO_COLLISION'
         self.set_blender_object(obj)
 
-    def color(self, r=0.1, g=0.1, b=0.1):
+    def color(self, r=0.1, g=0.1, b=0.1, a=1.0):
         if not self._bpy_object.active_material:
             self._bpy_object.active_material = bpymorse.create_new_material()
-        self._bpy_object.active_material.diffuse_color = (r, g, b)
+        self._bpy_object.active_material.diffuse_color = (r, g, b, a)
 
 class Plane(Mesh):
     mesh_primitive_add = bpymorse.add_mesh_plane

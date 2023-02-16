@@ -10,6 +10,7 @@ class Morsy(GroundRobot):
         self.set_rigid_body()
         print("I assume we here")
         mesh = self.get_child('morsy_mesh')
+        print("WARNING THIS BREAKS AND I NEED TO FIND OUT WHY")
         mesh.game.physics_type = 'NO_COLLISION'
 
         self._bpy_object.game.radius = 0.08
