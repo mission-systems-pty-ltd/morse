@@ -115,7 +115,7 @@ def check_blender_python_version(blender_path):
     """
     tmpF = tempfile.NamedTemporaryFile(delete = False)
     try:
-        tmpF.write(b"import sys\n")
+        tmpF.write(b"import sys,re\n")
         tmpF.write(b"print('>>>' + '.'.join((str(x) for x in sys.version_info[:3])))\n")
         tmpF.write(b"print('###%s' % sys.path)\n")
         tmpF.flush()
@@ -127,7 +127,7 @@ def check_blender_python_version(blender_path):
         ).communicate() # get only stdout
         stdout = output[0].decode()
         stderr = output[1].decode()
-        version = stdout.split('>>>')[1][0:5]
+        version = re.search( r'>>>([0-9.]+)', stdout )[1]
         logger.info("Checking version of Python within Blender " + blender_path + \
                         "... Found v." + version)
 
