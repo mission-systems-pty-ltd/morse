@@ -293,6 +293,12 @@ class WheeledRobot(GroundRobot):
                 'WheelRRName', 'CasterWheelName']
         properties = bpymorse.get_properties(self._bpy_object)
         for key in keys:
+            wheel_name = properties.get(key, None)
+            if wheel_name:
+                new_wheel_name = [child.name for child in self._bpy_object.children if wheel_name in child.name][0]
+                bpymorse._property_set(self._bpy_object, key, new_wheel_name)
+        properties = bpymorse.get_properties(self._bpy_object)
+        for key in keys:
             expected_wheel = properties.get(key, None)
             if expected_wheel:
                 wheel = self.get_child(expected_wheel)
