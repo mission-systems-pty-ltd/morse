@@ -153,6 +153,7 @@ class Component(AbstractComponent):
         # self.set_blender_object(imported_objects[0])
 
         imported_objects = self.append_meshes()
+        imported_objects.reverse()
 
         if blender_object_name is None:
             # Here we use the fact that after appending, Blender select the objects
