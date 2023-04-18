@@ -419,7 +419,8 @@ def set_viewport(viewport_shade='WIREFRAME', clip_end=1000):
         if area.type == 'VIEW_3D':
             for space in area.spaces:
                 if space.type == 'VIEW_3D':
-                    space.viewport_shade = viewport_shade
+                    # UPBGE HACK - viewport_shade is deprecated
+                    # space.viewport_shade = viewport_shade
                     space.clip_end = clip_end
 
 def set_viewport_perspective(perspective='CAMERA', camera_obj=None):

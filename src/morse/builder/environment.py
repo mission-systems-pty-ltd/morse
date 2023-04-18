@@ -42,7 +42,6 @@ class Environment(AbstractComponent):
             problem with your simulation, and report it to the Morse project.
         """
         AbstractComponent.__init__(self, category = 'environments', filename = filename)
-        print("INITIALIZED ABSTRACT COMPONENT!")
         if main_scene:
             base_scene = bpymorse.get_context_scene().name
             self.append_scenes()
@@ -81,17 +80,13 @@ class Environment(AbstractComponent):
         bpymorse.deselect_all()
         bpymorse.add_morse_empty()
         obj = bpymorse.get_context_object()
-        print("I HERE")
         obj.name = 'MORSE.Properties'
-
         self.set_blender_object(obj)
         # Init. camera's properties
         self.set_camera_speed()
         self.set_camera_clip()
 
         self.set_gravity()
-
-        print("Gravity set!!!\n")
 
     def is_internal_camera(self, camera):
         return not self._multinode_configured or \
@@ -297,13 +292,11 @@ class Environment(AbstractComponent):
                     cfg_camera_scene.append(name)
 
     def create(self, name=None):
-        print("File: ", os.path.basename(__file__), flush=True)
         """ Generate the scene configuration and insert necessary objects
 
         Should always be called at the very end of the Builder script. It will
         finalise the building process and write the configuration files.
         """
-        print("Running environment create!!\n\n\n")
         # Invoke special methods of component that must take place *after* renaming
         for component in AbstractComponent.components:
             if hasattr(component, "after_renaming"):
@@ -396,21 +389,20 @@ class Environment(AbstractComponent):
             # self.properties(time_management = TimeStrategies.FixedSimulationStep)     # UPBGE HACK
             self.properties(time_management = TimeStrategies.BestEffort)     # UPBGE HACK
 
-        print("At fixedmode!\n\n")
         if self.fastmode:
             # SINGLETEXTURE support has been removed between 2.69 and
             # 2.70. Handle properly the case where it is not defined
             # anymore.
-            try:
-                self.set_material_mode('SINGLETEXTURE')
-            except TypeError:
-                self.set_material_mode('MULTITEXTURE')
+            # UPBGE HACK - game_settings.material_mode is deprecated
+            # try:
+            #     self.set_material_mode('SINGLETEXTURE')
+            # except TypeError:
+            #     self.set_material_mode('MULTITEXTURE')
             self.set_viewport("WIREFRAME")
         elif not self.is_material_mode_custom:
             # make sure OpenGL shading language shaders (GLSL) is the
             # material mode to use for rendering
-            # self.set_material_mode('GLSL')
-            pass
+            self.set_material_mode('GLSL')
 
         # Set the unit system to use for button display (in edit mode) to metric
         bpymorse.get_context_scene().unit_settings.system = 'METRIC'
