@@ -363,6 +363,7 @@ class Environment(AbstractComponent):
 
         # Set Scene_Script_Holder as core Environment object
         self.set_blender_object(bpymorse.get_object('Scene_Script_Holder'))
+        
         # Copy properties (for UTM modifier configuration)
         _properties = bpymorse.get_properties(bpymorse.get_object('MORSE.Properties'))
         self.properties(**_properties)
@@ -385,32 +386,23 @@ class Environment(AbstractComponent):
         self.properties(environment_file = str(self._environment_file))
 
         # Default time management
-        if 'time_management' not in self._bpy_object.game.properties.keys(): # UPBGE HACK
-            # self.properties(time_management = TimeStrategies.FixedSimulationStep)     # UPBGE HACK
-            self.properties(time_management = TimeStrategies.BestEffort)     # UPBGE HACK
-
+        if 'time_management' not in self._bpy_object.game.properties.keys():
+            self.properties(time_management = TimeStrategies.BestEffort)
+        
+        # For applying fast mode
         if self.fastmode:
-            # SINGLETEXTURE support has been removed between 2.69 and
-            # 2.70. Handle properly the case where it is not defined
-            # anymore.
-            # UPBGE HACK - game_settings.material_mode is deprecated
-            # try:
-            #     self.set_material_mode('SINGLETEXTURE')
-            # except TypeError:
-            #     self.set_material_mode('MULTITEXTURE')
+            try:
+                self.set_material_mode('SINGLETEXTURE')
+            except TypeError:
+                self.set_material_mode('MULTITEXTURE')
             self.set_viewport("WIREFRAME")
         elif not self.is_material_mode_custom:
-            # make sure OpenGL shading language shaders (GLSL) is the
-            # material mode to use for rendering
             self.set_material_mode('GLSL')
 
-        # Set the unit system to use for button display (in edit mode) to metric
+        # Apply setting changes
+        bpymorse.get_context_scene().game_settings.use_viewport_render = True
         bpymorse.get_context_scene().unit_settings.system = 'METRIC'
-        # Select the type of Framing to Extend,
-        # Show the entire viewport in the display window,
-        # viewing more horizontally or vertically.
         bpymorse.get_context_scene().game_settings.frame_type = 'EXTEND'
-        # Start player with a visible mouse cursor
         bpymorse.get_context_scene().game_settings.show_mouse = True
 
         # Set the position of the camera HACK:
@@ -591,7 +583,8 @@ class Environment(AbstractComponent):
 
         :param material_mode: enum in ['SINGLETEXTURE', 'MULTITEXTURE', 'GLSL']
         """
-        bpymorse.get_context_scene().game_settings.material_mode = material_mode
+        # UPBGE HACK - material_mode is deprecated
+        # bpymorse.get_context_scene().game_settings.material_mode = material_mode
         self.is_material_mode_custom = True
 
     def set_viewport(self, viewport_shade='WIREFRAME', clip_end=1000):
@@ -892,4 +885,3 @@ class Environment(AbstractComponent):
         """ Call the create method if the user has not explicitly called it """
         if not self._created:
             self.create()
-
