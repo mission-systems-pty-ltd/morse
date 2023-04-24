@@ -372,7 +372,10 @@ class Component(object):
     def __getattribute__(self, name):
         comp = object.__getattribute__(self, name)
         if hasattr(comp, 'lazy_init'):
-            comp.lazy_init()
+            try:
+                comp.lazy_init()
+            except:
+                pass # UPBGE HACK - sometimes throws an initialisation error
         return comp
 
     def close(self):
