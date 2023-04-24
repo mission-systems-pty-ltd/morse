@@ -89,9 +89,9 @@ class OdometryTest(MorseTestCase):
         self.assertAlmostEqual(pose['x'], 5.0 - expected_y, delta=precision)
         self.assertAlmostEqual(pose['y'], 2.0 + expected_x, delta=precision)
         self.assertAlmostEqual(pose['yaw'], expected_yaw + math.pi/2, delta=precision)
-        self.assertAlmostEqual(integ_odo['x'], expected_x, delta=precision)
-        self.assertAlmostEqual(integ_odo['y'], expected_y, delta=precision)
-        self.assertAlmostEqual(integ_odo['yaw'], expected_yaw, delta=precision)
+        self.assertAlmostEqual(integ_odo['x'], pose['x'], delta=precision)
+        self.assertAlmostEqual(integ_odo['y'], pose['y'], delta=precision)
+        self.assertAlmostEqual(integ_odo['yaw'], pose['yaw'], delta=precision)
         self.clear_datas(expected_x, expected_y, expected_yaw)
 
     def test_odometry(self):

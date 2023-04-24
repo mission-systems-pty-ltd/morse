@@ -83,11 +83,6 @@ class DataStreamTest(MorseTestCase):
 
     def test_init(self):
         print("Initialized")
-
-        while True:
-            sleep(1)
-
-
         return True
         
 
