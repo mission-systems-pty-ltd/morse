@@ -67,5 +67,5 @@ class MotionVW(morse.core.actuator.Actuator):
         # It happens apparently when the simulation starts
         except ZeroDivisionError:
             pass
-        # FAILS HERE /!\
+        # UPBGE TODO FIX
         self.robot_parent.apply_speed(self._type, [vx, vy, vz], [rx, ry, rz])

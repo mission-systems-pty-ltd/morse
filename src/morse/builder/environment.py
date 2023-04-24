@@ -167,7 +167,7 @@ class Environment(AbstractComponent):
                     list_name = [cmpt._bpy_object.name for cmpt in AbstractComponent.components if cmpt != component ]
                     fqn.append(cmpt.basename)
                     new_name = '.'.join(fqn)
-
+                    
                     i = 1
                     while new_name in list_name:
                         fqn.pop()
@@ -387,7 +387,8 @@ class Environment(AbstractComponent):
 
         # Default time management
         if 'time_management' not in self._bpy_object.game.properties.keys():
-            self.properties(time_management = TimeStrategies.BestEffort)
+            # self.properties(time_management = TimeStrategies.BestEffort)
+            self.properties(time_management = TimeStrategies.FixedSimulationStep)
         
         # For applying fast mode
         if self.fastmode:
@@ -605,7 +606,7 @@ class Environment(AbstractComponent):
         of :py:class:`morse.builder.TimeStrategies`
         """
         if strategy == TimeStrategies.FixedSimulationStep:
-            bpymorse.get_context_scene().game_settings.use_frame_rate = 0
+            bpymorse.get_context_scene().game_settings.use_frame_rate = 1 # UPBGE HACK - used to be 0
             self.auto_tune_time = False
         elif strategy == TimeStrategies.BestEffort:
             bpymorse.get_context_scene().game_settings.use_frame_rate = 1

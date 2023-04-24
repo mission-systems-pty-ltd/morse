@@ -306,12 +306,8 @@ class AbstractComponent(object):
         :param objects: if specified, look for the child in this list of bpy Objects
         :param recursive: (default: True) if true, search for the child recursively
         """
-        print("objects are as follows: \n " )
-        print("objects: ", objects)
-        print("name: ", name)
         if objects is None:
             objects = self._bpy_object.children
-            print("objects now: ", objects)
         for obj in objects:
             if obj.name == name:
                 return obj

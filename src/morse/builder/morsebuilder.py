@@ -1,4 +1,3 @@
-import os; print("File: ", os.path.basename(__file__), flush=True)
 import logging; logger = logging.getLogger("morsebuilder." + __name__)
 import sys
 import math
@@ -139,28 +138,17 @@ class Component(AbstractComponent):
         """
         AbstractComponent.__init__(self, filename=filename, category=category)
 
-
-        # if blender_object_name is None:
-        #     imported_objects = self.append_meshes()
-        # else:
-        #     imported_objects = self.append_meshes(objects=[blender_object_name])
-        #     if not imported_objects:
-        #         raise MorseBuilderNoComponentError("No object named <%s> in %s" % (blender_object_name, filename))
-
-        
-        # # Here we use the fact that after appending, Blender select the objects
-        # # and the root (parent) object first ( [0] )
-        # self.set_blender_object(imported_objects[0])
-
+        # Get the objects
         imported_objects = self.append_meshes()
-        imported_objects.reverse()
-
+        
+        # Get the main object
         if blender_object_name is None:
-            # Here we use the fact that after appending, Blender select the objects
-            # and the root (parent) object first ( [0] )
             self.set_blender_object(imported_objects[0])
         else:
-            self.set_blender_object([o for o in imported_objects if o.name == blender_object_name][0])
+            # UPBGE HACK
+            # - accounts for object numbering (e.g., morsy.001)
+            # - robots need to be defined with a blender object name now though
+            self.set_blender_object([o for o in imported_objects if blender_object_name in o.name][0])
 
         # If the object has no MORSE logic, add default one
         if make_morseable and category in ['sensors', 'actuators', 'robots'] \
@@ -288,11 +276,23 @@ class WheeledRobot(GroundRobot):
     def unparent_wheels(self):
         """ Make the wheels orphans, but keep the transformation applied to
             the parent robot """
+        
         # Force Blender to update the transformation matrices of objects
-        bpymorse.get_context_scene().update()
+        import bpy; bpy.context.evaluated_depsgraph_get().update() # UPBGE HACK FIX?
 
-        keys = ['WheelFLName', 'WheelFRName', 'WheelRLName',
-                'WheelRRName', 'CasterWheelName']
+        # Define wheel names
+        keys = ['WheelFLName', 'WheelFRName', 'WheelRLName', 'WheelRRName', 'CasterWheelName']
+        
+        # Perform proper mapping of wheels
+        properties = bpymorse.get_properties(self._bpy_object)
+        for key in keys:
+            wheel_name = properties.get(key, None)
+            if wheel_name:
+                matched_names = [child.name for child in self._bpy_object.children if child.name.startswith(wheel_name)]
+                if matched_names != []:
+                    bpymorse._property_set(self._bpy_object, key, matched_names[0])
+        
+        # Attach wheels to chassis
         properties = bpymorse.get_properties(self._bpy_object)
         for key in keys:
             expected_wheel = properties.get(key, None)
@@ -301,7 +301,7 @@ class WheeledRobot(GroundRobot):
                 if wheel:
                     # Make a copy of the current transformation matrix
                     transformation = wheel.matrix_world.copy()
-                    wheel.parent = None
+                    # wheel.parent = None # UPBGE HACK - otherwise, wheels aren't named properly
                     wheel.matrix_world = transformation
                 else:
                     logger.error('Wheel %s is required but not found' % expected_wheel)
