@@ -385,10 +385,9 @@ class Environment(AbstractComponent):
         # Write the name of the 'environment file'
         self.properties(environment_file = str(self._environment_file))
 
-        # Default time management
+        # Default time management (BestEffort)
         if 'time_management' not in self._bpy_object.game.properties.keys():
-            # self.properties(time_management = TimeStrategies.BestEffort)
-            self.properties(time_management = TimeStrategies.FixedSimulationStep)
+            self.properties(time_management = TimeStrategies.BestEffort)
         
         # For applying fast mode
         if self.fastmode:

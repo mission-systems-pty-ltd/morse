@@ -63,7 +63,7 @@ class Jido(GroundRobot):
         mesh.game.physics_type = 'STATIC'
 
 # see human.py
-#class MocapHuman(Robot):
+# class MocapHuman(Robot):
 #    def __init__(self, name="Human", blender_object_name="Human"):
 #        Robot.__init__(self, "mocap_human")
 #        self.name = name
@@ -139,6 +139,3 @@ class PatrolBot(WheeledRobot):
                         WheelFLName = "Wheel_L", WheelFRName = "Wheel_R",
                         WheelRLName = "None", WheelRRName = "None",
                         CasterWheelName = "CasterWheel")
-
-
-

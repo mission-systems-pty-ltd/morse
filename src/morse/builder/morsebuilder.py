@@ -137,7 +137,7 @@ class Component(AbstractComponent):
             simulation, append default Morse ones. See self.morseable()
         """
         AbstractComponent.__init__(self, filename=filename, category=category)
-
+        
         # Get the objects
         imported_objects = self.append_meshes()
         
@@ -148,7 +148,11 @@ class Component(AbstractComponent):
             # UPBGE HACK
             # - accounts for object numbering (e.g., morsy.001)
             # - robots need to be defined with a blender object name now though
-            self.set_blender_object([o for o in imported_objects if blender_object_name in o.name][0])
+            for imported_object in imported_objects:
+                object_name = imported_object.name.split(".")[0].lower()
+                if blender_object_name == object_name:
+                    self.set_blender_object(imported_object)
+                    break
 
         # If the object has no MORSE logic, add default one
         if make_morseable and category in ['sensors', 'actuators', 'robots'] \
