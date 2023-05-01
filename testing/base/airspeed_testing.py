@@ -23,6 +23,7 @@ class Airspeed_Test(MorseMoveTestCase):
         """ Defines the test scenario, using the Builder API.
         """
         robot = Morsy()
+        robot.translate(z = 0.1)
 
         motion = MotionXYW()
         robot.append(motion)
@@ -39,7 +40,6 @@ class Airspeed_Test(MorseMoveTestCase):
         airspeed_pos.add_stream('socket')
         airspeed_pos.properties(ComputationMode = 'Position')
         robot.append(airspeed_pos)
-
 
         env = Environment('empty', fastmode = True)
         env.add_service('socket')

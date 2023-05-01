@@ -48,9 +48,20 @@ class Airspeed(Sensor):
 
         if self._type == 'Velocity':
             self.robot_vel_body = self.robot_parent.bge_object.localLinearVelocity
+            
+            # /!\ UPBGE TODO /!\
+            # There is an error in the self.airspeed2body.matrix value that ...
+            # ... causes airspeed_testing to fail.
+            # This error is believed to be caused by the matrix not being ...
+            # ... updated properly during initialisation.
+            # In morse/src/morse/helpers/transformation.py, one of the ...
+            # ... matrices need to go through 'self.update(obj)', but doesn't.
             self.airspeed2body = self.sensor_to_robot_position_3d()
+            
             # rotate vector from body to airspeed frame
             self.rot_b2a = self.airspeed2body.rotation.conjugated()
+            
+            self.local_data['temp'] = [self.position_3d.matrix]
         else:
             self.pp = copy(self.position_3d)
 
@@ -58,7 +69,7 @@ class Airspeed(Sensor):
 
     def default_action(self):
         if self._type == 'Velocity':
-            vel = self.rot_b2a * self.robot_vel_body
+            vel = self.rot_b2a @ self.robot_vel_body
         else:
             vel = linear_velocities(self.pp, self.position_3d, 1 / self.frequency)
             self.pp = copy(self.position_3d)
