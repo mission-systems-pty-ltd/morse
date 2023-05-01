@@ -49,7 +49,7 @@ class Airspeed(Sensor):
         if self._type == 'Velocity':
             self.robot_vel_body = self.robot_parent.bge_object.localLinearVelocity
             
-            # /!\ UPBGE TODO /!\
+            # UPBGE TODO
             # There is an error in the self.airspeed2body.matrix value that ...
             # ... causes airspeed_testing to fail.
             # This error is believed to be caused by the matrix not being ...

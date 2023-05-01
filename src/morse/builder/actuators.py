@@ -207,7 +207,6 @@ class Sound(ActuatorCreator):
 
 class Armature(ActuatorCreator):
     _classpath = "morse.actuators.armature.Armature"
-    
     def __init__(self, name = None, armature_name = None, model_name = None):
         """ Initialize an armature
 
@@ -237,10 +236,12 @@ class Armature(ActuatorCreator):
                                 blendobject = armature_name,
                                 make_morseable = True)
 
-
         self.ik_targets = []
         # the user may have created IK constraints on the armature, without
         # setting an IK target. In that case, we add such a target
+        
+        # UPBGE TODO
+        # 'self._bpy_object.pose.bones' is deprecated
         for bone in self._bpy_object.pose.bones:
             for c in bone.constraints:
                 if c.type == 'IK' and c.ik_type == 'DISTANCE':
