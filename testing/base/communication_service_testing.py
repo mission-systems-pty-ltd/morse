@@ -43,15 +43,15 @@ class Communication_Service_Testing(MorseTestCase):
                 res = morse.rpc('communication', 'distance_and_view', 'mana', 'unknow_robot')
                 
             res = morse.rpc('communication', 'distance_and_view', 'mana', 'minnie')
-            self.assertAlmostEquals(res[0], 10.0, delta=0.01)
+            self.assertAlmostEqual(res[0], 10.0, delta=0.01)
             self.assertTrue(res[1])
 
             res = morse.rpc('communication', 'distance_and_view', 'mana', 'munu')
-            self.assertAlmostEquals(res[0], 10.0, delta=0.01)
+            self.assertAlmostEqual(res[0], 10.0, delta=0.01)
             self.assertFalse(res[1])
 
             res = morse.rpc('communication', 'distance_and_view', 'minnie', 'munu')
-            self.assertAlmostEquals(res[0], 20.0, delta=0.01)
+            self.assertAlmostEqual(res[0], 20.0, delta=0.01)
             self.assertFalse(res[1])
 
 ########################## Run these tests ##########################

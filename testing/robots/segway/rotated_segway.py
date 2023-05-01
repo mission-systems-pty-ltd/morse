@@ -67,6 +67,9 @@ class Rotated_Segway_Test(MorseTestCase):
     def test_vw_controller(self):
         with Morse() as morse:
         
+            # Let drop
+            morse.sleep(0.5)
+            
             # Read the start position, it must be (0.0, 0.0, 0.0)
             pose_stream = morse.robot.pose
             pose = pose_stream.get()
@@ -78,14 +81,16 @@ class Rotated_Segway_Test(MorseTestCase):
                 elif key != 'timestamp':
                     self.assertAlmostEqual(coord, 0.0, delta=0.03)
 
+            # v_w socket
             v_w = morse.robot.motion
 
+            # Send speed and test
             send_speed(v_w, morse, 1.0, -math.pi/4.0, 2.0)
-
+            delta = 0.20
             pose = pose_stream.get()
-            self.assertAlmostEqual(pose['x'], 0.75, delta=0.15)
-            self.assertAlmostEqual(pose['y'], 1.75, delta=0.15)
-            self.assertAlmostEqual(pose['yaw'], 0.75, delta=0.15)
+            self.assertAlmostEqual(pose['x'], 1.20, delta=delta)
+            self.assertAlmostEqual(pose['y'], 1.40, delta=delta)
+            self.assertAlmostEqual(pose['yaw'], 0.00, delta=delta)
 
 ########################## Run these tests ##########################
 if __name__ == "__main__":

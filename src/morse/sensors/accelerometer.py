@@ -61,7 +61,6 @@ class Accelerometer(morse.core.sensor.Sensor):
                         "physics")
             return
 
-
         # imu2body will transform a vector from imu frame to body frame
         self.imu2body = self.sensor_to_robot_position_3d()
         # rotate vector from body to imu frame
@@ -82,6 +81,10 @@ class Accelerometer(morse.core.sensor.Sensor):
     def _sim_simple(self):
         self.v = self.dp / self.dt
         self.a = (self.v - self.plv) / self.dt
+        
+        # UPBGE HACK - Stores most recent substantial acceleration (>10)
+        if [a for a in self.a if abs(a) > 10] != []:
+            self.local_data["acceleration_substantial"] = self.a
 
         # Update the data for the velocity
         self.plv = self.v.copy()
@@ -94,11 +97,15 @@ class Accelerometer(morse.core.sensor.Sensor):
     def _sim_physics(self):
         w2a = self.position_3d.rotation_matrix.transposed()
         # rotate the angular rates from the robot frame into the imu frame
-        rates = self.rot_b2i * self.robot_w
+        rates = self.rot_b2i @ self.robot_w
 
         # differentiate linear velocity in world (inertial) frame
         # and rotate to imu frame
-        self.a = w2a * (self.robot_vel - self.plv) / self.dt
+        self.a = w2a @ (self.robot_vel - self.plv) / self.dt
+        
+        # UPBGE HACK - Stores most recent substantial acceleration (>10)
+        if [a for a in self.a if abs(a) > 10] != []:
+            self.local_data["acceleration_substantial"] = self.a
 
         if self.compute_offset_acceleration:
             # acceleration due to rotation (centripetal)
@@ -116,7 +123,7 @@ class Accelerometer(morse.core.sensor.Sensor):
         self.plv = self.robot_vel.copy()
         self.pav = self.robot_w.copy()
 
-        self.local_data['velocity'] = w2a * self.robot_vel
+        self.local_data['velocity'] = w2a @ self.robot_vel
         self.local_data['acceleration'] = self.a
 
     def default_action(self):

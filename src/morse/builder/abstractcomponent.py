@@ -770,9 +770,9 @@ class AbstractComponent(object):
     def _make_transparent(self, obj, alpha):
         obj.game.physics_type = 'NO_COLLISION'
         for m in obj.material_slots:
-            m.material.use_transparency = True
-            m.material.alpha = alpha
-            m.material.transparency_method = 'Z_TRANSPARENCY'
+            m.material.show_transparent_back = True           # UPBGE HACK
+            m.material.alpha_threshold = alpha                # UPBGE HACK
+            # m.material.transparency_method = 'Z_TRANSPARENCY' # UPBGE HACK
         for c in obj.children:
             self._make_transparent(c, alpha)
 

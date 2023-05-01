@@ -4,7 +4,7 @@ from morse.builder import Robot, GroundRobot, WheeledRobot
 
 class Morsy(GroundRobot):
     def __init__(self, name=None):
-        GroundRobot.__init__(self, "morsy", name, blender_object_name="morsy")
+        GroundRobot.__init__(self, "morsy", name)
         self.properties(classpath = "morse.robots.morsy.Morsy")
         self.set_rigid_body()
         mesh = self.get_child('morsy_mesh')
@@ -22,12 +22,12 @@ class Morsy(GroundRobot):
 
 class ATRV(GroundRobot):
     def __init__(self, name=None):
-        GroundRobot.__init__(self, "atrv", name, blender_object_name="atrv")
+        GroundRobot.__init__(self, "atrv", name)
         self.properties(classpath = "morse.robots.atrv.ATRV")
 
 class B21(GroundRobot):
     def __init__(self, name=None):
-        GroundRobot.__init__(self, "b21", name, blender_object_name="b21")
+        GroundRobot.__init__(self, "b21", name)
         self.properties(classpath = "morse.robots.b21.B21")
 
         self.set_rigid_body()
@@ -39,32 +39,30 @@ class B21(GroundRobot):
 # see src/morse/robots/environment.py
 class FakeRobot(Robot):
     def __init__(self, name=None):
-        Robot.__init__(self, name = name, blender_object_name="") # no Blender model -> a simple Empty will be created
+        Robot.__init__(self, name = name) # no Blender model -> a simple Empty will be created
         self.properties(classpath = "morse.robots.fakerobot.FakeRobot")
         self.set_no_collision()
 
 class Hummer(GroundRobot):
     def __init__(self, name=None):
-        GroundRobot.__init__(self, "hummer", name, blender_object_name="hummer")
+        GroundRobot.__init__(self, "hummer", name)
         self.properties(classpath = "morse.robots.hummer.Hummer",
                         brakes = 0.0, friction = 200.0, force = 0.0,
                         steer = 0.0, init = 0, cid = 0)
 
 class Jido(GroundRobot):
     def __init__(self, name=None):
-        GroundRobot.__init__(self, "jido", name, blender_object_name="jido")
+        GroundRobot.__init__(self, "jido", name)
         self.properties(classpath = "morse.robots.jido.Jido")
-
         self.set_dynamic()
         self.set_collision_bounds()
         self._bpy_object.game.radius = 0.01
-
         mesh = self.get_child('JidoBase')
         mesh.game.physics_type = 'STATIC'
 
 # see human.py
-# class MocapHuman(Robot):
-#    def __init__(self, name="Human", blender_object_name="Human"):
+#class MocapHuman(Robot):
+#    def __init__(self, name="Human"):
 #        Robot.__init__(self, "mocap_human")
 #        self.name = name
 #        self.properties(classpath = "morse.robots.mocap_human.MocapHuman",\
@@ -74,7 +72,7 @@ class Jido(GroundRobot):
 
 class Pioneer3DX(WheeledRobot):
     def __init__(self, name=None):
-        WheeledRobot.__init__(self, "pioneer3dx", name, blender_object_name="pioneer3dx")
+        WheeledRobot.__init__(self, "pioneer3dx", name)
         self.properties(classpath = "morse.robots.pioneer3dx.Pioneer3DX",
                         HasSuspension = False, 
                         Influence = 0.1, Friction = 0.8,
@@ -85,19 +83,19 @@ class Pioneer3DX(WheeledRobot):
 
 class QUAD2012(Robot):
     def __init__(self, name=None):
-        Robot.__init__(self, "quadrotor", name, blender_object_name="quadrotor")
+        Robot.__init__(self, "quadrotor", name)
         self.properties(classpath = "morse.robots.quadrotor.Quadrotor")
         # Collision - Motion Game Logic
         self.set_no_collision()
 
 class Quadrotor(Robot):
     def __init__(self, name=None):
-        Robot.__init__(self, "quadrotor_dynamic", name, blender_object_name="quadrotor_dynamic")
+        Robot.__init__(self, "quadrotor_dynamic", name)
         self.properties(classpath = "morse.robots.quadrotor_dynamic.Quadrotor")
 
 class RMax(Robot):
     def __init__(self, name=None):
-        Robot.__init__(self, "rmax", name, blender_object_name="rmax")
+        Robot.__init__(self, "rmax", name)
         self.properties(classpath = "morse.robots.rmax.RMax",
                         NoGravity = True)
 
@@ -107,7 +105,7 @@ class RMax(Robot):
 
 class SegwayRMP400(WheeledRobot):
     def __init__(self, name=None):
-        WheeledRobot.__init__(self, "segwayrmp400", name, blender_object_name="segwayrmp400")
+        WheeledRobot.__init__(self, "segwayrmp400", name)
         self.properties(classpath = "morse.robots.segwayrmp400.SegwayRMP400",
                         HasSuspension = False, 
                         Influence = 0.1, Friction = 0.8, FixTurningSpeed = 1.16,
@@ -116,7 +114,7 @@ class SegwayRMP400(WheeledRobot):
 
 class Submarine(Robot):
     def __init__(self, name=None):
-        Robot.__init__(self, "submarine", name, blender_object_name="submarine")
+        Robot.__init__(self, "submarine", name)
         self.properties(classpath = "morse.robots.submarine.Submarine",
                         NoGravity = True)
         self.set_rigid_body()
@@ -124,7 +122,7 @@ class Submarine(Robot):
 
 class Victim(GroundRobot):
     def __init__(self, name=None):
-        GroundRobot.__init__(self, "victim", name, blender_object_name="victim")
+        GroundRobot.__init__(self, "victim", name)
         self.properties(classpath = "morse.robots.victim.Victim",
                         Victim_Tag = True, Requirements = "1,2,3",
                         Injured = True, Severity = 10)
@@ -132,7 +130,7 @@ class Victim(GroundRobot):
 
 class PatrolBot(WheeledRobot):
     def __init__(self, name=None):
-        WheeledRobot.__init__(self, "patrolbot", name, blender_object_name="patrolbot")
+        WheeledRobot.__init__(self, "patrolbot", name)
         self.properties(classpath = "morse.robots.patrolbot.PatrolBot",
                         HasSuspension = False, 
                         Influence = 0.1, Friction = 0.8,

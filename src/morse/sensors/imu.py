@@ -130,7 +130,7 @@ class IMU(morse.core.sensor.Sensor):
         """
 
         # rotate the angular rates from the robot frame into the imu frame
-        rates = self.rot_b2i * self.robot_w
+        rates = self.rot_b2i @ self.robot_w
         #logger.debug("rates in robot frame (% .4f, % .4f, % .4f)", self.robot_w[0], self.robot_w[1], self.robot_w[2])
         #logger.debug("rates in imu frame   (% .4f, % .4f, % .4f)", rates[0], rates[1], rates[2])
 

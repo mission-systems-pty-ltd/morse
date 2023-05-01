@@ -27,8 +27,11 @@ class Zone:
         # Get list of unique vertexes
         vertexes_ = set()
         for v_index in range(24):
-            vertex = mesh.getVertex(0, v_index)
-            vertexes_.add(vertex.getXYZ()[:])
+            try:
+                vertex = mesh.getVertex(0, v_index)
+                vertexes_.add(vertex.getXYZ()[:])
+            except:
+                pass
 
         vertexes = [mathutils.Vector(p) for p in vertexes_]
 

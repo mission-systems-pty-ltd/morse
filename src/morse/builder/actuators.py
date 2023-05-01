@@ -207,7 +207,7 @@ class Sound(ActuatorCreator):
 
 class Armature(ActuatorCreator):
     _classpath = "morse.actuators.armature.Armature"
-
+    
     def __init__(self, name = None, armature_name = None, model_name = None):
         """ Initialize an armature
 
@@ -217,7 +217,6 @@ class Armature(ActuatorCreator):
         :param armature_name: Armature object name
         :param model_name: Armature model name, if any
         """
-        
         if not armature_name and not model_name:
             raise MorseBuilderError("You need to specify either the name of " \
                     "an armature or a Blender model in order to create an " \
@@ -240,7 +239,6 @@ class Armature(ActuatorCreator):
 
 
         self.ik_targets = []
-
         # the user may have created IK constraints on the armature, without
         # setting an IK target. In that case, we add such a target
         for bone in self._bpy_object.pose.bones:
@@ -264,7 +262,6 @@ class Armature(ActuatorCreator):
         return armature.pose.bones[bone_name]
 
     def create_ik_targets(self, bones):
-
         # Bug with iTaSC! cf http://developer.blender.org/T37894
         if bpymorse.version() < (2, 70, 0):
             if self._bpy_object.pose.ik_solver == 'ITASC':
@@ -278,7 +275,6 @@ class Armature(ActuatorCreator):
             bpymorse.add_morse_empty("ARROWS")
             empty = bpymorse.get_first_selected_object()
             empty.scale = [0.01, 0.01, 0.01]
-
             empty.matrix_local = posebone.bone.matrix_local
             empty.location = posebone.bone.tail_local
 
@@ -298,7 +294,6 @@ class Armature(ActuatorCreator):
             ik_constraint.target = empty
 
             self.ik_targets.append((empty, target))
-
 
     def after_renaming(self):
         for empty, target in self.ik_targets:

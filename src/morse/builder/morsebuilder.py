@@ -141,13 +141,17 @@ class Component(AbstractComponent):
         # Get the objects
         imported_objects = self.append_meshes()
         
+        # Redefine blender object name # UPBGE HACK
+        if category in ['sensors', 'actuators', 'robots'] \
+            and blender_object_name is None and not filename is None:
+            blender_object_name = filename
+
         # Get the main object
         if blender_object_name is None:
             self.set_blender_object(imported_objects[0])
+            
+        # UPBGE HACK - accounts for numbering (e.g., morsy.001)
         else:
-            # UPBGE HACK
-            # - accounts for object numbering (e.g., morsy.001)
-            # - robots need to be defined with a blender object name now though
             for imported_object in imported_objects:
                 object_name = imported_object.name.split(".")[0].lower()
                 if blender_object_name == object_name:

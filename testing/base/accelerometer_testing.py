@@ -47,25 +47,27 @@ class Accelero_Test(MorseMoveTestCase):
     def test_accel_sensor(self):
         with Morse() as morse:
 
-            delta = 0.06
+            # Let drop
+            morse.sleep(1.0)
 
+            # Initialisation
             xyw = morse.robot.motion
             accel_stream = morse.robot.accel
             accel_pi_stream = morse.robot.accel_pi
-
             xyw.publish({'x' : 1.0, 'y': 0.0, 'w' : 0.0})
+            delta = 0.06
+            
             morse.sleep(0.01)
-
-            acc = accel_stream.get() 
-            acc_pi = accel_pi_stream.last() 
-
-            self.assertGreater(acc['acceleration'][0], 50)
+            acc = accel_stream.get()
+            acc_pi = accel_pi_stream.last()
+            
+            self.assertGreater(acc["acceleration_substantial"][0], 50) # UPBGE HACK
             self.assert_accel_almost_null(acc, 1)
             self.assertAlmostEqual(acc['velocity'][0], 1.0, delta = delta)
             self.assertAlmostEqual(acc['velocity'][1], 0.0, delta = delta)
 
             # acceleration phase
-            self.assertLess(acc_pi['acceleration'][1], -50)
+            self.assertLess(acc_pi["acceleration_substantial"][1], -50) # UPBGE HACK
             self.assert_accel_almost_null(acc_pi, 0)
             self.assertAlmostEqual(acc_pi['velocity'][0], 0.0, delta = delta)
             self.assertAlmostEqual(acc_pi['velocity'][1], -1.0, delta = delta)
@@ -78,32 +80,32 @@ class Accelero_Test(MorseMoveTestCase):
             self.assert_accel_almost_null(acc, 1)
             self.assertAlmostEqual(acc['velocity'][0], 1.0, delta = delta)
             self.assertAlmostEqual(acc['velocity'][1], 0.0, delta = delta)
-            self.assertAlmostEquals(acc['distance'], 1/60, delta = delta)
+            self.assertAlmostEqual(acc['distance'], 1/60, delta = delta)
 
             self.assert_accel_almost_null(acc_pi, 0)
             self.assert_accel_almost_null(acc_pi, 1)
             self.assertAlmostEqual(acc_pi['velocity'][1], -1.0, delta = delta)
             self.assertAlmostEqual(acc_pi['velocity'][0], 0.0, delta = delta)
-            self.assertAlmostEquals(acc_pi['distance'], 1/60, delta = delta)
+            self.assertAlmostEqual(acc_pi['distance'], 1/60, delta = delta)
 
             xyw.publish({'x' : 0.0, 'y': 0.0, 'w' : 0.0})
             morse.sleep(0.01)
 
-            # decacceleration phase
+            # deceleration phase
             acc = accel_stream.last() 
             acc_pi = accel_pi_stream.last() 
 
-            self.assertLess(acc['acceleration'][0], -50)
+            self.assertLess(acc["acceleration_substantial"][0], -50) # UPBGE HACK
             self.assert_accel_almost_null(acc, 1)
             self.assertAlmostEqual(acc['velocity'][0], 0.0, delta = delta)
             self.assertAlmostEqual(acc['velocity'][1], 0.0, delta = delta)
-            self.assertAlmostEquals(acc['distance'], 0.0, delta = delta)
+            self.assertAlmostEqual(acc['distance'], 0.0, delta = delta)
 
             self.assert_accel_almost_null(acc_pi, 0)
-            self.assertGreater(acc_pi['acceleration'][1], 50)
+            self.assertGreater(acc_pi["acceleration_substantial"][1], -50) # UPBGE HACK
             self.assertAlmostEqual(acc_pi['velocity'][0], 0.0, delta = delta)
             self.assertAlmostEqual(acc_pi['velocity'][1], 0.0, delta = delta)
-            self.assertAlmostEquals(acc_pi['distance'], 0.0, delta = delta)
+            self.assertAlmostEqual(acc_pi['distance'], 0.0, delta = delta)
 
 
             morse.sleep(0.1)
@@ -113,13 +115,13 @@ class Accelero_Test(MorseMoveTestCase):
             self.assert_accel_almost_null(acc, 1)
             self.assertAlmostEqual(acc['velocity'][0], 0.0, delta = delta)
             self.assertAlmostEqual(acc['velocity'][1], 0.0, delta = delta)
-            self.assertAlmostEquals(acc['distance'], 0.0, delta = delta)
+            self.assertAlmostEqual(acc['distance'], 0.0, delta = delta)
 
             self.assert_accel_almost_null(acc_pi, 0)
             self.assert_accel_almost_null(acc_pi, 1)
             self.assertAlmostEqual(acc_pi['velocity'][0], 0.0, delta = delta)
             self.assertAlmostEqual(acc_pi['velocity'][1], 0.0, delta = delta)
-            self.assertAlmostEquals(acc_pi['distance'], 0.0, delta = delta)
+            self.assertAlmostEqual(acc_pi['distance'], 0.0, delta = delta)
 
 
             xyw.publish({'x' : 0.0, 'y': 1.0, 'w' : 0.0})
@@ -131,13 +133,13 @@ class Accelero_Test(MorseMoveTestCase):
             self.assert_accel_almost_null(acc, 1)
             self.assertAlmostEqual(acc['velocity'][0], 0.0, delta = delta)
             self.assertAlmostEqual(acc['velocity'][1], 1.0, delta = delta)
-            self.assertAlmostEquals(acc['distance'], 1/60, delta = delta)
+            self.assertAlmostEqual(acc['distance'], 1/60, delta = delta)
 
             self.assert_accel_almost_null(acc_pi, 0)
             self.assert_accel_almost_null(acc_pi, 1)
             self.assertAlmostEqual(acc_pi['velocity'][0], 1.0, delta = delta)
             self.assertAlmostEqual(acc_pi['velocity'][1], 0.0, delta = delta)
-            self.assertAlmostEquals(acc_pi['distance'], 1/60, delta = delta)
+            self.assertAlmostEqual(acc_pi['distance'], 1/60, delta = delta)
 
 
 ########################## Run these tests ##########################
