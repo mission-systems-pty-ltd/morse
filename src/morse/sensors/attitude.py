@@ -89,7 +89,7 @@ class Attitude(morse.core.sensor.Sensor):
         """
         Simulate angular velocity using the physics of the robot.
         """
-        return  self.rot_b2i * self.robot_w
+        return  self.rot_b2i @ self.robot_w
 
     def default_action(self):
         if self._type == 'Velocity':
