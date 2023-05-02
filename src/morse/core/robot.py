@@ -108,7 +108,7 @@ class Robot(morse.core.object.Object):
             parent.applyForce(-blenderapi.gravity())
             parent.worldLinearVelocity = [0.0, 0.0, 0.0]
             parent.suspendDynamics()
-
+        
         if position:
             parent.worldPosition = position
 

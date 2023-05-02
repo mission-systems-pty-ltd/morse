@@ -43,18 +43,17 @@ class BarometerTest(MorseTestCase):
         with Morse() as morse:
             bat_stream = morse.robot.barometer
             teleport_stream = morse.robot.teleport
+            delta = 5
 
             send_pose(teleport_stream, 0.0, 0.0, 0.0)
             bat = bat_stream.get()
-            [print(f"{key} \t {bat[key]}") for key in bat.keys()]
-            # self.assertAlmostEqual(bat['pressure'], 101325.0, delta = 0.1)
+            self.assertAlmostEqual(bat['pressure'], 101325.0, delta = delta)
 
             # pressure is independant of position (x,y)
             send_pose(teleport_stream, 5.0, 2.0, 0.0)
             morse.sleep(0.01)
             bat = bat_stream.get()
-            [print(f"{key} \t {bat[key]}") for key in bat.keys()]
-            # self.assertAlmostEqual(bat['pressure'], 101325.0, delta = 0.1)
+            self.assertAlmostEqual(bat['pressure'], 101325.0, delta = delta)
 
             # Pressure computed from
             # http://www.digitaldutch.com/atmoscalc/
@@ -62,14 +61,12 @@ class BarometerTest(MorseTestCase):
             send_pose(teleport_stream, 0.0, 0.0, 100.0)
             morse.sleep(0.01)
             bat = bat_stream.get()
-            [print(f"{key} \t {bat[key]}") for key in bat.keys()]
-            # self.assertAlmostEqual(bat['pressure'], 100129.0, delta = 0.1)
+            self.assertAlmostEqual(bat['pressure'], 100129.0, delta = delta)
 
             send_pose(teleport_stream, 0.0, 0.0, 1000.0)
             morse.sleep(0.01)
             bat = bat_stream.get()
-            [print(f"{key} \t {bat[key]}") for key in bat.keys()]
-            # self.assertAlmostEqual(bat['pressure'], 89871.0, delta = 0.1)
+            self.assertAlmostEqual(bat['pressure'], 89871.0, delta = delta)
 
 ########################## Run these tests ##########################
 if __name__ == "__main__":

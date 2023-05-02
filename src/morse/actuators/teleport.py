@@ -89,16 +89,23 @@ class Teleport(morse.core.actuator.Actuator):
         position = mathutils.Vector((self.local_data['x'],
                                      self.local_data['y'],
                                      self.local_data['z']))
-
+        
         # New parent orientation
         orientation = mathutils.Euler([self.local_data['roll'],
                                        self.local_data['pitch'],
                                        self.local_data['yaw']])
 
-        world2actuator = Transformation3d(None)
-        world2actuator.translation = position
-        world2actuator.rotation = orientation
+        # UPBGE HACK
+        #   This hack gives the robot the pose directly, instead of ...
+        #   ... considering any relativity.
+        #   Without it, world2actuator.matrix is a simple identity matrix, ...
+        #   ... which teleports the robot to 0,0,0 all the time.
+        
+        # world2actuator = Transformation3d(None)
+        # world2actuator.translation = position
+        # world2actuator.rotation = orientation
 
-        (loc, rot, _) = (world2actuator.matrix * self.actuator2robot.matrix).decompose()
-
-        self.robot_parent.force_pose(loc, rot)
+        # (loc, rot, _) = (world2actuator.matrix * self.actuator2robot.matrix).decompose()
+        # self.robot_parent.force_pose(loc, rot)
+        
+        self.robot_parent.force_pose(position, orientation)

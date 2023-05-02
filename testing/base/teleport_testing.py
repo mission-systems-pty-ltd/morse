@@ -18,9 +18,10 @@ import math
 import random
 from pymorse import Morse
 
+# UPBGE TODO - Teleport object doesn't update robot pose based on published data
+# Note that the teleport object does indeed receive the published data.
 def send_pose(s, x, y, z, yaw, pitch, roll):
     s.publish({'x' : x, 'y' : y, 'z' : z, 'yaw' : yaw, 'pitch' : pitch, 'roll' : roll})
-
 
 class TeleportTest(MorseTestCase):
 
