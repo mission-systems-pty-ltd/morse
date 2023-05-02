@@ -45,8 +45,8 @@ class ForceTorque(morse.core.actuator.Actuator):
         else:
             (loc, rot, scale) = robot.position_3d.transformation3d_with(self.position_3d).matrix.decompose()
             # rotate into robot frame, but still at actuator origin
-            force = rot * mathutils.Vector(self.local_data['force'])
-            torque = rot * mathutils.Vector(self.local_data['torque'])
+            force = rot @ mathutils.Vector(self.local_data['force'])
+            torque = rot @ mathutils.Vector(self.local_data['torque'])
             # add torque due to lever arm
             torque += loc.cross(force)
             robot.bge_object.applyForce(force, True)

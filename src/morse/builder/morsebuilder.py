@@ -189,9 +189,10 @@ class Robot(Component):
         :param friction: [0, 100], default 0.0
         :type  friction: float
         """
-        for slot in self._bpy_object.material_slots: # ['TireMat']
-            slot.material.physics.friction = friction
-
+        bpymorse.set_friction(self.name, friction) # UPBGE HACK (old code deprecated)
+        # for slot in self._bpy_object.material_slots: # ['TireMat']
+        #     slot.material.physics.friction = friction
+        
     def set_mass(self, mass):
         """ Set component's mass
 

@@ -22,7 +22,7 @@ class Barometer(Sensor):
     for an altitude less than 11000m
     """
     _name = "Barometer"
-    _short_desc = "Mesure the atmospheric pressure"
+    _short_desc = "Measure the atmospheric pressure"
 
     add_data('pressure', 0.0, "float", 'Pressure in Pa')
     add_property('_ref_p', 101325, "ReferencePressure", "float", 
@@ -46,3 +46,4 @@ class Barometer(Sensor):
         dz = self.position_3d.z - self._ref_z
         tmp = 1 - (TEMPERATURE_LAPSE_RATE * dz  / SEA_LEVEL_TEMP)
         self.local_data['pressure'] = self._ref_p * pow(tmp, self._inv_exp)
+        self.local_data['temp'] = [self.position_3d.z, self._ref_z]

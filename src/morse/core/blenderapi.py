@@ -151,10 +151,11 @@ def scene():
         return None
 
 def add_scene(name, overlay=1):
-    if not fake:
-        return bge.logic.addScene(name, overlay)
-    else:
-        return None
+    return None # UPBGE HACK - scenes don't exist anymore
+    # if not fake:
+    #     return bge.logic.addScene(name, overlay)
+    # else:
+    #     return None
 
 def get_scene_list():
     if not fake:

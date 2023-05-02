@@ -282,7 +282,7 @@ class Environment(AbstractComponent):
                 name = 'S.%dx%d' % (res_x, res_y)
                 if not name in cfg_camera_scene:
                     # Create a new scene for the Camera
-                    bpymorse.new_scene(type='LINK_OBJECTS')
+                    bpymorse.new_scene(type='LINK_COPY')
                     scene = bpymorse.get_context_scene()
                     scene.name = name
                     scene.render.resolution_x = res_x

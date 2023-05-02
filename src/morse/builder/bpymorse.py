@@ -93,6 +93,13 @@ def version():
     else:
         return 0,0,0
 
+# UPBGE HACK
+def set_friction(name, friction):
+    bpy.data.objects[name].game.friction = friction
+
+# UPBGE HACK
+def get_friction(name):
+    return bpy.data.objects[name].game.friction
 
 def create_new_material():
     all_materials = get_materials().keys()
@@ -202,18 +209,8 @@ def get_scene(name_or_id):
         return None
 
 def set_active_scene(name_or_id):
-    print("SCENES DO NOT EXIST ANYMORE ")
+    print("SCENES DO NOT EXIST ANYMORE ") # UPBGE HACK
     return None
-    # if bpy:
-    #    scene = get_scene(name_or_id)
-    #    if scene:
-    #        bpy.data.screens['Default'].scene = scene
-    #     #    bpy.context.screen.scene = scene
-    #        return scene
-    #    else:
-    #        return None
-    # else:
-    #    return None
 
 def get_last_scene():
     return get_scene(-1)
@@ -290,7 +287,6 @@ def _get_xxx_in_blend(filepath, kind):
         logger.error(detail)
         raise MorseBuilderNoComponentError("Component not found")
     return objects
-
 
 def get_objects_in_blend(filepath):
     return _get_xxx_in_blend(filepath, 'objects')

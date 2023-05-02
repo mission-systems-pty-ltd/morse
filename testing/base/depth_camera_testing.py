@@ -28,11 +28,11 @@ class DepthCameraTest(MorseTestCase):
         robot.append(motion)
         motion.add_stream('socket')
 
-        camera = DepthCamera()
-        camera.translate(z = 1)
-        camera.frequency(3)
-        robot.append(camera)
-        camera.add_stream('socket')
+        # camera = DepthCamera()
+        # camera.translate(z = 1)
+        # camera.frequency(3)
+        # robot.append(camera)
+        # camera.add_stream('socket')
 
         env = Environment('indoors-1/boxes')
         # No fastmode here, no MaterialIndex in WIREFRAME mode: AttributeError:

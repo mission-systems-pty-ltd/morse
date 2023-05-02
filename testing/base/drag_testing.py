@@ -26,6 +26,9 @@ class DragTest(MorseTestCase):
         # Make sure there is no friction with ground and it won't fall
         robot_ref.translate(z = 1.0)
         robot_ref._bpy_object.game.lock_location_z = True
+        robot_ref._bpy_object.game.lock_rotation_x = True
+        robot_ref._bpy_object.game.lock_rotation_y = True
+        robot_ref._bpy_object.game.lock_rotation_z = True
 
         force = ForceTorque()
         robot_ref.append(force)
@@ -40,6 +43,9 @@ class DragTest(MorseTestCase):
         # Make sure there is no friction with ground and it won't fall
         robot.translate(z = 1.0)
         robot._bpy_object.game.lock_location_z = True
+        robot._bpy_object.game.lock_rotation_x = True
+        robot._bpy_object.game.lock_rotation_y = True
+        robot._bpy_object.game.lock_rotation_z = True
 
         force2 = ForceTorque()
         robot.append(force2)

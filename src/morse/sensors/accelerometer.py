@@ -110,11 +110,11 @@ class Accelerometer(morse.core.sensor.Sensor):
         if self.compute_offset_acceleration:
             # acceleration due to rotation (centripetal)
             # is zero if imu is mounted in robot center (assumed axis of rotation)
-            a_centripetal = self.rot_b2i * rates.cross(rates.cross(self.imu2body.translation))
+            a_centripetal = self.rot_b2i @ rates.cross(rates.cross(self.imu2body.translation))
             #logger.debug("centripetal acceleration (% .4f, % .4f, % .4f)", a_rot[0], a_rot[1], a_rot[2])
 
             # linear acceleration due to angular acceleration
-            a_alpha = self.rot_b2i * (self.robot_w - self.pav).cross(self.imu2body.translation) / self.dt
+            a_alpha = self.rot_b2i @ (self.robot_w - self.pav).cross(self.imu2body.translation) / self.dt
 
             # final measurement includes acceleration due to rotation center not in IMU
             self.a += a_centripetal + a_alpha
