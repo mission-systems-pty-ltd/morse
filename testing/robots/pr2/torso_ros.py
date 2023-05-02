@@ -46,7 +46,7 @@ class PR2TorsoTest(RosTestCase):
         rospy.loginfo("Preparing to publish on %s" % topic)
         ctl = rospy.Publisher(topic, JointTrajectory)
 
-        self.assertEquals(getjoint("torso_lift_joint"), 0.0)
+        self.assertEqual(getjoint("torso_lift_joint"), 0.0)
 
         duration = 0.1
 
@@ -68,7 +68,7 @@ class PR2TorsoTest(RosTestCase):
 
         ctl.publish(traj)
         time.sleep(duration + 0.1)
-        self.assertEquals(getjoint("torso_lift_joint"), 0.195)
+        self.assertEqual(getjoint("torso_lift_joint"), 0.195)
 
         # Go back to initial position
         finalpoint.time_from_start = rospy.Duration(0.0)
@@ -77,7 +77,7 @@ class PR2TorsoTest(RosTestCase):
 
         ctl.publish(traj)
         time.sleep(duration + 0.1)
-        self.assertEquals(getjoint("torso_lift_joint"), 0.0)
+        self.assertEqual(getjoint("torso_lift_joint"), 0.0)
 
     def test_action(self):
 
@@ -87,7 +87,7 @@ class PR2TorsoTest(RosTestCase):
         client = actionlib.SimpleActionClient('torso_controller/position_joint_action', SingleJointPositionAction)
         self.assertTrue(client.wait_for_server(rospy.Duration(5)))
 
-        self.assertEquals(getjoint("torso_lift_joint"), 0.0)
+        self.assertEqual(getjoint("torso_lift_joint"), 0.0)
 
         up = SingleJointPositionGoal
         up.position = 0.195
@@ -100,7 +100,7 @@ class PR2TorsoTest(RosTestCase):
         print("Got this status: " + str(status))
         self.assertEqual(status, actionlib.GoalStatus.SUCCEEDED)
 
-        self.assertEquals(getjoint("torso_lift_joint"), 0.195)
+        self.assertEqual(getjoint("torso_lift_joint"), 0.195)
 
         down = SingleJointPositionGoal
         down.position = 0.0
@@ -113,7 +113,7 @@ class PR2TorsoTest(RosTestCase):
         print("Got this status: " + str(status))
         self.assertEqual(status, actionlib.GoalStatus.SUCCEEDED)
 
-        self.assertEquals(getjoint("torso_lift_joint"), 0.0)
+        self.assertEqual(getjoint("torso_lift_joint"), 0.0)
 
 
 ########################## Run these tests ##########################

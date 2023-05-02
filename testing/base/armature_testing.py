@@ -63,7 +63,7 @@ class ArmatureTest(MorseTestCase):
 
     def test_joints_names(self):
         with Morse() as simu:
-            self.assertEquals(simu.robot.arm.get_joints(), JOINTS)
+            self.assertEqual(simu.robot.arm.get_joints(), JOINTS)
 
     def test_object_attach(self):
         """ Checks that attached object are indeed attached at the right place.

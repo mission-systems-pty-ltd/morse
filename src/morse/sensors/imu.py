@@ -110,7 +110,7 @@ class IMU(morse.core.sensor.Sensor):
         ang_vel = angular_velocities(self.pp, self.position_3d, 1 / self.frequency)
 
         # linear acceleration in imu frame
-        dv_imu = self.rot_i2w.transposed() * (lin_vel - self.plv) * self.frequency
+        dv_imu = self.rot_i2w.transposed() @ (lin_vel - self.plv) * self.frequency
 
         # measurement includes gravity and acceleration
         accel_meas = dv_imu + self.rot_i2w.transposed() * self.gravity
@@ -136,11 +136,11 @@ class IMU(morse.core.sensor.Sensor):
 
         # differentiate linear velocity in world (inertial) frame
         # and rotate to imu frame
-        dv_imu = self.rot_i2w.transposed() * (self.robot_vel - self.plv) * self.frequency
+        dv_imu = self.rot_i2w.transposed() @ (self.robot_vel - self.plv) * self.frequency
         #logger.debug("velocity_dot in imu frame (% .4f, % .4f, % .4f)", dv_imu[0], dv_imu[1], dv_imu[2])
 
         # rotate acceleration due to gravity into imu frame
-        g_imu = self.rot_i2w.transposed() * self.gravity
+        g_imu = self.rot_i2w.transposed() @ self.gravity
 
         # measurement includes gravity and acceleration
         accel_meas = dv_imu + g_imu

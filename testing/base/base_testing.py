@@ -53,11 +53,11 @@ class BaseTest(MorseTestCase):
         
         result = sockf.readline()
         id, success, robots = result.strip().split(' ', 2)
-        self.assertEquals(success, "SUCCESS")
+        self.assertEqual(success, "SUCCESS")
         
         import ast
         robotsset = set(ast.literal_eval(robots))
-        self.assertEquals(robotsset, {'jido', 'mana', 'dala', 'atrv'})
+        self.assertEqual(robotsset, {'jido', 'mana', 'dala', 'atrv'})
         sockf.close()
         s.close()
 
@@ -83,7 +83,7 @@ class BaseTest(MorseTestCase):
             s.send(q)
             result = sockf.readline()
             id, success, robots = result.strip().split(' ', 2)
-            self.assertEquals(success, "SUCCESS")
+            self.assertEqual(success, "SUCCESS")
 
         sockf.close()
         s.close()

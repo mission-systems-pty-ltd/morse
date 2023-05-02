@@ -204,13 +204,12 @@ class LaserSensorWithArc(SensorCreator):
         'resolution and 'scan_window' are used to determine how many points
         will be added to the arc.
         """
-        scene = bpymorse.get_context_scene()
         laserscanner_obj = self._bpy_object
 
         # Delete previously created arc
         for child in laserscanner_obj.children:
             if child.name.startswith("Arc_"):
-                scene.objects.unlink( child )
+                bpymorse.context_unlink( child )
 
         # Read the parameters to create the arc
         properties = laserscanner_obj.game.properties
@@ -277,7 +276,7 @@ class LaserSensorWithArc(SensorCreator):
         arc.game.physics_type = 'NO_COLLISION'
         arc.hide_render = True
         # Link the new object in the scene
-        scene.objects.link( arc )
+        bpymorse.context_link( arc )
         # Set the parent to be the laserscanner Empty
         arc.parent = laserscanner_obj
         # Set the material of the arc

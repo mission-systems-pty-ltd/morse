@@ -41,7 +41,7 @@ class MagnetoDriver(object):
                                  pos_lla[0, 2] / 1000.0, self._date)
         mag_field_enu = mathutils.Vector((e, n, -d))
 
-        return mag_field_enu * pose.rotation_matrix
+        return mag_field_enu @ pose.rotation_matrix
 
 class Magnetometer(morse.core.sensor.Sensor):
     """ 

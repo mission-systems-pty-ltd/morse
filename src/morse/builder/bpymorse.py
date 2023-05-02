@@ -101,6 +101,14 @@ def set_friction(name, friction):
 def get_friction(name):
     return bpy.data.objects[name].game.friction
 
+# UPBGE HACK
+def context_link(item):
+    bpy.context.collection.objects.link(item)
+
+# UPBGE HACK
+def context_unlink(item):
+    bpy.context.collection.objects.unlink(item)
+
 def create_new_material():
     all_materials = get_materials().keys()
     new_material()
