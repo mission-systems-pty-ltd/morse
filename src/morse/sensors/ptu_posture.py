@@ -53,8 +53,13 @@ class PTUPosture(morse.core.sensor.Sensor):
                     "This sensor must be a child of a PTU. Check you scene.")
             return
 
-        self._ptu_obj = blenderapi.persistantstorage().componentDict[ptu.name]
-
+        # UPBGE HACK
+        #   The original ptu name was incorrect.
+        #   The following serves as a quick fix, though it may not work for ...
+        #   ... all cases
+        ptu_name = ".".join(self.bge_object.name.split(".")[:2])
+        self._ptu_obj = blenderapi.persistantstorage().componentDict[ptu_name]
+        
         self.local_data['pan'] = 0.0
         self.local_data['tilt'] = 0.0
         logger.info('Component <%s> initialized, runs at %.2f Hz' % (self.bge_object.name, self.frequency))
