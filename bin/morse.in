@@ -311,7 +311,7 @@ def check_setup():
     else:
         our_python_version = '.'.join((str(x) for x in sys.version_info[:3]))
         if (python_version != our_python_version):
-            logger.error("Blender is compiled for Python " + python_version + \
+            logger.warn("Blender is compiled for Python " + python_version + \
                    " but MORSE has been compiled for Python " + \
                    our_python_version + "! Check your MORSE build configuration"
                    " or the selected Blender version.")
