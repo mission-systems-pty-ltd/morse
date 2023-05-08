@@ -46,12 +46,12 @@ class MultipleHumanTest(MorseTestCase):
             p2 = morse.raphael.pose.get()
             p3 = morse.novak.pose.get()
 
-            self.assertAlmostEquals(p1['x'], 5.0, delta=0.01)
-            self.assertAlmostEquals(p2['x'], -5.0, delta=0.01)
-            self.assertAlmostEquals(p3['x'], 0.0, delta=0.01)
-            self.assertAlmostEquals(p1['y'], 0.0, delta=0.01)
-            self.assertAlmostEquals(p2['y'], 0.0, delta=0.01)
-            self.assertAlmostEquals(p3['y'], 0.0, delta=0.01)
+            self.assertAlmostEqual(p1['x'], 5.0, delta=0.01)
+            self.assertAlmostEqual(p2['x'], -5.0, delta=0.01)
+            self.assertAlmostEqual(p3['x'], 0.0, delta=0.01)
+            self.assertAlmostEqual(p1['y'], 0.0, delta=0.01)
+            self.assertAlmostEqual(p2['y'], 0.0, delta=0.01)
+            self.assertAlmostEqual(p3['y'], 0.0, delta=0.01)
 
     def test_skeletons(self):
         with Morse() as morse:
@@ -61,10 +61,10 @@ class MultipleHumanTest(MorseTestCase):
 
             # Check that the pose is the same for all the models (ie, same joints value)
             for j1, j2 in zip(s1.get_state().result().values(), s2.get_state().result().values()):
-                self.assertAlmostEquals(j1, j2, delta=0.001)
+                self.assertAlmostEqual(j1, j2, delta=0.001)
 
             for j1, j3 in zip(s1.get_state().result().values(), s3.get_state().result().values()):
-                self.assertAlmostEquals(j1, j3, delta=0.001)
+                self.assertAlmostEqual(j1, j3, delta=0.001)
 
 ########################## Run these tests ##########################
 if __name__ == "__main__":

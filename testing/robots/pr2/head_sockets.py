@@ -40,13 +40,13 @@ class PR2TorsoTest(MorseTestCase):
 
         joint = "head_pan"
 
-        self.assertAlmostEquals(getjoint(joint), 0.0, 3)
+        self.assertAlmostEqual(getjoint(joint), 0.0, 3)
 
         with Morse() as simu:
 
             logger.info("Paning the head 1")
             action = simu.pr2.head.rotate(joint, 1, 1).result() # speed = 1 rad/s
-            self.assertAlmostEquals(getjoint(joint), 1, 1)
+            self.assertAlmostEqual(getjoint(joint), 1, 1)
 
 
 ########################## Run these tests ##########################

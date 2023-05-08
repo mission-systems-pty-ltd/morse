@@ -43,9 +43,9 @@ class MagnemoterTest(MorseTestCase):
                                       'pitch': 0.0, 'roll': 0.0})
         self.m.sleep(0.1)
         mag = self.mag_stream.get()
-        self.assertAlmostEquals(mag['x'], mag_x, delta = precision)
-        self.assertAlmostEquals(mag['y'], mag_y, delta = precision)
-        self.assertAlmostEquals(mag['z'], mag_z, delta = precision)
+        self.assertAlmostEqual(mag['x'], mag_x, delta = precision)
+        self.assertAlmostEqual(mag['y'], mag_y, delta = precision)
+        self.assertAlmostEqual(mag['z'], mag_z, delta = precision)
 
     def test_geodetic_modifier(self):
         """ Test if we can connect to the pose data stream, and read from it.

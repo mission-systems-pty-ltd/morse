@@ -57,12 +57,8 @@ class Odometry(morse.core.sensor.Sensor):
         """
         # Call the constructor of the parent class
         morse.core.sensor.Sensor.__init__(self, obj, parent)
-
         self.original_pos = copy.copy(self.position_3d)
-
-        self.previous_pos = self.original_pos.transformation3d_with(
-                                                            self.position_3d)
-
+        self.previous_pos = self.original_pos.transformation3d_with(self.position_3d)
         logger.info('Component initialized, runs at %.2f Hz', self.frequency)
 
 
@@ -74,6 +70,7 @@ class Odometry(morse.core.sensor.Sensor):
         """
         # Compute the position of the sensor within the original frame
         current_pos = self.original_pos.transformation3d_with(self.position_3d)
+        self.local_data["temp"] = current_pos
 
         # Compute the difference in positions with the previous loop
         self._dx = current_pos.x - self.previous_pos.x

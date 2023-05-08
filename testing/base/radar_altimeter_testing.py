@@ -48,14 +48,14 @@ class RadarAltimeterTest(MorseTestCase):
             precision = 0.01
 
             altitude = altimeter_stream.get()
-            self.assertAlmostEquals(altitude['z'], 20.0, delta = precision)
+            self.assertAlmostEqual(altitude['z'], 20.0, delta = precision)
 
             teleport_stream.publish({'x': 0.0, 'y': 0.0, 'z': 15.0,
                 'yaw': 0.0, 'pitch': 0.0, 'roll': 0.0})
             morse.sleep(0.1)
 
             altitude = altimeter_stream.get()
-            self.assertAlmostEquals(altitude['z'], 15.0, delta = precision)
+            self.assertAlmostEqual(altitude['z'], 15.0, delta = precision)
 
             teleport_stream.publish({'x': 0.0, 'y': 0.0, 'z': 30.0,
                 'yaw': 0.0, 'pitch': 0.0, 'roll': 0.0})
@@ -69,7 +69,7 @@ class RadarAltimeterTest(MorseTestCase):
             morse.sleep(0.1)
 
             altitude = altimeter_stream.get()
-            self.assertAlmostEquals(altitude['z'], 12.0, delta = precision)
+            self.assertAlmostEqual(altitude['z'], 12.0, delta = precision)
 
             # Goes on top on the red box, size ~1.8m
             teleport_stream.publish({'x': -7.5, 'y': 0.0, 'z': 15.0,
@@ -77,7 +77,7 @@ class RadarAltimeterTest(MorseTestCase):
             morse.sleep(0.1)
 
             altitude = altimeter_stream.get()
-            self.assertAlmostEquals(altitude['z'], 13.14, delta = precision)
+            self.assertAlmostEqual(altitude['z'], 13.14, delta = precision)
 
 
 ########################## Run these tests ##########################

@@ -122,7 +122,7 @@ class Transformation3d:
         res = Transformation3d(None)
         o2m = self.matrix.copy()
         o2m.invert()
-        res.matrix = o2m * t3d.matrix
+        res.matrix = o2m @ t3d.matrix # UPBGE HACK - replaced '*' with '@'
         res.euler = res.matrix.to_euler()
         return res
 
