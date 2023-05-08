@@ -149,7 +149,7 @@ class GPS(morse.core.sensor.Sensor):
         logger.info('%s initialization' % obj.name)
         # Call the constructor of the parent class
         morse.core.sensor.Sensor.__init__(self, obj, parent)
-
+        self.local_data["temp"] = []
         logger.info('Component initialized, runs at %.2f Hz', self.frequency)
 
 
@@ -163,6 +163,7 @@ class GPS(morse.core.sensor.Sensor):
 
         # Store the data acquired by this sensor that could be sent
         #  via a middleware.
+        self.local_data["temp"] += [self.position_3d.x]
         self.local_data['x'] = float(x)
         self.local_data['y'] = float(y)
         self.local_data['z'] = float(z)

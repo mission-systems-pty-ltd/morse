@@ -68,6 +68,7 @@ class FeetModifierTest(MorseTestCase):
             self.assertAlmostEqual(pos_mod['y'], 26.246, delta=precision)
             self.assertAlmostEqual(pos_mod['z'], .3280, delta=precision)
 
+            morse.deactivate('robot.teleport_mod') # UPBGE HACK - only one teleporter can be activated at the same time
             teleport_stream.publish({'x' : 100.0, 'y' : 200.0, 'z' : 50.0, 'yaw' : 0.0, 'pitch' : 0.0, 'roll' : 0.0})
             morse.sleep(0.01)
 
@@ -82,6 +83,7 @@ class FeetModifierTest(MorseTestCase):
             self.assertAlmostEqual(pos_mod['z'], 164.042, delta=precision)
 
             morse.deactivate('robot.teleport')
+            morse.activate('robot.teleport_mod') # UPBGE HACK - only one teleporter can be activated at the same time
             teleport_mod_stream.publish({'x': 32.8084, 'y': 26.246, 'z': 0.3280,  'yaw' : 0.0, 'pitch' : 0.0, 'roll': 0.0})
             morse.sleep(0.03)
 
