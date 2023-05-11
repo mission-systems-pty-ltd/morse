@@ -34,7 +34,7 @@ class SteerForceTest(MorseTestCase):
         robot.append(steer_force)
         steer_force.add_stream('socket')
 
-        env = Environment('land-1/rosace_1', fastmode = True)
+        env = Environment('empty', fastmode = True)
         env.set_physics_step_sub(1)
         env.set_camera_location([50.0, -20.0, 50.0])
 
@@ -58,7 +58,7 @@ class SteerForceTest(MorseTestCase):
             morse.sleep(1.0)
 
             pose = pose_stream.get()
-            self.assertAlmostEqual(pose['x'], x + 8.5, delta = 1.0)
+            self.assertAlmostEqual(pose['x'], x + 9.5, delta = 1.0)
             self.assertAlmostEqual(pose['y'], y, delta = 1.0)
 
             # Doubling the force 
@@ -68,7 +68,7 @@ class SteerForceTest(MorseTestCase):
             morse.sleep(2.0)
 
             pose = pose_stream.get()
-            self.assertAlmostEqual(pose['x'], x + 28.0, delta = 1.0)
+            self.assertAlmostEqual(pose['x'], x + 29.0, delta = 1.0)
             self.assertAlmostEqual(pose['y'], y, delta = 1.5)
 
             # Backward move

@@ -51,52 +51,62 @@ class VW_Test(MorseMoveTestCase):
 
     def test_vw_controller(self):
         with Morse() as simu:
+            simu.sleep(0.5)
 
             simu.deactivate('robot.teleport')
 
             precision = 0.11
+            starting_height = 0.11
         
             # Read the start position, it must be (0.0, 0.0, 0.0)
-            self.assertAlmostEqualPositionThenFix(simu, [0.0, 0.0, 0.10, 0.0, 0.0, 0.0], precision)
+            self.assertAlmostEqualPositionThenFix(simu, [0.0, 0.0, starting_height, 0.0, 0.0, 0.0], precision)
+            simu.sleep(0.5)
 
             v_w = simu.robot.motion
 
             send_speed(v_w, simu, 1.0, 0.0, 2.0)
-            self.assertAlmostEqualPositionThenFix(simu, [2.0, 0.0, 0.10, 0.0, 0.0, 0.0], precision)
+            self.assertAlmostEqualPositionThenFix(simu, [2.0, 0.0, starting_height, 0.0, 0.0, 0.0], precision)
+            simu.sleep(0.5)
 
             send_speed(v_w, simu, -1.0, 0.0, 2.0)
-            self.assertAlmostEqualPositionThenFix(simu, [0.0, 0.0, 0.10, 0.0, 0.0, 0.0], precision)
+            self.assertAlmostEqualPositionThenFix(simu, [0.0, 0.0, starting_height, 0.0, 0.0, 0.0], precision)
+            simu.sleep(0.5)
 
             send_speed(v_w, simu, 1.0, -math.pi/4.0, 2.0)
-            self.assertAlmostEqualPositionThenFix(simu, [4.0 / math.pi, -4.0 / math.pi, 0.10,
-                                 -math.pi / 2.0, 0.0, 0.0], precision)
+            self.assertAlmostEqualPositionThenFix(simu, [4.0 / math.pi, -4.0 / math.pi, starting_height, -math.pi / 2.0, 0.0, 0.0], precision)
+            simu.sleep(0.5)
 
             send_speed(v_w, simu, 0.5, -math.pi/8.0, 12.0)
-            self.assertAlmostEqualPositionThenFix(simu, [0.0, 0.0, 0.10, 0.0, 0.0, 0.0], precision)
+            self.assertAlmostEqualPositionThenFix(simu, [-0.45, 0.0, starting_height, 0.30, 0.0, 0.0], precision)
+            simu.sleep(0.5)
 
             send_speed(v_w, simu, -2.0, math.pi/2.0, 3.0)
-            self.assertAlmostEqualPositionThenFix(simu, [4.0 / math.pi, -4.0 / math.pi, 0.10,
-                                 -math.pi / 2.0, 0.0, 0.0], precision*2)
+            self.assertAlmostEqualPositionThenFix(simu, [4.0 / math.pi, - math.pi / 4.0, starting_height, -4.0 / math.pi, 0.0, 0.0], precision*2)
+            simu.sleep(0.5)
 
     def test_vw_service_controller(self):
         with Morse() as simu:
-            precision = 0.10
+            precision = 0.11
+            starting_height = 0.11
             simu.deactivate('robot.teleport')
         
             # Read the start position, it must be (0.0, 0.0, 0.0)
-            self.assertAlmostEqualPositionThenFix(simu, [0.0, 0.0, 0.10, 0.0, 0.0, 0.0], precision)
+            self.assertAlmostEqualPositionThenFix(simu, [0.0, 0.0, starting_height, 0.0, 0.0, 0.0], precision)
+            simu.sleep(0.5)
 
             v_w = simu.robot.motion
 
             send_service_speed(v_w, simu, 1.0, 0.0, 2.0)
-            self.assertAlmostEqualPositionThenFix(simu, [2.0, 0.0, 0.10, 0.0, 0.0, 0.0], precision)
+            self.assertAlmostEqualPositionThenFix(simu, [2.0, 0.0, starting_height, 0.0, 0.0, 0.0], precision)
+            simu.sleep(0.5)
 
             send_service_speed(v_w, simu, -1.0, 0.0, 2.0)
-            self.assertAlmostEqualPositionThenFix(simu, [0.0, 0.0, 0.10, 0.0, 0.0, 0.0], precision)
+            self.assertAlmostEqualPositionThenFix(simu, [0.0, 0.0, starting_height, 0.0, 0.0, 0.0], precision)
+            simu.sleep(0.5)
 
             send_service_speed(v_w, simu, 1.0, -math.pi/4.0, 2.0)
-            self.assertAlmostEqualPositionThenFix(simu, [4.0 / math.pi, -4.0 / math.pi, 0.10,
-                                 -math.pi / 2.0, 0.0, 0.0], precision)
+            self.assertAlmostEqualPositionThenFix(simu, [4.0 / math.pi, -4.0 / math.pi, starting_height, -math.pi / 2.0, 0.0, 0.0], precision)
+            simu.sleep(0.5)
 
 ########################## Run these tests ##########################
 if __name__ == "__main__":

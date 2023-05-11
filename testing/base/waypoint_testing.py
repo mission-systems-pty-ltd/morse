@@ -34,7 +34,6 @@ class Waypoints_Test(MorseTestCase):
         motion.add_stream('socket')
         motion.add_service('socket')
 
-        
         env = Environment('empty', fastmode = True)
         env.add_service('socket')
 

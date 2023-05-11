@@ -124,6 +124,7 @@ class Waypoint(ActuatorCreator):
         self.properties(Target = "")
         # append 2 Radar with logic
         self.add_lr_radars()
+        print("CCCC")
 
     def add_lr_radars(self):
         self.add_radar('Radar.L', 'Lcollision', +1)

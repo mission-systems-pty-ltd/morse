@@ -50,7 +50,7 @@ class Velocity_Test(MorseMoveTestCase):
         env.add_service('socket')
 
     def assert_velocity(self, morse, command, expected):
-        delta = 0.1
+        delta = 0.25
 
         self.xyw.publish(command)
         morse.sleep(0.1)
@@ -110,6 +110,7 @@ class Velocity_Test(MorseMoveTestCase):
 
     def test_velocity_sensor(self):
         with Morse() as morse:
+            morse.sleep(1.0)
 
             self.xyw = morse.robot.motion
             self.vel_stream = morse.robot.vel

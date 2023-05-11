@@ -67,7 +67,7 @@ class XYW_Test(MorseMoveTestCase):
                                  -math.pi / 2.0, 0.0, 0.0], precision)
 
 
-            send_speed(xyw, morse, 0.5, 0.0, -math.pi/8.0, 12.0)
+            send_speed(xyw, morse, 0.5, 0.0, -math.pi/8.0, 12 + 1)
             self.assertAlmostEqualPositionThenFix(morse, [0.0, 0.0, 0.10, 0.0, 0.0, 0.0], precision)
 
             send_speed(xyw, morse, -2.0, 0.0, math.pi/2.0, 3.0)

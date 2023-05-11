@@ -44,8 +44,7 @@ class ThermometerTest(MorseTestCase):
 
             send_dest(teleport_client, morse, 40.0, 0.0, 0.0)
 
-            # We are nearer of the fire so the temperature is expected
-            # to be hotter.
+            # We are nearer to the fire so the temperature is expected to be hotter.
             o = temp_stream.get()
             temp = o['temperature']
             self.assertGreater(temp, 28.0)

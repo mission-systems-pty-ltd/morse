@@ -146,23 +146,22 @@ class Component(AbstractComponent):
             and blender_object_name is None and not filename is None:
             blender_object_name = filename
 
-        # Get the main object
-        if blender_object_name is None:
+        # UPBGE HACK
+        #   Sets the object
+        #   Accounts for numbering (e.g., morsy.001)
+        is_object_set = False
+        for imported_object in imported_objects:
+            object_name = imported_object.name.split(".")[0].lower()
+            if blender_object_name == object_name:
+                self.set_blender_object(imported_object)
+                is_object_set = True
+                break
+        if not is_object_set:
             self.set_blender_object(imported_objects[0])
-            
-        # UPBGE HACK - accounts for numbering (e.g., morsy.001)
-        else:
-            for imported_object in imported_objects:
-                object_name = imported_object.name.split(".")[0].lower()
-                if blender_object_name == object_name:
-                    self.set_blender_object(imported_object)
-                    break
-
+        
         # If the object has no MORSE logic, add default one
-        if make_morseable and category in ['sensors', 'actuators', 'robots'] \
-                and not self.is_morseable():
+        if make_morseable and category in ['sensors', 'actuators', 'robots'] and not self.is_morseable():
             self.morseable()
-
 
 class Robot(Component):
     def __init__(self, filename='', name=None, blender_object_name=None):
@@ -285,14 +284,14 @@ class WheeledRobot(GroundRobot):
     def unparent_wheels(self):
         """ Make the wheels orphans, but keep the transformation applied to
             the parent robot """
-        
-        # Force Blender to update the transformation matrices of objects
-        import bpy; bpy.context.evaluated_depsgraph_get().update() # UPBGE HACK FIX?
 
         # Define wheel names
         keys = ['WheelFLName', 'WheelFRName', 'WheelRLName', 'WheelRRName', 'CasterWheelName']
         
-        # Perform proper mapping of wheels
+        # UPBGE HACK - forces Blender to update the transformation matrices of objects
+        import bpy; bpy.context.evaluated_depsgraph_get().update()
+
+        # UPBGE HACK - performs proper mapping of wheels
         properties = bpymorse.get_properties(self._bpy_object)
         for key in keys:
             wheel_name = properties.get(key, None)
@@ -305,7 +304,7 @@ class WheeledRobot(GroundRobot):
         properties = bpymorse.get_properties(self._bpy_object)
         for key in keys:
             expected_wheel = properties.get(key, None)
-            if expected_wheel:
+            if expected_wheel != None:
                 wheel = self.get_child(expected_wheel)
                 if wheel:
                     # Make a copy of the current transformation matrix

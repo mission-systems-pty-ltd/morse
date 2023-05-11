@@ -319,8 +319,7 @@ class Environment(AbstractComponent):
         time_scale = self.property_value('time_scale')
         if self.auto_tune_time:
             self.use_vsync('OFF')
-            # notyet :D
-            # self.use_internal_syncer()
+            # self.use_internal_syncer() # not yet :D
             if max_frequency_requested > base_frequency:
                 self.simulator_frequency(max_frequency_requested)
         else:
@@ -413,6 +412,7 @@ class Environment(AbstractComponent):
         camera_fp.data.clip_start = self._camera_clip_start
         camera_fp.data.clip_end   = self._camera_clip_end
         camera_fp.data.lens = self._focal_length # set focal length in mm
+        
         # Make CameraFP the active camera
         # bpymorse.deselect_all()
         # UPBGE HACK
@@ -450,7 +450,6 @@ class Environment(AbstractComponent):
         self._created = True
         # in case we are in edit mode, do not exit on error with CLI
         sys.excepthook = sys.__excepthook__ # Standard Python excepthook
-        print("FINISHED CREATING ENVIRONMENT")
 
     def set_horizon_color(self, color=(0.05, 0.22, 0.4)):
         """ Set the horizon color

@@ -278,7 +278,7 @@ class LaserScanner(Sensor):
         for ray in self._ray_list:
             # Transform the ray to the current position and rotation
             #  of the sensor
-            correct_ray = self.position_3d.matrix * ray
+            correct_ray = self.position_3d.matrix @ ray
 
             # Shoot a ray towards the target
             target, point, normal = self.bge_object.rayCast(correct_ray, None,
@@ -291,7 +291,7 @@ class LaserScanner(Sensor):
             if target:
                 distance = self.bge_object.getDistanceTo(point)
                 # Return the point to the reference of the sensor
-                new_point = inverse * point
+                new_point = inverse @ point
 
                 #logger.debug("\t\tGOT INTERSECTION WITH RAY: [%.4f, %.4f, %.4f]" % (correct_ray[0], correct_ray[1], correct_ray[2]))
                 #logger.debug("\t\tINTERSECTION AT: [%.4f, %.4f, %.4f] = %s" % (point[0], point[1], point[2], target))
@@ -388,7 +388,7 @@ class RSSILaserScanner(LaserScanner):
         for ray in self._ray_list:
             # Transform the ray to the current position and rotation
             #  of the sensor
-            correct_ray = self.position_3d.matrix * ray
+            correct_ray = self.position_3d.matrix @ ray
 
             # Shoot a ray towards the target
             """
@@ -410,7 +410,7 @@ class RSSILaserScanner(LaserScanner):
 
             if target_poly:
                 distance = self.bge_object.getDistanceTo(point)
-                new_point = inverse * point
+                new_point = inverse @ point
 
                 rssi = self.getRSSIValue(target_poly)                        
                             

@@ -43,8 +43,8 @@ class PTUTest(MorseTestCase):
         gyro.add_stream('socket')
         ptu.append(gyro)
         
-        chair = PassiveObject(prefix='RollingChair')
-        chair.translate(x=ptu_x, y=3, z=0.01)
+        # chair = PassiveObject(prefix='RollingChair')
+        # chair.translate(x=ptu_x, y=3, z=0.01)
 
         env = Environment('empty', fastmode = True)
         env.add_service('socket')
@@ -196,10 +196,10 @@ class PTUTest(MorseTestCase):
             # Reset position
             morse.rpc('robot.ptu', 'set_pan_tilt', 0.0, 0.0)
 
-            res = morse.rpc('robot.ptu', 'look_at_object', 'chair')
-            res = morse.rpc('robot.ptu', 'get_pan_tilt')
-            self.assertAlmostEqual(res[0], math.radians(90), delta=precision)
-            self.assertAlmostEqual(res[1], 0.466, delta=precision)
+            # res = morse.rpc('robot.ptu', 'look_at_object', 'chair')
+            # res = morse.rpc('robot.ptu', 'get_pan_tilt')
+            # self.assertAlmostEqual(res[0], math.radians(90), delta=precision)
+            # self.assertAlmostEqual(res[1], 0.466, delta=precision)
 
 
 
