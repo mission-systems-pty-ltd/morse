@@ -97,11 +97,11 @@ class Accelerometer(morse.core.sensor.Sensor):
     def _sim_physics(self):
         w2a = self.position_3d.rotation_matrix.transposed()
         # rotate the angular rates from the robot frame into the imu frame
-        rates = self.rot_b2i @ self.robot_w
+        rates = self.rot_b2i @ self.robot_w # UPBGE HACK - replaced '*' with '@'
 
         # differentiate linear velocity in world (inertial) frame
         # and rotate to imu frame
-        self.a = w2a @ (self.robot_vel - self.plv) / self.dt
+        self.a = w2a @ (self.robot_vel - self.plv) / self.dt # UPBGE HACK - replaced '*' with '@'
         
         # UPBGE HACK - Stores most recent substantial acceleration (>10)
         if [a for a in self.a if abs(a) > 10] != []:
@@ -110,11 +110,11 @@ class Accelerometer(morse.core.sensor.Sensor):
         if self.compute_offset_acceleration:
             # acceleration due to rotation (centripetal)
             # is zero if imu is mounted in robot center (assumed axis of rotation)
-            a_centripetal = self.rot_b2i @ rates.cross(rates.cross(self.imu2body.translation))
+            a_centripetal = self.rot_b2i @ rates.cross(rates.cross(self.imu2body.translation)) # UPBGE HACK - replaced '*' with '@'
             #logger.debug("centripetal acceleration (% .4f, % .4f, % .4f)", a_rot[0], a_rot[1], a_rot[2])
 
             # linear acceleration due to angular acceleration
-            a_alpha = self.rot_b2i @ (self.robot_w - self.pav).cross(self.imu2body.translation) / self.dt
+            a_alpha = self.rot_b2i @ (self.robot_w - self.pav).cross(self.imu2body.translation) / self.dt # UPBGE HACK - replaced '*' with '@'
 
             # final measurement includes acceleration due to rotation center not in IMU
             self.a += a_centripetal + a_alpha
@@ -123,7 +123,7 @@ class Accelerometer(morse.core.sensor.Sensor):
         self.plv = self.robot_vel.copy()
         self.pav = self.robot_w.copy()
 
-        self.local_data['velocity'] = w2a @ self.robot_vel
+        self.local_data['velocity'] = w2a @ self.robot_vel # UPBGE HACK - replaced '*' with '@'
         self.local_data['acceleration'] = self.a
 
     def default_action(self):

@@ -110,7 +110,7 @@ class IMU(morse.core.sensor.Sensor):
         ang_vel = angular_velocities(self.pp, self.position_3d, 1 / self.frequency)
 
         # linear acceleration in imu frame
-        dv_imu = self.rot_i2w.transposed() @ (lin_vel - self.plv) * self.frequency
+        dv_imu = self.rot_i2w.transposed() @ (lin_vel - self.plv) * self.frequency # UPBGE HACK - replaced '*' with '@'
 
         # measurement includes gravity and acceleration
         accel_meas = dv_imu + self.rot_i2w.transposed() * self.gravity
@@ -130,17 +130,17 @@ class IMU(morse.core.sensor.Sensor):
         """
 
         # rotate the angular rates from the robot frame into the imu frame
-        rates = self.rot_b2i @ self.robot_w
+        rates = self.rot_b2i @ self.robot_w # UPBGE HACK - replaced '*' with '@'
         #logger.debug("rates in robot frame (% .4f, % .4f, % .4f)", self.robot_w[0], self.robot_w[1], self.robot_w[2])
         #logger.debug("rates in imu frame   (% .4f, % .4f, % .4f)", rates[0], rates[1], rates[2])
 
         # differentiate linear velocity in world (inertial) frame
         # and rotate to imu frame
-        dv_imu = self.rot_i2w.transposed() @ (self.robot_vel - self.plv) * self.frequency
+        dv_imu = self.rot_i2w.transposed() @ (self.robot_vel - self.plv) * self.frequency # UPBGE HACK - replaced '*' with '@'
         #logger.debug("velocity_dot in imu frame (% .4f, % .4f, % .4f)", dv_imu[0], dv_imu[1], dv_imu[2])
 
         # rotate acceleration due to gravity into imu frame
-        g_imu = self.rot_i2w.transposed() @ self.gravity
+        g_imu = self.rot_i2w.transposed() @ self.gravity # UPBGE HACK - replaced '*' with '@'
 
         # measurement includes gravity and acceleration
         accel_meas = dv_imu + g_imu
@@ -148,11 +148,11 @@ class IMU(morse.core.sensor.Sensor):
         if self.compute_offset_acceleration:
             # acceleration due to rotation (centripetal)
             # is zero if imu is mounted in robot center (assumed axis of rotation)
-            a_centripetal = self.rot_b2i @ rates.cross(rates.cross(self.imu2body.translation))
+            a_centripetal = self.rot_b2i @ rates.cross(rates.cross(self.imu2body.translation)) # UPBGE HACK - replaced '*' with '@'
             #logger.debug("centripetal acceleration (% .4f, % .4f, % .4f)", a_rot[0], a_rot[1], a_rot[2])
 
             # linear acceleration due to angular acceleration
-            a_alpha = self.rot_b2i @ (self.robot_w - self.pav).cross(self.imu2body.translation) * self.frequency
+            a_alpha = self.rot_b2i @ (self.robot_w - self.pav).cross(self.imu2body.translation) * self.frequency # UPBGE HACK - replaced '*' with '@'
 
             # final measurement includes acceleration due to rotation center not in IMU
             accel_meas += a_centripetal + a_alpha

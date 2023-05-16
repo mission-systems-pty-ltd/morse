@@ -36,4 +36,4 @@ def angular_velocities(prev, now, dt):
                           [0, c0, c1 * s0],
                           [0, -s0, c1 * c0]))
 
-    return m @ euler_rate
+    return m @ euler_rate # UPBGE HACK - replaced '*' with '@'

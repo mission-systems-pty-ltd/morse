@@ -69,7 +69,7 @@ class Airspeed(Sensor):
 
     def default_action(self):
         if self._type == 'Velocity':
-            vel = self.rot_b2a @ self.robot_vel_body
+            vel = self.rot_b2a @ self.robot_vel_body # UPBGE HACK - replaced '*' with '@'
         else:
             vel = linear_velocities(self.pp, self.position_3d, 1 / self.frequency)
             self.pp = copy(self.position_3d)
