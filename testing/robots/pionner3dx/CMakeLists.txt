@@ -1,1 +1,0 @@
-add_morse_test(pionner3dx_testing)

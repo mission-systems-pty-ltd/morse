@@ -1,1 +1,0 @@
-add_morse_test(invalid_builder_syntax)
