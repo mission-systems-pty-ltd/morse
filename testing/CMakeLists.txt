@@ -11,7 +11,7 @@ if (BUILD_CORE_SUPPORT)
 	add_subdirectory(robots/segway)
 	add_subdirectory(robots/submarine)
 	add_subdirectory(robots/pr2)
-	add_subdirectory(robots/pionner3dx)
+	add_subdirectory(robots/pioneer3dx)
 	add_subdirectory(human)
 endif()
 

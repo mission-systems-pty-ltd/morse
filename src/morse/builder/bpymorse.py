@@ -216,8 +216,9 @@ def get_scene(name_or_id):
     else:
         return None
 
+# UPBGE HACK
+#   Scenes are deprecated
 def set_active_scene(name_or_id):
-    print("SCENES DO NOT EXIST ANYMORE ") # UPBGE HACK
     return None
 
 def get_last_scene():

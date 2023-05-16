@@ -238,30 +238,39 @@ class Armature(ActuatorCreator):
                                 make_morseable = True)
 
         self.ik_targets = []
-        # the user may have created IK constraints on the armature, without
-        # setting an IK target. In that case, we add such a target
-        
-        # UPBGE TODO
-        # 'self._bpy_object.pose.bones' is deprecated
-        for bone in self._bpy_object.pose.bones:
+
+        # UPBGE HACK
+        #   The path 'self._bpy_object.pose.bones' is deprecated
+        #   Path has been replaced with 'self._bpy_object.parent.children'
+        for bone in self._bpy_object.parent.children:
+            if bone.parent_type != "BONE":
+                continue
             for c in bone.constraints:
                 if c.type == 'IK' and c.ik_type == 'DISTANCE':
                     if not c.target:
                         self.create_ik_targets([bone.name])
 
+    # UPBGE HACK
+    #   The whole function was reworked
+    #   The path 'self._bpy_object.pose.bones' is deprecated
+    #   Additionally, 'armature.parent.children[bone_name]' does not work
+    #   To fix this, a for loop was used instead
     def _get_posebone(self, bone_name):
         """ Returns a given PoseBone in the armature.
 
         If the joint does not exist, throw an exception.
         """
+        
+        # Get bone
         armature = self._bpy_object
-
-        if bone_name not in [c.name for c in armature.pose.bones]:
-            msg = "Joint <%s> does not exist in model %s." % (bone_name, armature.name)
-            msg += " Did you add a skeleton to your model in MakeHuman?"
-            raise MorseBuilderError(msg)
-
-        return armature.pose.bones[bone_name]
+        for bone in armature.parent.children:
+            if bone.name == bone_name:
+                return bone
+        
+        # Raise error if bone not found
+        msg = "Joint <%s> does not exist in model %s." % (bone_name, armature.name)
+        msg += " Did you add a skeleton to your model in MakeHuman?"
+        raise MorseBuilderError(msg)
 
     def create_ik_targets(self, bones):
         # Bug with iTaSC! cf http://developer.blender.org/T37894
@@ -277,8 +286,10 @@ class Armature(ActuatorCreator):
             bpymorse.add_morse_empty("ARROWS")
             empty = bpymorse.get_first_selected_object()
             empty.scale = [0.01, 0.01, 0.01]
-            empty.matrix_local = posebone.bone.matrix_local
-            empty.location = posebone.bone.tail_local
+            # UPBGE HACK - deprecated path, 'posebone.bone.matrix_local' 
+            empty.matrix_local = posebone.matrix_local
+            # UPBGE HACK - deprecated path, 'posebone.bone.tail_local' 
+            empty.location = posebone.location
 
             existing_ik = [c for c in posebone.constraints if c.type == 'IK']
             if len(existing_ik) == 1:
