@@ -599,6 +599,8 @@ class Environment(AbstractComponent):
             self.auto_tune_time = False
         elif strategy == TimeStrategies.BestEffort:
             bpymorse.get_context_scene().game_settings.use_frame_rate = 1
+        elif strategy == TimeStrategies.WallTime:
+            bpymorse.get_context_scene().game_settings.use_frame_rate = 1
         else:
             raise ValueError(strategy)
 
