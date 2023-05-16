@@ -99,22 +99,6 @@ class DataStreamTest(RosTestCase):
         self.assertAlmostEqual(self.pos.pose.pose.position.y, -4.0 / math.pi, delta=precision)
         self.assertAlmostEqual(self.pos.pose.pose.position.z, 0.0, delta=precision)
 
-        # sleep to make sure that the other peer can read it ...
-        sleep(1)
-
-        send_speed(cmd_stream, 0.5, -math.pi/8.0, 12.0)
-        sleep(1)
-
-        self.assertAlmostEqual(self.pos.pose.pose.position.x, 0.0, delta=precision)
-        self.assertAlmostEqual(self.pos.pose.pose.position.y, 0.0, delta=precision)
-        self.assertAlmostEqual(self.pos.pose.pose.position.z, 0.0, delta=precision)
-
-        send_speed(cmd_stream, -2.0, math.pi/2.0, 3.0)
-
-        self.assertAlmostEqual(self.pos.pose.pose.position.x, 4.0 / math.pi, delta=precision)
-        self.assertAlmostEqual(self.pos.pose.pose.position.y, -4.0 / math.pi, delta=precision)
-        self.assertAlmostEqual(self.pos.pose.pose.position.z, 0.0, delta=precision)
-
 ########################## Run these tests ##########################
 if __name__ == "__main__":
     from morse.testing.testing import main

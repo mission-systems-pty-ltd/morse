@@ -53,6 +53,7 @@ class Spiral_Test(MorseTestCase):
 
     def test_vw_controller(self):
         with Morse() as morse:
+            morse.sleep(1.0)
         
             # Read the start position, it must be (0.0, 0.0, 0.0)
             pose_stream = morse.robot.pose
@@ -65,7 +66,6 @@ class Spiral_Test(MorseTestCase):
 
             # v_w socket
             v_w = morse.robot.motion
-
             send_speed(v_w, morse, 0.0, -math.pi/4.0, 2.0)
 
             pose = pose_stream.get()
@@ -128,6 +128,7 @@ class Spiral_Test(MorseTestCase):
     def X_test_vw_service_controller(self):
     #def test_vw_service_controller(self):
         with Morse() as morse:
+            morse.sleep(1.0)
         
             # Read the start position, it must be (0.0, 0.0, 0.0)
             pose_stream = morse.stream('Pose')
