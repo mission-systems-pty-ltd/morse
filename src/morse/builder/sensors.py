@@ -175,6 +175,12 @@ class Thermometer(SensorCreator):
         mesh.color(0, .6, .5)
         self.append(mesh)
 
+class Info(SensorCreator):
+    _classpath = "morse.sensors.info.Info"
+    
+    def __init__(self, name=None):
+        SensorCreator.__init__(self, name)
+        
 # abstract class
 class LaserSensorWithArc(SensorCreator):
     _classpath  = "morse.sensors.laserscanner.LaserScanner"
