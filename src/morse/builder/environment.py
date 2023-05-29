@@ -297,10 +297,16 @@ class Environment(AbstractComponent):
         Should always be called at the very end of the Builder script. It will
         finalise the building process and write the configuration files.
         """
+
         # Invoke special methods of component that must take place *after* renaming
+        # UPBGE HACK
+        #   Added try and except because some components fail in the hasattr call
         for component in AbstractComponent.components:
-            if hasattr(component, "after_renaming"):
-                component.after_renaming()
+            try:
+                if hasattr(component, "after_renaming"):
+                    component.after_renaming()
+            except:
+                pass
 
         # Compute node name
         if name is None:

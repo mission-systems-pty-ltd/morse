@@ -32,6 +32,7 @@ class Gripper(ActuatorCreator):
                     make_morseable = False)
         self.properties(Angle = 60.0, Distance = 0.5)
     def properties(self, **kwargs):
+        print(self._bpy_object.game.sensors)
         radar = self._bpy_object.game.sensors["Radar"]
         if 'Angle' in kwargs:
             radar.angle = kwargs['Angle']
