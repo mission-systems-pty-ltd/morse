@@ -65,18 +65,15 @@ def find_family(self):
             break
     return set(family)
     
+# UPBGE HACK
+#   Scenes no longer exist, so the below line was commented out
+#   bpy.context.scene.update()
 def translate_compound(self, x=0.0, y=0.0, z=0.0):
-    
     objs = bpymorse.get_objects()
     family = find_family(self)
     for f in family:
-        print(f)
         oldl = objs[f].location
         objs[f].location = (oldl.x+x,oldl.y+y,oldl.z+z)  
-        # update needed so that matrix_world will update
-        # print(objs[f].matrix_world)
-        bpy.context.scene.update()
-
     return
 
 def rotate_compound(self, x=0.0, y=0.0, z=0.0):
