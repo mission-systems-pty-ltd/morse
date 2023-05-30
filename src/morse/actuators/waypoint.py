@@ -283,7 +283,7 @@ class Waypoint(morse.core.actuator.Actuator):
         self._projection = [ self.local_data['x'],
                              self.local_data['y'],
                              self.bge_object.worldPosition[2] ]
-
+        
         # Do nothing at all if:
         # - we were not ask to actively remain at the last wp
         # - we already are at destination
@@ -347,8 +347,14 @@ class Waypoint(morse.core.actuator.Actuator):
             # If the projected distance is not null: else computing the
             # target angle is not possible!
             if projection_distance - self.local_data['tolerance'] / 2 > 0:
-                ### Get the angle of the robot ###
-                robot_angle = parent.position_3d.yaw
+
+                # UPBGE HACK
+                #   The robot's angle was originally taken from parent.position_3d.yaw.
+                #   However, it seems like this path always stores the angle as 0.
+                #   This was fixed by getting the orientation matrix, converting it ...
+                #   ... into a vector, and extracting the yaw.
+                orientation = self.bge_object.orientation
+                robot_angle = orientation.to_euler('XYZ').z
 
                 ### Get the angle to the target ###
                 target_angle = projection_vector.angle(self.world_x_vector)
@@ -452,5 +458,4 @@ class Waypoint(morse.core.actuator.Actuator):
                 vz = 0
             logger.debug("Applying vx = %.4f, vz = %.4f, rz = %.4f (v = %.4f)" %
                         (vx, vz, rz, v))
-
             self.robot_parent.apply_speed(self._type, [vx, 0, vz], [0, 0, rz])

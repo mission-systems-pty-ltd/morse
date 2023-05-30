@@ -53,17 +53,15 @@ class Waypoints_Test(MorseTestCase):
             # waypoint controller
             motion = simu.robot.motion
             motion.publish({'x' : 4.0, 'y': 2.0, 'z': 0.0, 'tolerance' : 0.5, 'speed' : 2.0})
-            simu.sleep(10)
+            simu.sleep(5)
 
             pose = pose_stream.get()
             self.assertAlmostEqual(pose['x'], 4.0, delta=0.5)
             self.assertAlmostEqual(pose['y'], 2.0, delta=0.5)
 
             # test tolerance parameter
-            motion.publish({'x' : 0.0, 'y': 0.0, 'z': 0.0, 
-                            'tolerance' : 1.0, 
-                            'speed' : 2.0})
-            simu.sleep(10)
+            motion.publish({'x' : 0.0, 'y': 0.0, 'z': 0.0, 'tolerance' : 1.0, 'speed' : 2.0})
+            simu.sleep(5)
             pose = pose_stream.get()
             distance_goal = math.sqrt( pose['x'] * pose['x'] + pose['y'] * pose['y'])
             self.assertLess(distance_goal, 1.0)
