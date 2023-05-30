@@ -287,9 +287,11 @@ class Armature(ActuatorCreator):
             bpymorse.add_morse_empty("ARROWS")
             empty = bpymorse.get_first_selected_object()
             empty.scale = [0.01, 0.01, 0.01]
-            # UPBGE HACK - deprecated path, 'posebone.bone.matrix_local' 
+
+            # UPBGE HACK
+            #   Deprecated path, 'posebone.bone.matrix_local', to 'posebone.matrix_local' 
+            #   Deprecated path, posebone.bone.tail_local' , to 'posebone.location' 
             empty.matrix_local = posebone.matrix_local
-            # UPBGE HACK - deprecated path, 'posebone.bone.tail_local' 
             empty.location = posebone.location
 
             existing_ik = [c for c in posebone.constraints if c.type == 'IK']

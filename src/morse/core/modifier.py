@@ -23,9 +23,9 @@ def register_modifier(classpath, component, direction, args):
 
     # Determine weither to store the function in input or output list,
     #   what is the direction of our stream?
-    if direction is 'OUT':
+    if direction == 'OUT':
         component.output_modifiers.append(modifier.modify)
-    elif direction is 'IN':
+    elif direction == 'IN':
         component.input_modifiers.append(modifier.modify)
     else:
         logger.error("Direction '%s' for '%s'is not 'IN' or 'OUT'",

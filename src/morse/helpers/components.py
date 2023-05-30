@@ -56,7 +56,7 @@ def add_data(name, default_value, type = "", doc = "(no documentation available 
 
     """
 
-    if isinstance(level, str) and level is not "all":
+    if isinstance(level, str) and level != "all":
         level = [level]
     _set_cls_value('_data_fields', name, (default_value, type, doc, level))
 

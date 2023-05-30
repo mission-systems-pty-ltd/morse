@@ -298,7 +298,6 @@ class Environment(AbstractComponent):
         finalise the building process and write the configuration files.
         """
 
-        # Invoke special methods of component that must take place *after* renaming
         # UPBGE HACK
         #   Added try and except because some components fail in the hasattr call
         for component in AbstractComponent.components:
@@ -410,7 +409,8 @@ class Environment(AbstractComponent):
         bpymorse.get_context_scene().game_settings.frame_type = 'EXTEND'
         bpymorse.get_context_scene().game_settings.show_mouse = True
 
-        # Set the position of the camera HACK:
+        # UPBGE HACK
+        #   Sets the position of the camera
         camera_fp = bpymorse.get_object('CameraFP')
         camera_fp.location = self._camera_location
         camera_fp.rotation_euler = self._camera_rotation
@@ -419,15 +419,13 @@ class Environment(AbstractComponent):
         camera_fp.data.clip_end   = self._camera_clip_end
         camera_fp.data.lens = self._focal_length # set focal length in mm
         
-        # Make CameraFP the active camera
-        # bpymorse.deselect_all()
         # UPBGE HACK
-        # SCENES have changed so the way this camera is operating no longer works.
+        #   Scenes have changed so the way this camera is operating no longer works.
+        # bpymorse.deselect_all()
 
         ### UPBGE HACK
         ### Disabled the below code because it causes the timer to screw up with the error:
         ### AttributeError: 'BestEffortStrategy' object has no attribute '_morse_dt_analyser' 
-        
         # camera_fp.select = True                                 
         # bpymorse.get_context_scene().objects.active = camera_fp 
         # # Set default camera
@@ -440,8 +438,9 @@ class Environment(AbstractComponent):
         # Set viewport to Camera
         bpymorse.set_viewport_perspective(perspective='CAMERA', camera_obj=camera_fp)
 
+        # Fit the HUD plane
         hud_text = bpymorse.get_object('Keys_text')
-        hud_text.scale.y = 0.027 # to fit the HUD_plane
+        hud_text.scale.y = 0.027
 
         # Create a cube to compute the dt between two frames
         _dt_name = '__morse_dt_analyser'
@@ -453,8 +452,8 @@ class Environment(AbstractComponent):
         cube_obj.hide_render = True
         cube_obj.game.lock_location_z = True
 
+        # In case we are in edit mode, do not exit on error with CLI
         self._created = True
-        # in case we are in edit mode, do not exit on error with CLI
         sys.excepthook = sys.__excepthook__ # Standard Python excepthook
 
     def set_horizon_color(self, color=(0.05, 0.22, 0.4)):

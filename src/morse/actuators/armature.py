@@ -98,24 +98,7 @@ class Armature(morse.core.actuator.Actuator):
     add_property('ik_target_radial_speed', 0.5, 'IKRotationSpeed', 'float', "Default speed of IK target rotation (in rad/s)")
     add_property('ik_target_linear_speed', 0.5, 'IKLinearSpeed', 'float', "Default speed of IK target motion (in m/s)")
 
-    # UPBGE TODO
-    #   REMOVE the function
-    def print_obj(self, obj):
-        print("========================")
-        print(obj)
-        print("========================")
-        max_len = max([len(o) for o in dir(obj)])
-        for o in dir(obj):
-            try:
-                padding = " " * (max_len - len(o))
-                print(o, padding, getattr(obj, o))
-            except:
-                pass
-
     def __init__(self, obj, parent=None):
-        
-        self.print_obj(obj.blenderObject)
-
         """
         Creates a new instance of Armature.
 
@@ -124,10 +107,17 @@ class Armature(morse.core.actuator.Actuator):
 
         # Call the constructor of the parent class
         morse.core.actuator.Actuator.__init__(self, obj, parent)
-        
+
         # Initialize the values in local_data for each segment
         armature = self.bge_object
-        for channel in armature.channels: # UPBGE TODO - channels is deprecated
+        
+        # UPBGE TODO
+        #   Channels are deprecated
+        #   We have to somehow find a path to the bones
+        #   They can be accessed via: import bpy; print(bpy.data.objects["kuka_armature"])
+        #   However, when we don't know the name of the armatures, then we will have a problem
+        #   It seems like channels refer to bones
+        for channel in armature.channels:
             self.local_data[channel.name] = 0.0
         self._ik_targets = {c.target: c for c in armature.blenderObject.constraints \
                             if c.type == blenderapi.CONSTRAINT_TYPE_KINEMATIC and \
