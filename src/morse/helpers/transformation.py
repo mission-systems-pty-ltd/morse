@@ -122,7 +122,7 @@ class Transformation3d:
         res = Transformation3d(None)
         o2m = self.matrix.copy()
         o2m.invert()
-        res.matrix = o2m @ t3d.matrix # UPBGE HACK - replaced '*' with '@'
+        res.matrix = o2m @ t3d.matrix  if blenderapi.using_upbge() else o2m * t3d.matrix
         res.euler = res.matrix.to_euler()
         return res
 
@@ -174,7 +174,8 @@ class Transformation3d:
         direction of the Y axis, contrary to most of the MORSE components
         that move along the X axis.
         """
-        self.matrix = (obj.worldOrientation * self.correction_matrix).to_4x4()
+        if blenderapi.using_upbge(): self.matrix = (obj.worldOrientation @ self.correction_matrix).to_4x4() 
+        else: self.matrix = (obj.worldOrientation * self.correction_matrix).to_4x4()
 
         pos = obj.worldPosition
         for i in range(0, 3):

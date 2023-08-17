@@ -2,6 +2,7 @@ import logging; logger = logging.getLogger("morse." + __name__)
 from morse.builder.data import MORSE_COMPONENTS
 from morse.core import mathutils
 import morse.core.sensor
+from morse.core import blenderapi
 from morse.helpers.components import add_data, add_property
 from morse.helpers.coordinates import CoordinateConverter
 
@@ -41,7 +42,7 @@ class MagnetoDriver(object):
                                  pos_lla[0, 2] / 1000.0, self._date)
         mag_field_enu = mathutils.Vector((e, n, -d))
 
-        return mag_field_enu @ pose.rotation_matrix # UPBGE HACK - replaced '*' with '@'
+        return mag_field_enu @ pose.rotation_matrix if blenderapi.using_upbge() else mag_field_enu * pose.rotation_matrix
 
 class Magnetometer(morse.core.sensor.Sensor):
     """ 
@@ -65,12 +66,9 @@ class Magnetometer(morse.core.sensor.Sensor):
 
     _name = "Magnetometer"
 
-    add_data('x', 0.0, "float",
-             'Northern component of the magnetic field vector, in nT')
-    add_data('y', 0.0, "float",
-             'Eastern component of the magnetic field vector, in nT')
-    add_data('z', 0.0, "float",
-             'Downward component of the magnetic field vector, in nT')
+    add_data('x', 0.0, "float", 'Northern component of the magnetic field vector, in nT')
+    add_data('y', 0.0, "float", 'Eastern component of the magnetic field vector, in nT')
+    add_data('z', 0.0, "float", 'Downward component of the magnetic field vector, in nT')
 
     add_property('date', None, 'date', 'float', 'the date used to adjust \
             for magnetic field. If not precised, consider the today \
@@ -88,7 +86,6 @@ class Magnetometer(morse.core.sensor.Sensor):
         self._mag = MagnetoDriver(self.date)
 
         logger.info('Component initialized, runs at %.2f Hz', self.frequency)
-
 
     def default_action(self):
         mag_field_enu = self._mag.compute(self.position_3d)

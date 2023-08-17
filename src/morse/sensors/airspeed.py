@@ -1,6 +1,7 @@
 import logging
 logger = logging.getLogger("morse." + __name__)
 from morse.core.sensor import Sensor
+from morse.core import blenderapi
 from morse.helpers.components import add_data, add_property
 from morse.helpers.velocity import linear_velocities
 from copy import copy
@@ -69,7 +70,7 @@ class Airspeed(Sensor):
 
     def default_action(self):
         if self._type == 'Velocity':
-            vel = self.rot_b2a @ self.robot_vel_body # UPBGE HACK - replaced '*' with '@'
+            vel = self.rot_b2a @ self.robot_vel_body if blenderapi.using_upbge() else self.rot_b2a * self.robot_vel_body
         else:
             vel = linear_velocities(self.pp, self.position_3d, 1 / self.frequency)
             self.pp = copy(self.position_3d)

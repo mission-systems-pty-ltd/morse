@@ -1,6 +1,7 @@
 import logging; logger = logging.getLogger("morse." + __name__)
 from morse.core import mathutils
 import morse.core.actuator
+from morse.core import blenderapi
 from morse.helpers.components import add_data, add_property
 
 class ForceTorque(morse.core.actuator.Actuator):
@@ -45,8 +46,8 @@ class ForceTorque(morse.core.actuator.Actuator):
         else:
             (loc, rot, scale) = robot.position_3d.transformation3d_with(self.position_3d).matrix.decompose()
             # rotate into robot frame, but still at actuator origin
-            force = rot @ mathutils.Vector(self.local_data['force']) # UPBGE HACK - replaced '*' with '@'
-            torque = rot @ mathutils.Vector(self.local_data['torque']) # UPBGE HACK - replaced '*' with '@'
+            force = rot @ mathutils.Vector(self.local_data['force']) if blenderapi.using_upbge() else rot * mathutils.Vector(self.local_data['force'])
+            torque = rot @ mathutils.Vector(self.local_data['torque']) if blenderapi.using_upbge() else rot * mathutils.Vector(self.local_data['torque'])
             # add torque due to lever arm
             torque += loc.cross(force)
             robot.bge_object.applyForce(force, True)

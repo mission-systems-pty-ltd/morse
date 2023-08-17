@@ -1,6 +1,7 @@
 import logging; logger = logging.getLogger("morse." + __name__)
 
 import morse.core.sensor
+from morse.core import blenderapi
 from morse.helpers.components import add_data, add_property
 from morse.core.mathutils import * 
 from math import degrees
@@ -87,7 +88,7 @@ class Velocity(morse.core.sensor.Sensor):
 
         w2a = self.position_3d.rotation_matrix.transposed()
 
-        self.local_data['linear_velocity'] = w2a @ v # UPBGE HACK - replaced '*' with '@'
+        self.local_data['linear_velocity'] = w2a @ v if blenderapi.using_upbge() else w2a * v 
         self.local_data['angular_velocity'] =  w
         self.local_data['world_linear_velocity'] = v
         
@@ -96,8 +97,8 @@ class Velocity(morse.core.sensor.Sensor):
 
         if self._type == 'Velocity':
             # Store the important data
-            self.local_data['linear_velocity'] = self.rot_b2s @ self.robot_v # UPBGE HACK - replaced '*' with '@'
-            self.local_data['angular_velocity'] = self.rot_b2s @ self.robot_w # UPBGE HACK - replaced '*' with '@'
+            self.local_data['linear_velocity'] = self.rot_b2s @ self.robot_v if blenderapi.using_upbge() else self.rot_b2s * self.robot_v
+            self.local_data['angular_velocity'] = self.rot_b2s @ self.robot_w if blenderapi.using_upbge() else self.rot_b2s * self.robot_w
             self.local_data['world_linear_velocity'] = self.robot_world_v.copy()
         else:
             self._sim_simple()

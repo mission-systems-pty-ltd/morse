@@ -1,5 +1,6 @@
 from morse.core import mathutils
 from math import cos, sin
+from morse.core import blenderapi 
 
 def linear_velocities(prev, now, dt):
     """
@@ -36,4 +37,4 @@ def angular_velocities(prev, now, dt):
                           [0, c0, c1 * s0],
                           [0, -s0, c1 * c0]))
 
-    return m @ euler_rate # UPBGE HACK - replaced '*' with '@'
+    return m @ euler_rate if blenderapi.using_upbge() else m * euler_rate
