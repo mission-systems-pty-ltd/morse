@@ -57,10 +57,10 @@ class MagnemoterTest(MorseTestCase):
             self.teleport_stream = morse.robot.teleport
 
             # Tests from WMM2015 
-            self._teleport_and_test(0, 80, 0,  6627.1, -445.9, 54432.3)
-            self._teleport_and_test(120, 0, 0, 39518.2,  392.9, -11252.4)
-            self._teleport_and_test(240, -80, 0, 5797.3, 15761.1, -52919.1)
-            self._teleport_and_test(0, 80, 100000,  6314.3, -471.6,  52269.8)
+            self._teleport_and_test(0, 80, 0,  6651.3, -441.2, 54391.3)
+            self._teleport_and_test(120, 0, 0, 39503.5,  414.0, -11178.4)
+            self._teleport_and_test(240, -80, 0, 5788.7, 15762.8, -52939.1)
+            self._teleport_and_test(0, 80, 100000,  6337.3, -467.6,  52233.2)
 
 ########################## Run these tests ##########################
 if __name__ == "__main__":

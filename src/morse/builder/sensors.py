@@ -175,6 +175,12 @@ class Thermometer(SensorCreator):
         mesh.color(0, .6, .5)
         self.append(mesh)
 
+class Info(SensorCreator):
+    _classpath = "morse.sensors.info.Info"
+    
+    def __init__(self, name=None):
+        SensorCreator.__init__(self, name)
+        
 # abstract class
 class LaserSensorWithArc(SensorCreator):
     _classpath  = "morse.sensors.laserscanner.LaserScanner"
@@ -713,7 +719,7 @@ class OS1(SensorCreator):
             self.properties(elevation_width = 33.2)
         self.properties(azimuth_beams = horizontal_beams)
         self.properties(elevation_beams = channels)
-        self.properties(max_range = 120)
+        self.properties(max_range = 100)
         # OS1 sensors have variable distance noise and accuracy depending on target type and distance,
         # which is not yet supported by the object server. From the OS1 manual:
         # Range Accuracy:

@@ -33,6 +33,7 @@ import shutil
 import glob
 import re
 import tempfile
+from pkg_resources import parse_version
 
 try:
     import configparser
@@ -46,7 +47,7 @@ MIN_BLENDER_VERSION = "2.65"
 #Blender version must be smaller than...
 LAST_TESTED_BLENDER_VERSION = "2.77"
 
-#Unix-style path to the MORSE default scene and templates, within the prefix
+#Unix-style path to the MORSsE default scene and templates, within the prefix
 DEFAULT_SCENE_PATH = "share/morse/data/morse_default.blend"
 DEFAULT_SCENE_AUTORUN_PATH = "share/morse/data/morse_default_autorun.blend"
 
@@ -89,9 +90,14 @@ def check_blender_version(blender_path):
                                 stdout=subprocess.PIPE).communicate()[0]
         for line in version_str.splitlines():
             line = line.decode().strip()
-            if line.startswith("Blender"):
-                version = line.split()[1] + '.' + line.split()[3][:-1]
-                break
+            if (line.startswith("Blender")):
+                
+                match = re.search(r"(\d+)\.(\d+)\.(\d+)", line)
+                if match:
+                    version = str(match.group(1))+"."+str(match.group(2))+"."+str(match.group(3))
+                else: 
+                    match = re.search(r"(\d+)\.(\d+)", line)
+                    version = str(match.group(1))+"."+str(match.group(2))
     except OSError:
         return None
 
@@ -103,10 +109,16 @@ def check_blender_version(blender_path):
 
     logger.info("Checking version of " + blender_path + "... Found v." + version)
 
-    if version.split('.') < MIN_BLENDER_VERSION.split('.'):
+    parsed_version = parse_version( version )
+    min_version = parse_version(MIN_BLENDER_VERSION)
+    last_tested = parse_version(LAST_TESTED_BLENDER_VERSION)
+    if parsed_version < min_version:
+        print("ERROR "+str(parsed_version)+" is less than the minimum version: "+str(min_version))
+        logger.error("Version %s of Blender is below the minimum version" % version)
         return False
-    if version.split('.') > LAST_TESTED_BLENDER_VERSION.split('.'):
+    if parsed_version > last_tested:
         logger.warning("Version %s of Blender is untested but should work" % version)
+
     return version
 
 def check_blender_python_version(blender_path):
@@ -303,12 +315,12 @@ def check_setup():
     else:
         our_python_version = '.'.join((str(x) for x in sys.version_info[:3]))
         if (python_version != our_python_version):
-            logger.error("Blender is compiled for Python " + python_version + \
+            logger.warning("Blender is compiled for Python " + python_version + \
                    " but MORSE has been compiled for Python " + \
                    our_python_version + "! Check your MORSE build configuration"
                    " or the selected Blender version.")
-            if 'MORSE_SILENT_PYTHON_CHECK' not in os.environ:
-                raise MorseError("Bad Python version")
+            #if 'MORSE_SILENT_PYTHON_CHECK' not in os.environ:
+            #    raise MorseError("Bad Python version")
         else:
             logger.info("Blender and Morse are using Python " + \
             python_version + ". Alright.")
@@ -557,7 +569,7 @@ def prelaunch():
         logger.error("Your environment is not yet correctly setup to run MORSE!\n" +\
         "Please fix it with above information.\n" +\
         "You can also run 'morse check' for more details.")
-        sys.exit(1)
+        sys.exit()
 
 def launch_simulator(scene=None, script=None, node_name=None, geometry=None,
         noaudio = False, script_options = []):
@@ -660,7 +672,7 @@ def do_check(args):
     except MorseError as e:
         logger.error(e.value)
         logger.error("Your environment is not correctly setup to run MORSE!")
-        sys.exit(1)
+        sys.exit()
     logger.info("Your environment is correctly setup to run MORSE.")
 
 

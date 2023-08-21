@@ -24,7 +24,9 @@ def _decimal_date(date):
 class MagnetoDriver(object):
     def __init__(self, date = None):
         from morse.sensors._magnetometer import Magnetometer as Mag
-        self._mag = Mag(os.path.join(MORSE_COMPONENTS, 'WMM.COF'))
+        file = os.path.join(MORSE_COMPONENTS, 'WMM.COF')
+        assert(os.path.exists(file) and "The file '%s' does not exist. Please download it from NOAA." % file)
+        self._mag = Mag(file)
         self._coord_conv = CoordinateConverter.instance()
         if date:
             self._date = date

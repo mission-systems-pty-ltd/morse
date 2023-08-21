@@ -111,6 +111,23 @@ class BestEffortStrategy:
     def real_time(self):
         return time.time() - self._real_time_offset
 
+class WallTimeStrategy(BestEffortStrategy):
+    """
+        We have found some bug in the Morse time strategy where there is an additional fixed offset between 
+        real time and the simulation 'real time'. I.e. we see a time skew between the wall clock and what is
+        supposed to be the wall clock in sim. This leads to desynchronisation of sensors & some pretty painful 
+        timing artefacts that we don't fully understand yet...
+    """
+    def update(self):
+        current_time = blenderapi.frame_time()
+        if current_time == -1:
+            self._dt = self._morse_dt_analyser.worldPosition[0] - self.px
+            self.time += self._dt
+            self._prepare_compute_dt()
+        else:
+            self.time = time.time() 
+        self._update_statistics()
+
 class FixedSimulationStepStrategy:
     def __init__ (self, relative_time):
         if relative_time:
@@ -164,7 +181,7 @@ class FixedSimulationStepStrategy:
             self._stat_jitter.update(ds)
 
 class TimeStrategies:
-    (BestEffort, FixedSimulationStep) = range(2)
+    (BestEffort, WallTime, FixedSimulationStep) = range(3)
 
     internal_mapping = {
         BestEffort:
@@ -176,7 +193,12 @@ class TimeStrategies:
             { "impl": FixedSimulationStepStrategy,
               "python_repr": b"TimeStrategies.FixedSimulationStep",
               "human_repr": "Fixed Simulation Step"
-            }
+            },
+        WallTime:
+            { "impl": WallTimeStrategy,
+              "python_repr": b"TimeStrategies.WallTime",
+              "human_repr" : "Real Best Effort"
+            },
         }
 
     @staticmethod
