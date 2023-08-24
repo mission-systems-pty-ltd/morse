@@ -93,6 +93,9 @@ def version():
     else:
         return 0,0,0
 
+def using_upbge():
+    return version() >= (2, 79, 0)
+
 # UPBGE HACK
 def set_friction(name, friction):
     bpy.data.objects[name].game.friction = friction
@@ -423,7 +426,8 @@ def set_viewport(viewport_shade='WIREFRAME', clip_end=1000):
         if area.type == 'VIEW_3D':
             for space in area.spaces:
                 if space.type == 'VIEW_3D':
-                    space.shading.type = viewport_shade # UPBGE HACK - old attribute deprecated
+                    if using_upbge(): space.shading.type = viewport_shade 
+                    else: space.viewport_shade = viewport_shade
                     space.clip_end = clip_end
 
 def set_viewport_perspective(perspective='CAMERA', camera_obj=None):
