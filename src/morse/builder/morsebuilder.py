@@ -141,14 +141,12 @@ class Component(AbstractComponent):
         # Get the objects
         imported_objects = self.append_meshes()
         
-        # Redefine blender object name # UPBGE HACK
+        # UPBGE HACK Redefine blender object name 
         if category in ['sensors', 'actuators', 'robots'] \
             and blender_object_name is None and not filename is None:
             blender_object_name = filename
 
-        # UPBGE HACK
-        #   Sets the object
-        #   Accounts for numbering (e.g., morsy.001)
+        # UPBGE HACK - Sets the object and Accounts for numbering (e.g., morsy.001)
         is_object_set = False
         for imported_object in imported_objects:
             object_name = imported_object.name.split(".")[0].lower()
@@ -188,9 +186,13 @@ class Robot(Component):
         :param friction: [0, 100], default 0.0
         :type  friction: float
         """
-        bpymorse.set_friction(self.name, friction) # UPBGE HACK (old code deprecated)
-        # for slot in self._bpy_object.material_slots: # ['TireMat']
-        #     slot.material.physics.friction = friction
+        # UPBGE HACK (old code deprecated)
+        # TODO - move the 2.79 code to bpymorse too - this function will become one line.
+        if bpymorse.using_upbge():  
+            bpymorse.set_friction(self.name, friction) 
+        else:
+            for slot in self._bpy_object.material_slots: # ['TireMat']
+                slot.material.physics.friction = friction
         
     def set_mass(self, mass):
         """ Set component's mass
@@ -289,17 +291,19 @@ class WheeledRobot(GroundRobot):
         keys = ['WheelFLName', 'WheelFRName', 'WheelRLName', 'WheelRRName', 'CasterWheelName']
         
         # UPBGE HACK - forces Blender to update the transformation matrices of objects
-        import bpy; bpy.context.evaluated_depsgraph_get().update()
+        if bpymorse.using_upbge():
+            import bpy; bpy.context.evaluated_depsgraph_get().update()
 
         # UPBGE HACK - performs proper mapping of wheels
         properties = bpymorse.get_properties(self._bpy_object)
         for key in keys:
             wheel_name = properties.get(key, None)
             if wheel_name:
-                matched_names = [child.name for child in self._bpy_object.children if child.name.startswith(wheel_name)]
+                if bpymorse.using_upbge(): matched_names = [child.name for child in self._bpy_object.children if child.name.startswith(wheel_name)]
+                else: matched_names = [child.name for child in self._bpy_object.children if wheel_name in child.name]
                 if matched_names != []:
                     bpymorse._property_set(self._bpy_object, key, matched_names[0])
-        
+
         # Attach wheels to chassis
         properties = bpymorse.get_properties(self._bpy_object)
         for key in keys:
@@ -309,7 +313,8 @@ class WheeledRobot(GroundRobot):
                 if wheel:
                     # Make a copy of the current transformation matrix
                     transformation = wheel.matrix_world.copy()
-                    # wheel.parent = None # UPBGE HACK - otherwise, wheels aren't named properly
+                    if bpymorse.using_upbge(): pass 
+                    else: wheel.parent = None # UPBGE HACK - otherwise, wheels aren't named properly
                     wheel.matrix_world = transformation
                 else:
                     logger.error('Wheel %s is required but not found' % expected_wheel)

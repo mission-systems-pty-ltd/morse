@@ -70,7 +70,8 @@ class GeodeticModifierTest(MorseTestCase):
             self.assertAlmostEqual(pos_mod['y'], 1.433372470, delta=geodetic_precision)
             self.assertAlmostEqual(pos_mod['z'], 135.1000, delta=precision)
 
-            morse.deactivate('robot.teleport_mod') # UPBGE HACK - only one teleporter can be activated at the same time
+            # UPBGE HACK - only one teleporter can be activated at the same time
+            if blenderapi.using_upbge(): morse.deactivate('robot.teleport_mod') 
             teleport_stream.publish({'x' : 100.0, 'y' : 200.0, 'z' : 50.0, 'yaw' : 0.0, 'pitch' : 0.0, 'roll' : 0.0})
             morse.sleep(0.01)
 
@@ -85,7 +86,8 @@ class GeodeticModifierTest(MorseTestCase):
             self.assertAlmostEqual(pos_mod['z'], 185.0039, delta=precision)
 
             morse.deactivate('robot.teleport')
-            morse.activate('robot.teleport_mod') # UPBGE HACK - only one teleporter can be activated at the same time
+            # UPBGE HACK - only one teleporter can be activated at the same time
+            if blenderapi.using_upbge(): morse.activate('robot.teleport_mod')
             teleport_mod_stream.publish({'x': 43.6000883, 'y': 1.433372470, 'z': 135.1000,  'yaw' : 0.0, 'pitch' : 0.0, 'roll': 0.0})
             morse.sleep(0.03)
 

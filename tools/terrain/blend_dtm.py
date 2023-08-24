@@ -86,7 +86,9 @@ def set_viewport(viewport_shade='WIREFRAME', clip_end=1000):
         if area.type == 'VIEW_3D':
             for space in area.spaces:
                 if space.type == 'VIEW_3D':
-                    space.shading.type = viewport_shade # UPBGE HACK
+                    # UPBGE HACK
+                    if bpy.app.version > (2,79,0): space.shading.type = viewport_shade
+                    else: space.viewport_shade = viewport_shade
                     space.clip_end = clip_end
                     space.grid_scale = 10
                     space.grid_lines = 50

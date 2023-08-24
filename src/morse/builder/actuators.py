@@ -3,7 +3,7 @@ import os; print("File: ", os.path.basename(__file__), flush=True)
 from morse.builder.creator import ComponentCreator, ActuatorCreator
 from morse.builder.blenderobjects import *
 from morse.core.exceptions import MorseBuilderError
-
+from morse.builder import bpymorse
 class Arucomarker(ActuatorCreator):
     _classpath = "morse.actuators.arucomarker.Arucomarker"
     _blendname = "arucomarker"
@@ -32,7 +32,6 @@ class Gripper(ActuatorCreator):
                     make_morseable = False)
         self.properties(Angle = 60.0, Distance = 0.5)
     def properties(self, **kwargs):
-        print(self._bpy_object.game.sensors)
         radar = self._bpy_object.game.sensors["Radar"]
         if 'Angle' in kwargs:
             radar.angle = kwargs['Angle']
@@ -125,7 +124,6 @@ class Waypoint(ActuatorCreator):
         self.properties(Target = "")
         # append 2 Radar with logic
         self.add_lr_radars()
-        print("CCCC")
 
     def add_lr_radars(self):
         self.add_radar('Radar.L', 'Lcollision', +1)
@@ -241,15 +239,21 @@ class Armature(ActuatorCreator):
         self.ik_targets = []
 
         # UPBGE HACK
-        #   The path 'self._bpy_object.pose.bones' is deprecated
-        #   Path has been replaced with 'self._bpy_object.parent.children'
-        for bone in self._bpy_object.parent.children:
-            if bone.parent_type != "BONE":
-                continue
-            for c in bone.constraints:
-                if c.type == 'IK' and c.ik_type == 'DISTANCE':
-                    if not c.target:
-                        self.create_ik_targets([bone.name])
+        if bpymorse.using_upbge():
+            #   The path 'self._bpy_object.pose.bones' is deprecated
+            #   Path has been replaced with 'self._bpy_object.parent.children'
+            for bone in self._bpy_object.parent.children:
+                if bone.parent_type != "BONE": continue
+                for c in bone.constraints:
+                    if c.type == 'IK' and c.ik_type == 'DISTANCE':
+                        if not c.target:
+                            self.create_ik_targets([bone.name])
+        else: 
+            for bone in self._bpy_object.pose.bones:
+                for c in bone.constraints:
+                    if c.type == 'IK' and c.ik_type == 'DISTANCE':
+                        if not c.target:
+                            self.create_ik_targets([bone.name])
 
     # UPBGE HACK
     #   The whole function was reworked
@@ -261,17 +265,23 @@ class Armature(ActuatorCreator):
 
         If the joint does not exist, throw an exception.
         """
-        
-        # Get bone
         armature = self._bpy_object
-        for bone in armature.parent.children:
-            if bone.name == bone_name:
-                return bone
         
-        # Raise error if bone not found
-        msg = "Joint <%s> does not exist in model %s." % (bone_name, armature.name)
-        msg += " Did you add a skeleton to your model in MakeHuman?"
-        raise MorseBuilderError(msg)
+        if bpymorse.using_upbge():
+            for bone in armature.parent.children:
+                if bone.name == bone_name: return bone
+            msg = "Joint <%s> does not exist in model %s." % (bone_name, armature.name)
+            msg += " Did you add a skeleton to your model in MakeHuman?"
+            raise MorseBuilderError(msg)
+
+        else: 
+            if bone_name not in [c.name for c in armature.pose.bones]:
+                msg = "Joint <%s> does not exist in model %s." % (bone_name, armature.name)
+                msg += " Did you add a skeleton to your model in MakeHuman?"
+                raise MorseBuilderError(msg)
+
+        return armature.pose.bones[bone_name]
+
 
     def create_ik_targets(self, bones):
         # Bug with iTaSC! cf http://developer.blender.org/T37894
@@ -291,8 +301,12 @@ class Armature(ActuatorCreator):
             # UPBGE HACK
             #   Deprecated path, 'posebone.bone.matrix_local', to 'posebone.matrix_local' 
             #   Deprecated path, posebone.bone.tail_local' , to 'posebone.location' 
-            empty.matrix_local = posebone.matrix_local
-            empty.location = posebone.location
+            if bpymorse.using_upbge():
+                empty.matrix_local = posebone.matrix_local
+                empty.location = posebone.location
+            else: 
+                empty.matrix_local = posebone.bone.matrix_local
+                empty.location = posebone.bone.tail_local
 
             existing_ik = [c for c in posebone.constraints if c.type == 'IK']
             if len(existing_ik) == 1:

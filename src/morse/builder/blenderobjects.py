@@ -18,7 +18,8 @@ class Mesh(AbstractComponent):
     def color(self, r=0.1, g=0.1, b=0.1, a=1.0):
         if not self._bpy_object.active_material:
             self._bpy_object.active_material = bpymorse.create_new_material()
-        self._bpy_object.active_material.diffuse_color = (r, g, b, a)
+        if bpymorse.using_upbge(): self._bpy_object.active_material.diffuse_color = (r, g, b, a)
+        else: self._bpy_object.active_material.diffuse_color = (r, g, b)
 
 class Plane(Mesh):
     mesh_primitive_add = bpymorse.add_mesh_plane

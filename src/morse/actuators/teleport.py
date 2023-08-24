@@ -4,6 +4,7 @@ from morse.core.services import service
 from morse.core import mathutils
 from morse.helpers.components import add_data
 from morse.helpers.transformation import Transformation3d
+from morse.core import blenderapi
 
 class Teleport(morse.core.actuator.Actuator):
     """ 
@@ -96,16 +97,18 @@ class Teleport(morse.core.actuator.Actuator):
                                        self.local_data['yaw']])
 
         # UPBGE HACK
+        # TODO: I wonder if this is because * -> is now @ for matrix multiplication in mathutils.
         #   This hack gives the robot the pose directly, instead of ...
         #   ... considering any relativity.
         #   Without it, world2actuator.matrix is a simple identity matrix, ...
         #   ... which teleports the robot to 0,0,0 all the time.
+        if blenderapi.using_upbge():
+            self.robot_parent.force_pose(position, orientation)
         
-        # world2actuator = Transformation3d(None)
-        # world2actuator.translation = position
-        # world2actuator.rotation = orientation
+        else:
+            world2actuator = Transformation3d(None)
+            world2actuator.translation = position
+            world2actuator.rotation = orientation
 
-        # (loc, rot, _) = (world2actuator.matrix * self.actuator2robot.matrix).decompose()
-        # self.robot_parent.force_pose(loc, rot)
-        
-        self.robot_parent.force_pose(position, orientation)
+            (loc, rot, _) = (world2actuator.matrix * self.actuator2robot.matrix).decompose()
+            self.robot_parent.force_pose(loc, rot)

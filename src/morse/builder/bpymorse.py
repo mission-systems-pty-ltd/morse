@@ -94,22 +94,26 @@ def version():
         return 0,0,0
 
 def using_upbge():
-    return version() >= (2, 79, 0)
+    return version() > (2, 79, 0)
 
 # UPBGE HACK
 def set_friction(name, friction):
+    if version() < (2, 79, 0): return
     bpy.data.objects[name].game.friction = friction
 
 # UPBGE HACK
 def get_friction(name):
+    if version() < (2, 79, 0): return
     return bpy.data.objects[name].game.friction
 
 # UPBGE HACK
 def context_link(item):
+    if version() < (2, 79, 0): return
     bpy.context.collection.objects.link(item)
 
 # UPBGE HACK
 def context_unlink(item):
+    if version() < (2, 79, 0): return
     bpy.context.collection.objects.unlink(item)
 
 def create_new_material():
@@ -219,10 +223,20 @@ def get_scene(name_or_id):
     else:
         return None
 
-# UPBGE HACK
-#   Scenes are deprecated
+# UPBGE HACK Scenes are deprecated
 def set_active_scene(name_or_id):
-    return None
+    if using_upbge(): return None
+    if bpy:
+        scene = get_scene(name_or_id)
+        if scene:
+            bpy.data.screens['Default'].scene = scene
+            bpy.context.screen.scene = scene
+            return scene
+        else:
+            return None
+    else:
+        return None
+
 
 def get_last_scene():
     return get_scene(-1)
@@ -230,8 +244,12 @@ def get_last_scene():
 def select_only(obj):
     if bpy:
         deselect_all()
-        obj.select_set(True)
-        bpy.context.view_layer.objects.active = obj
+        if using_upbge(): 
+            obj.select_set(True)
+            bpy.context.view_layer.objects.active = obj
+        else: 
+            obj.select = True
+            bpy.context.scene.objects.active = obj
 
 def delete(objects):
     if not bpy:

@@ -83,6 +83,7 @@ class Accelerometer(morse.core.sensor.Sensor):
         self.a = (self.v - self.plv) / self.dt
         
         # UPBGE HACK - Stores most recent substantial acceleration (>10)
+        # What is the purpose of this?
         if [a for a in self.a if abs(a) > 10] != []:
             self.local_data["acceleration_substantial"] = self.a
 

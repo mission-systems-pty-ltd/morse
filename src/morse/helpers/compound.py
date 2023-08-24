@@ -74,6 +74,8 @@ def translate_compound(self, x=0.0, y=0.0, z=0.0):
     for f in family:
         oldl = objs[f].location
         objs[f].location = (oldl.x+x,oldl.y+y,oldl.z+z)  
+        if bpymorse.using_upbge(): pass
+        else: bpy.context.scene.update()
     return
 
 def rotate_compound(self, x=0.0, y=0.0, z=0.0):

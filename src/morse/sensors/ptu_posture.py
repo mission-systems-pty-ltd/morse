@@ -55,8 +55,7 @@ class PTUPosture(morse.core.sensor.Sensor):
 
         # UPBGE HACK
         #   The original ptu name was incorrect.
-        #   The following serves as a quick fix, though it may not work for ...
-        #   ... all cases
+        #   The following serves as a quick fix, though it may not work for all cases
         ptu_name = ".".join(self.bge_object.name.split(".")[:2])
         self._ptu_obj = blenderapi.persistantstorage().componentDict[ptu_name]
         

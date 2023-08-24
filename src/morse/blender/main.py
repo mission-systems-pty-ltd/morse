@@ -541,7 +541,6 @@ def init_multinode():
 
 class MorseSyncProcess:
     def __init__(self):
-        print("PATH I ASSUME WE GOT HERE \n\n\n\n\n")
         args = ['morse_sync', '-p', str(1.0/morse.core.blenderapi.getfrequency())]
         socket_manager = 'morse.middleware.socket_datastream.SocketDatastreamManager'
         socket_properties = component_config.stream_manager[socket_manager]
@@ -578,7 +577,8 @@ def init(contr):
     logger.info("PID: %d" % os.getpid())
 
     persistantstorage.morse_initialised = False
-    persistantstorage.time = TimeStrategies.make(morse.core.blenderapi.getssr()['time_management'], morse.core.blenderapi.getssr().get('use_relative_time', False)) # UPBGE HACK
+    persistantstorage.time = TimeStrategies.make(morse.core.blenderapi.getssr()['time_management'], 
+                                                 morse.core.blenderapi.getssr().get('use_relative_time', False))
     
     # Variable to keep trac of the camera being used
     persistantstorage.current_camera_index = 0

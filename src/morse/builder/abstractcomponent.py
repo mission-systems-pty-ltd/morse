@@ -145,8 +145,8 @@ class AbstractComponent(object):
             obj.matrix_parent_inverse.identity()
             # make sure the object is visible in the viewport
             # otherwise it can prevent from updating its properties
-            # obj.hide = False # UPBGE3 MOD
-            obj.hide_set(False) # UPBGE3 MOD
+            if bpymorse.using_upbge(): obj.hide_set(False)
+            else: obj.hide = False
         self._bpy_object = obj # bpy object
 
     def append(self, obj, child = None, level=1):
@@ -770,9 +770,13 @@ class AbstractComponent(object):
     def _make_transparent(self, obj, alpha):
         obj.game.physics_type = 'NO_COLLISION'
         for m in obj.material_slots:
-            m.material.show_transparent_back = True           # UPBGE HACK
-            m.material.alpha_threshold = alpha                # UPBGE HACK
-            # m.material.transparency_method = 'Z_TRANSPARENCY' # UPBGE HACK
+            if bpymorse.using_upbge():
+                m.material.show_transparent_back = True           # UPBGE HACK
+                m.material.alpha_threshold = alpha                # UPBGE HACK
+            else:
+                m.material.use_transparency = True
+                m.material.alpha = alpha
+                m.material.transparency_method = 'Z_TRANSPARENCY'
         for c in obj.children:
             self._make_transparent(c, alpha)
 

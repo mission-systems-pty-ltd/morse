@@ -4,6 +4,7 @@ from morse.core import status, blenderapi, mathutils
 import morse.core.actuator
 from morse.core.services import service, async_service, interruptible
 from morse.helpers.components import add_data, add_property
+from morse.core import blenderapi
 
 class Waypoint(morse.core.actuator.Actuator):
     """
@@ -348,13 +349,18 @@ class Waypoint(morse.core.actuator.Actuator):
             # target angle is not possible!
             if projection_distance - self.local_data['tolerance'] / 2 > 0:
 
+                ### Get the angle of the robot ###
+                robot_angle = 0.0
+
                 # UPBGE HACK
                 #   The robot's angle was originally taken from parent.position_3d.yaw.
                 #   However, it seems like this path always stores the angle as 0.
                 #   This was fixed by getting the orientation matrix, converting it ...
                 #   ... into a vector, and extracting the yaw.
-                orientation = self.bge_object.orientation
-                robot_angle = orientation.to_euler('XYZ').z
+                if blenderapi.using_upbge():
+                    robot_angle = self.bge_object.orientation.to_euler('XYZ').z
+                else:
+                    robot_angle = parent.position_3d.yaw
 
                 ### Get the angle to the target ###
                 target_angle = projection_vector.angle(self.world_x_vector)

@@ -150,9 +150,13 @@ def scene():
     else:
         return None
 
-# UPBGE HACK - scenes don't exist anymore
 def add_scene(name, overlay=1):
-    return None
+    # UPBGE HACK - scenes don't exist anymore
+    if using_upbge(): 
+        return None
+    else:
+        if not fake: return bge.logic.addScene(name, overlay)
+        else: return None
 
 def get_scene_list():
     if not fake:
@@ -259,7 +263,7 @@ def version():
 
 # UPBGE has proven to be a breaking change and it would be nice to keep some backward compatibility with the old blender versions.
 def using_upbge():
-    return version() >= (2, 79, 0)
+    return version() > (2, 79, 0)
 
 def getssr():
     if not fake:
@@ -274,6 +278,7 @@ def joysticks():
         return None
 
 def isfastmode():
+    print("checking fastmode")
     for area in bpy.context.window.screen.areas:
         if area.type == 'VIEW_3D':
             for space in area.spaces:

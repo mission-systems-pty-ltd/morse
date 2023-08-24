@@ -282,7 +282,8 @@ class Environment(AbstractComponent):
                 name = 'S.%dx%d' % (res_x, res_y)
                 if not name in cfg_camera_scene:
                     # Create a new scene for the Camera
-                    bpymorse.new_scene(type='LINK_COPY')
+                    if bpymorse.using_upbge(): bpymorse.new_scene(type='LINK_COPY')
+                    else: bpymorse.new_scene(type='LINK_OBJECTS')
                     scene = bpymorse.get_context_scene()
                     scene.name = name
                     scene.render.resolution_x = res_x
@@ -351,9 +352,12 @@ class Environment(AbstractComponent):
         self._cfg_camera_scene() 
 
         # Create a new scene for the MORSE_LOGIC (Scene_Script_Holder, CameraFP)
-        # scene = bpymorse.set_active_scene('S.MORSE_LOGIC')
-        import bpy
-        scene =  bpy.data.scenes["S.MORSE_LOGIC"]
+        if bpymorse.using_upbge():
+            import bpy
+            scene =  bpy.data.scenes["S.MORSE_LOGIC"]
+        else:
+            scene = bpymorse.set_active_scene('S.MORSE_LOGIC')
+
         scene.game_settings.physics_engine = 'BULLET'
         scene.game_settings.physics_step_sub = self._physics_step_sub
         # set simulation view resolution (4:3)
@@ -404,13 +408,24 @@ class Environment(AbstractComponent):
             self.set_material_mode('GLSL')
 
         # Apply setting changes
-        bpymorse.get_context_scene().game_settings.use_viewport_render = True
-        bpymorse.get_context_scene().unit_settings.system = 'METRIC'
-        bpymorse.get_context_scene().game_settings.frame_type = 'EXTEND'
-        bpymorse.get_context_scene().game_settings.show_mouse = True
+        if bpymorse.using_upbge():
+            # I'm not convinced that the viewport_render is the correct way to go - we want to see the in game renderer
+            # TODO: Review.
+            bpymorse.get_context_scene().game_settings.use_viewport_render = True
+            bpymorse.get_context_scene().unit_settings.system = 'METRIC'
+            bpymorse.get_context_scene().game_settings.frame_type = 'EXTEND'
+            bpymorse.get_context_scene().game_settings.show_mouse = True
+        else:
+            # Set the unit system to use for button display (in edit mode) to metric
+            bpymorse.get_context_scene().unit_settings.system = 'METRIC'
+            # Select the type of Framing to Extend,
+            # Show the entire viewport in the display window,
+            # viewing more horizontally or vertically.
+            bpymorse.get_context_scene().game_settings.frame_type = 'EXTEND'
+            # Start player with a visible mouse cursor
+            bpymorse.get_context_scene().game_settings.show_mouse = True
 
-        # UPBGE HACK
-        #   Sets the position of the camera
+        # Sets the position of the camera
         camera_fp = bpymorse.get_object('CameraFP')
         camera_fp.location = self._camera_location
         camera_fp.rotation_euler = self._camera_rotation
@@ -418,25 +433,25 @@ class Environment(AbstractComponent):
         camera_fp.data.clip_start = self._camera_clip_start
         camera_fp.data.clip_end   = self._camera_clip_end
         camera_fp.data.lens = self._focal_length # set focal length in mm
-        
         # UPBGE HACK
         #   Scenes have changed so the way this camera is operating no longer works.
-        # bpymorse.deselect_all()
+        # Disabled the below code because it causes the timer to screw up with the error:
+        # AttributeError: 'BestEffortStrategy' object has no attribute '_morse_dt_analyser' 
+        #   Setting the viewport perspective causes the game to crash with a segfault. 
+        # This seems to only happen when 'CAMERA' is selected. ORTH and PERSECTIVE work fine...
+        # The game won't crash however if the camera is manually set as active (pressing '0' in exit mode with cameraFP selected)
+        if bpymorse.using_upbge():
+            bpymorse.set_viewport_perspective(perspective='CAMERA', camera_obj=camera_fp)
+        else:        
+            # Make CameraFP the active camera
+            bpymorse.deselect_all()
+            camera_fp.select = True
+            bpymorse.get_context_scene().objects.active = camera_fp
+            # Set default camera
+            bpymorse.get_context_scene().camera = camera_fp
+            # Set viewport to Camera
+            bpymorse.set_viewport_perspective()
 
-        ### UPBGE HACK
-        ### Disabled the below code because it causes the timer to screw up with the error:
-        ### AttributeError: 'BestEffortStrategy' object has no attribute '_morse_dt_analyser' 
-        # camera_fp.select = True                                 
-        # bpymorse.get_context_scene().objects.active = camera_fp 
-        # # Set default camera
-        # bpymorse.get_context_scene().camera = camera_fp         
-        
-        ### UPBGE HACK 
-        ### Setting the viewport perspective causes the game to crash with a segfault. 
-        ### This seems to only happen when 'CAMERA' is selected. ORTH and PERSECTIVE work fine...
-        ### The game won't crash however if the camera is manually set as active (pressing '0' in exit mode with cameraFP selected)
-        # Set viewport to Camera
-        bpymorse.set_viewport_perspective(perspective='CAMERA', camera_obj=camera_fp)
 
         # Fit the HUD plane
         hud_text = bpymorse.get_object('Keys_text')
@@ -588,7 +603,8 @@ class Environment(AbstractComponent):
         :param material_mode: enum in ['SINGLETEXTURE', 'MULTITEXTURE', 'GLSL']
         """
         # UPBGE HACK - material_mode is deprecated
-        # bpymorse.get_context_scene().game_settings.material_mode = material_mode
+        if bpymorse.using_upbge(): pass
+        else: bpymorse.get_context_scene().game_settings.material_mode = material_mode
         self.is_material_mode_custom = True
 
     def set_viewport(self, viewport_shade='WIREFRAME', clip_end=1000):
@@ -609,7 +625,8 @@ class Environment(AbstractComponent):
         of :py:class:`morse.builder.TimeStrategies`
         """
         if strategy == TimeStrategies.FixedSimulationStep:
-            bpymorse.get_context_scene().game_settings.use_frame_rate = 1 # UPBGE HACK - used to be 0
+            if bpymorse.using_upbge(): bpymorse.get_context_scene().game_settings.use_frame_rate = 1 # UPBGE HACK - used to be 0
+            else: bpymorse.get_context_scene().game_settings.use_frame_rate = 0
             self.auto_tune_time = False
         elif strategy == TimeStrategies.BestEffort:
             bpymorse.get_context_scene().game_settings.use_frame_rate = 1
