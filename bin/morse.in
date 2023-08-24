@@ -88,12 +88,16 @@ def check_blender_version(blender_path):
         version_str = subprocess.Popen(
                                 [blender_path, '--version'],
                                 stdout=subprocess.PIPE).communicate()[0]
+        print(version_str)    
         for line in version_str.splitlines():
             line = line.decode().strip()
             if line.startswith("Blender"):
                 match = re.search(r"(\d+)\.(\d+)\.(\d+)", line)
                 if match:
-                    version = f"{match.group(1)}.{match.group(2)}.{match.group(3)}"
+                    version = str(match.group(1))+"."+str(match.group(2))+"."+str(match.group(3))
+                else: 
+                    match = re.search(r"(\d+)\.(\d+)", line)
+                    version = str(match.group(1))+"."+str(match.group(2))
     except OSError:
         return None
 
