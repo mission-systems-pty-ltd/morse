@@ -329,7 +329,11 @@ def triangulate_object(obj):
     bm = bmesh.new()
     bm.from_mesh(me)
 
-    bmesh.ops.triangulate(bm, faces=bm.faces[:], quad_method=0, ngon_method=0)
+    # Blender docs notes that quad and ngon method are undocumentd: https://docs.blender.org/api/2.79/bmesh.ops.html
+    # experimentation in 2.79 by overlaying meshes triangulated with this code and the modifiers tab shows that
+    # quad_method=0 and ngon_method=0 are the same as the blender triangulate modifier with quad_method=BEAUTY and ngon_method=BEAUTY
+    if bpymorse.using_upbge(): bmesh.ops.triangulate(bm, faces=bm.faces[:], quad_method="BEAUTY", ngon_method="BEAUTY")
+    else: bmesh.ops.triangulate(bm, faces=bm.faces[:], quad_method=0, ngon_method=0)
 
     # Finish up, write the bmesh back to the mesh
     bm.to_mesh(me)
