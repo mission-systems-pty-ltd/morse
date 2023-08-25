@@ -86,7 +86,7 @@ class ROSPublisher(AbstractROS):
         if self.ros_class != Header:
             # Generate a publisher for the component
             self.topic = rospy.Publisher(topic_name, self.ros_class, queue_size=self.determine_queue_size())
-        if self.default_frame_id is 'USE_TOPIC_NAME': # morse convention
+        if self.default_frame_id == 'USE_TOPIC_NAME': # morse convention
             self.frame_id = self.kwargs.get('frame_id', self.topic_name)
         else: # default_frame_id was overloaded in subclass
             self.frame_id = self.kwargs.get('frame_id', self.default_frame_id)
