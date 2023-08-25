@@ -93,7 +93,8 @@ def check_blender_version(blender_path):
                                 stdout=subprocess.PIPE).communicate()[0]
         for line in version_str.splitlines():
             line = line.decode().strip()
-            if line.startswith("Blender"):
+
+            if (line.startswith("Blender")):
                 match = re.search(r"(\d+)\.(\d+)\.(\d+)", line)
                 if match:
                     version = str(match.group(1))+"."+str(match.group(2))+"."+str(match.group(3))
@@ -107,17 +108,17 @@ def check_blender_version(blender_path):
                      "Please copy the output of " +  blender_path + \
                      " --version and send it to morse-dev@laas.fr.")
         return None
-    
-    version = parse_version(version)
-    logger.info("Checking version of " + blender_path + "... Found v." + str(version))
-    
+
+    logger.info("Checking version of " + blender_path + "... Found v." + version)
+
+    parsed_version = parse_version( version )
     min_version = parse_version(MIN_BLENDER_VERSION)
     last_tested = parse_version(LAST_TESTED_BLENDER_VERSION)
-    if version < min_version:
-        print(f"ERROR {version} is less than the minimum version: {min_version}")
+    if parsed_version < min_version:
+        print("ERROR "+str(parsed_version)+" is less than the minimum version: "+str(min_version))
         logger.error("Version %s of Blender is below the minimum version" % version)
         return False
-    if version > last_tested:
+    if parsed_version > last_tested:
         logger.warning("Version %s of Blender is untested but should work" % version)
 
     return version

@@ -371,6 +371,15 @@ MORSE_DATASTREAM_DICT = {
             "text": INTERFACE_DEFAULT_OUT,
             }
         },
+    "morse.sensors.info.Info": {
+        "default": {
+            "ros": ['morse.middleware.ros.message.MessagePublisher'],
+            "socket": INTERFACE_DEFAULT_OUT,
+            "yarp": INTERFACE_DEFAULT_OUT,
+            "moos": INTERFACE_DEFAULT_OUT,
+            "text": INTERFACE_DEFAULT_OUT,
+            }
+        },        
     "morse.sensors.velocity.Velocity": {
         "default": {
             "ros": ['morse.middleware.ros.velocity.TwistStampedPublisher'],
