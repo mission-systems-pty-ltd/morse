@@ -26,6 +26,38 @@ except:
     print("\033[0m")
 
 flatten = lambda l: [item for sublist in l for item in sublist]
+# blender_upbge_types = {
+# "ARMATURE": "UNSUPPORTED", "CAMERA": "UNSUPPORTED", "CURVE": "UNSUPPORTED",
+# "EMPTY": "UNSUPPORTED", "FONT": "UNSUPPORTED", "GPENCIL": "UNSUPPORTED",
+# "LATTICE": "UNSUPPORTED", "LIGHT": "UNSUPPORTED", "LIGHT_PROBE": "UNSUPPORTED",
+# "MESH": "SUPPORTED", "META": "UNSUPPORTED", "SPEAKER": "UNSUPPORTED",
+# "SURFACE": "UNSUPPORTED", "VOLUME": "UNSUPPORTED"}
+
+# blender_2_79_types = {
+# "ARMATURE": "UNSUPPORTED", "CAMERA": "UNSUPPORTED", "CURVE": "UNSUPPORTED",
+# "EMPTY": "UNSUPPORTED", "FONT": "UNSUPPORTED", "LAMP": "SUPPORTED",
+# "LATTICE": "UNSUPPORTED", "MESH": "SUPPORTED", "META": "UNSUPPORTED",
+# "SPEAKER": "UNSUPPORTED", "SURFACE": "UNSUPPORTED"}
+class bpy_types:
+
+    supported = {
+        (2, 79, 0): ["MESH", "LAMP" ],
+        (3, 0, 0): ["MESH"]
+    }
+
+    @staticmethod
+    def nearest_supported_version():
+        max_version = (0, 0, 0)
+        for v in bpy_types.supported.keys():
+            if v <= bpymorse.version() and v > max_version:
+                max_version = v
+        return max_version if max_version in bpy_types.supported else None
+
+    @staticmethod
+    def is_supported_object_type(typename):
+        nearest_version = bpy_types.nearest_supported_version()
+        if nearest_version is None: return False
+        return typename in bpy_types.supported[nearest_version]
 
 # Set logger level - DEBUG used for timing of all messages sent
 # logger.setLevel(logging.INFO)
@@ -65,7 +97,14 @@ def create_instance_msg(optix_instance, optix_object, dict_msg = True):
     rotation = optix_instance.worldOrientation.to_quaternion()
     scale = optix_object.scale
     properties = optix_object.game.properties
-    has_rgba = 'texture' in properties and properties['texture'].value and len(optix_object.data.materials) > 0
+    if bpymorse.using_upbge(): 
+        if not hasattr(create_instance_msg, "_has_printed"):
+            print("\n [OPTIX WARNING!] Texture slots have not been implemented for UPBGE!")
+            create_instance_msg._has_printed = True
+        has_rgba = False
+    else: 
+        has_rgba = 'texture' in properties and properties['texture'].value and len(optix_object.data.materials) > 0 and len(optix_object.data.materials[0].texture_slots) > 0
+
     rgba_texture_name = "" if not has_rgba else optix_object.data.materials[0].texture_slots[0].texture.name
     rgba_uvs_name = "" if not has_rgba else optix_object.data.name
 
@@ -355,10 +394,14 @@ class Objectserver(morse.core.sensor.Sensor):
         # Environmental ambient light
         environment_light = world.light_settings
         self.ambient_lights = {}
-        if environment_light.use_environment_light:
-            self.ambient_lights['world_light'] = environment_light
+
+        if bpymorse.using_upbge(): 
+            print("ENVIRONMENT LIGHTING IS NOT IMPLEMENTED")
         else:
-            logger.info("Ambient light is disabled")
+            if environment_light.use_environment_light:
+                self.ambient_lights['world_light'] = environment_light
+            else:
+                logger.info("Ambient light is disabled")
 
         # Data structures for optix
         self.dynamic_instances = []
@@ -371,7 +414,11 @@ class Objectserver(morse.core.sensor.Sensor):
         for obj in bpy_objs:
             props = obj.game.properties
             if 'optix' in props and props['optix'].value:
-                if obj.type == 'LAMP':
+                if not bpy_types.is_supported_object_type( obj.type ):
+                    logger.warn('Object ' + obj.name + ' is of unsupported type ' + obj.type + ' and will be ignored. Supported types are ' + str(bpy_types.supported))
+                    continue
+
+                if obj.type == 'LAMP' or obj.type == 'LIGHT':
                     lamp = obj.data
                     if lamp.type == 'SUN':
                         self.directional_lights[obj.name] = obj
@@ -384,9 +431,13 @@ class Objectserver(morse.core.sensor.Sensor):
                         if 'texture' in props and props['texture'].value:
                             if len(obj.data.materials) == 0:
                                 raise RuntimeError('texture was specified for ' + obj.name + ' but no materials were found')
-                            if len(obj.data.materials[0].texture_slots) == 0:
-                                raise RuntimeError('texture was specified for ' + obj.name + ' but no texture slots were found for the material')
-                            self.optix_textures[obj.data.materials[0].texture_slots[0].texture.name] = obj.data.materials[0].texture_slots[0].texture
+
+                            if bpymorse.using_upbge(): 
+                                print("MATERIAL TEXTURE SLOT IS NOT IMPLEMENTED")
+                            else:
+                                if len(obj.data.materials[0].texture_slots) == 0:
+                                    raise RuntimeError('texture was specified for ' + obj.name + ' but no texture slots were found for the material')
+                                self.optix_textures[obj.data.materials[0].texture_slots[0].texture.name] = obj.data.materials[0].texture_slots[0].texture
                     if 'dynamic' in props and props['dynamic'].value:
                         self.dynamic_instances.append(bge_objs[obj.name])
             else:
