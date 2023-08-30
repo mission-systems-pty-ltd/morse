@@ -701,8 +701,10 @@ def process_run_edit(args):
         scene = get_scene(args.env, args.file) or sys.exit(1)
 
         prelaunch()
-        if check_blender_version( blender_exec ) < parse_version("3.0.0"): scene_autorun_path = DEFAULT_SCENE_AUTORUN_PATH_2_79_0
-        else: scene_autorun_path = DEFAULT_SCENE_AUTORUN_PATH_3_0_0
+        if parse_version( check_blender_version( blender_exec )) < parse_version("3.0.0"):
+            scene_autorun_path = DEFAULT_SCENE_AUTORUN_PATH_2_79_0
+        else:
+            scene_autorun_path = DEFAULT_SCENE_AUTORUN_PATH_3_0_0
 
         if scene.endswith(".blend"):
             launch_simulator(
