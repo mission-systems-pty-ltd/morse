@@ -47,7 +47,7 @@ MIN_BLENDER_VERSION = "2.79"
 #Blender version must be smaller than...
 LAST_TESTED_BLENDER_VERSION = "3.0"
 
-#Unix-style path to the MORSsE default scene and templates, within the prefix
+#Unix-style path to the MORSE default scene and templates, within the prefix
 DEFAULT_SCENE_PATH = "share/morse/data/morse_default.blend"
 
 # Check for blender version or ubuntu version or something...
@@ -128,7 +128,7 @@ def check_blender_python_version(blender_path):
     """
     tmpF = tempfile.NamedTemporaryFile(delete = False)
     try:
-        tmpF.write(b"import sys\n")
+        tmpF.write(b"import sys,re\n")
         tmpF.write(b"print('>>>' + '.'.join((str(x) for x in sys.version_info[:3])))\n")
         tmpF.write(b"print('###%s' % sys.path)\n")
         tmpF.flush()
@@ -140,7 +140,7 @@ def check_blender_python_version(blender_path):
         ).communicate() # get only stdout
         stdout = output[0].decode()
         stderr = output[1].decode()
-        version = stdout.split('>>>')[1][0:5]
+        version = re.search( r'>>>([0-9.]+)', stdout )[1]
         logger.info("Checking version of Python within Blender " + blender_path + \
                         "... Found v." + version)
 
@@ -570,7 +570,7 @@ def prelaunch():
         logger.error("Your environment is not yet correctly setup to run MORSE!\n" +\
         "Please fix it with above information.\n" +\
         "You can also run 'morse check' for more details.")
-        sys.exit()
+        sys.exit(1)
 
 def launch_simulator(scene=None, script=None, node_name=None, geometry=None,
         noaudio = False, script_options = []):
@@ -673,7 +673,7 @@ def do_check(args):
     except MorseError as e:
         logger.error(e.value)
         logger.error("Your environment is not correctly setup to run MORSE!")
-        sys.exit()
+        sys.exit(1)
     logger.info("Your environment is correctly setup to run MORSE.")
 
 
@@ -700,8 +700,10 @@ def process_run_edit(args):
         scene = get_scene(args.env, args.file) or sys.exit(1)
 
         prelaunch()
-        if check_blender_version( blender_exec ) < parse_version("3.0.0"): scene_autorun_path = DEFAULT_SCENE_AUTORUN_PATH_2_79_0
-        else: scene_autorun_path = DEFAULT_SCENE_AUTORUN_PATH_3_0_0
+        if parse_version( check_blender_version( blender_exec )) < parse_version("3.0.0"):
+            scene_autorun_path = DEFAULT_SCENE_AUTORUN_PATH_2_79_0
+        else:
+            scene_autorun_path = DEFAULT_SCENE_AUTORUN_PATH_3_0_0
 
         if scene.endswith(".blend"):
             launch_simulator(
