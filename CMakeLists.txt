@@ -33,6 +33,8 @@ endif(NOT WIN32)
 set(PythonInterp_FIND_VERSION 3.3)
 find_package(PythonInterp REQUIRED)
 
+get_filename_component( PYTHON_EXECUTABLE_NAME ${PYTHON_EXECUTABLE} NAME )
+
 set(PythonLibs_FIND_VERSION "${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}")
 set(PythonLibs_FIND_VERSION_EXACT "${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}")
 find_package(PythonLibs REQUIRED)

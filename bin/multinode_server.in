@@ -1,4 +1,4 @@
-#! @PYTHON_EXECUTABLE@
+#! /usr/bin/env @PYTHON_EXECUTABLE_NAME@
 """ Simulation Manager that coordinates multiple MORSE nodes.
 
 TEST
