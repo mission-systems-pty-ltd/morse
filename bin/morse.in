@@ -19,6 +19,9 @@ logger.addHandler(log_handler)
 logger.setLevel(logging.INFO)
 ##
 
+# Ensure that any virtual environment path comes first
+sys.path = sorted( sys.path, key=lambda x: x.startswith("/usr/local/share/virtualenvs/"), reverse=True )
+
 try:
     sys.path.append("@PYTHON_INSTDIR@")
     from morse.version import VERSION
