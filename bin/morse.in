@@ -50,12 +50,13 @@ MIN_BLENDER_VERSION = "2.79"
 #Blender version must be smaller than...
 LAST_TESTED_BLENDER_VERSION = "3.0"
 
-#Unix-style path to the MORSE default scene and templates, within the prefix
-DEFAULT_SCENE_PATH = "share/morse/data/morse_default.blend"
 
 # Check for blender version or ubuntu version or something...
 DEFAULT_SCENE_AUTORUN_PATH_2_79_0 = "share/morse/data/morse_default_autorun.blend"
 DEFAULT_SCENE_AUTORUN_PATH_3_0_0 = "share/morse/data/morse_default_autorun_upbge.blend"
+#Unix-style path to the MORSE default scene and templates, within the prefix
+DEFAULT_SCENE_PATH = "share/morse/data/morse_default.blend"
+DEFAULT_SCENE_PATH_3_0_0 = "share/morse/data/morse_default_upbge.blend"
 
 DEFAULT_SCENE_NAME = "default.py"
 
@@ -732,6 +733,10 @@ def process_run_edit(args):
         scene = get_scene(args.env, args.file) or sys.exit(1)
 
         prelaunch()
+
+        # Bit of a hack to get around the inability to properly test the blender version before prelaunch.
+        if check_blender_version( blender_exec ) > parse_version("3.0.0"):
+            default_scene_abspath = os.path.join(os.path.normpath(os.environ['MORSE_ROOT']), os.path.normpath(DEFAULT_SCENE_PATH_3_0_0))
 
         if scene.endswith(".blend"):
             launch_simulator(
