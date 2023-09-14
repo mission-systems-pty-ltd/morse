@@ -471,6 +471,19 @@ class Environment(AbstractComponent):
         self._created = True
         sys.excepthook = sys.__excepthook__ # Standard Python excepthook
 
+
+        # If in autorun - exec the startup script
+
+        # Read environment variables for MORSE_AUTORUN
+        #   MORSE_AUTORUN - if set to 1, will run the startup script
+
+        if os.environ.get('MORSE_AUTORUN', '0') == "True":
+            try:
+                import bpy
+                exec( bpy.data.texts['autostart'].as_string() )
+            except Exception as e:
+                logger.info("No autostart script found, skipping: %s" % e)
+
     def set_horizon_color(self, color=(0.05, 0.22, 0.4)):
         """ Set the horizon color
 
