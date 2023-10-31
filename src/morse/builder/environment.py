@@ -452,7 +452,6 @@ class Environment(AbstractComponent):
             # Set viewport to Camera
             bpymorse.set_viewport_perspective()
 
-
         # Fit the HUD plane
         hud_text = bpymorse.get_object('Keys_text')
         hud_text.scale.y = 0.027
@@ -471,17 +470,15 @@ class Environment(AbstractComponent):
         self._created = True
         sys.excepthook = sys.__excepthook__ # Standard Python excepthook
 
-
         # If in autorun - exec the startup script
-
         # Read environment variables for MORSE_AUTORUN
         #   MORSE_AUTORUN - if set to 1, will run the startup script
-
+        
         if os.environ.get('MORSE_AUTORUN', '0') == "True":
             try:
                 import bpy
                 # exec( bpy.data.texts['autostart'].as_string() )
-                exec( """
+                auto_start_command = """
 import bpy
 class WaitForTextures(bpy.types.Operator):
     import bpy
@@ -492,7 +489,13 @@ class WaitForTextures(bpy.types.Operator):
     max_checks = 50  # Maximum number of checks before giving up
     check_count = 0
 
+    def finish(self, context):
+        self.maximize_and_start_game()
+        context.window_manager.event_timer_remove(self._timer)
+        return {'FINISHED'}
+
     def modal(self, context, event):
+        %s
         import bpy
         if event.type == 'TIMER':
             self.check_count += 1
@@ -503,11 +506,8 @@ class WaitForTextures(bpy.types.Operator):
             # If all images are loaded or we've checked too many times, start the game
             if all_loaded or self.check_count >= self.max_checks:
                 print("[MORSE STARTUP] Loading maximize_and_start_game. environment.py calling text script from morse_default_autorun_upbge.py")
-                self.maximize_and_start_game()
-                context.window_manager.event_timer_remove(self._timer)
-                return {'FINISHED'}
+                return self.finish(context)
 
-        
         return {'PASS_THROUGH'}
 
     def execute(self, context):
@@ -546,8 +546,9 @@ bpy.utils.register_class(WaitForTextures)
 
 # Start the operator to wait for textures to load
 bpy.ops.wm.wait_for_textures()
-                """ )
-
+                """ % ("return self.finish(context)" if self.fastmode else "")
+                print(self.fastmode)
+                exec(auto_start_command)
 
             except Exception as e:
                 logger.info("No autostart script found, skipping: %s" % e)
