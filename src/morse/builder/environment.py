@@ -480,7 +480,75 @@ class Environment(AbstractComponent):
         if os.environ.get('MORSE_AUTORUN', '0') == "True":
             try:
                 import bpy
-                exec( bpy.data.texts['autostart'].as_string() )
+                # exec( bpy.data.texts['autostart'].as_string() )
+                exec( """
+import bpy
+class WaitForTextures(bpy.types.Operator):
+    import bpy
+    bl_idname = "wm.wait_for_textures"
+    bl_label = "Wait for Textures to Load"
+    
+    _timer = None
+    max_checks = 50  # Maximum number of checks before giving up
+    check_count = 0
+
+    def modal(self, context, event):
+        import bpy
+        if event.type == 'TIMER':
+            self.check_count += 1
+            
+            # Check if all image data is loaded
+            all_loaded = all(img.packed_file for img in bpy.data.images)
+            
+            # If all images are loaded or we've checked too many times, start the game
+            if all_loaded or self.check_count >= self.max_checks:
+                print("[MORSE STARTUP] Loading maximize_and_start_game. environment.py calling text script from morse_default_autorun_upbge.py")
+                self.maximize_and_start_game()
+                context.window_manager.event_timer_remove(self._timer)
+                return {'FINISHED'}
+
+        
+        return {'PASS_THROUGH'}
+
+    def execute(self, context):
+        import bpy
+        self.check_count = 0
+        self._timer = context.window_manager.event_timer_add(0.2, window=context.window)  # Check every 0.2 seconds
+        context.window_manager.modal_handler_add(self)
+        return {'RUNNING_MODAL'}
+    
+    def maximize_and_start_game(self):
+        import bpy
+
+        # Find a 3D view area
+        try:
+            area_3d = next((area for area in bpy.context.screen.areas if area.type == 'VIEW_3D'), None)
+        except Exception as e:
+            print("we didnt make it: ", e)
+        if area_3d:
+            # Create the context override dictionary
+            override = {
+                'window': bpy.context.window,
+                'screen': bpy.context.screen,
+                'area': area_3d,
+                'region': area_3d.regions[-1]  # Typically, the window region
+            }
+            
+            # Maximize the 3D view area
+            bpy.ops.screen.screen_full_area(override)
+            # Start the game engine
+            bpy.ops.view3d.game_start(override)
+        else:
+            print("[MORSE STARTUP] Autorun startup failed. environment.py calling text script from morse_default_autorun_upbge.py")
+
+# Register the operator
+bpy.utils.register_class(WaitForTextures)
+
+# Start the operator to wait for textures to load
+bpy.ops.wm.wait_for_textures()
+                """ )
+
+
             except Exception as e:
                 logger.info("No autostart script found, skipping: %s" % e)
 
