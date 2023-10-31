@@ -5,6 +5,7 @@ documentation generation purposes).
 
 import sys
 import os
+import subprocess
 
 fake = False
 bpy = None
@@ -259,7 +260,11 @@ def version():
     if not fake:
         return bpy.app.version
     else:
-        return 0,0,0
+        # UPBGE HACK - the morse tests seem to turn on the 'fake' variable
+        result = subprocess.run("blender --version | head -n 1 | awk '{print $2}'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        version = result.stdout.strip().split(".")
+        version = tuple([int(value) for value in version])
+        return version
 
 # UPBGE has proven to be a breaking change and it would be nice to keep some backward compatibility with the old blender versions.
 def using_upbge():
