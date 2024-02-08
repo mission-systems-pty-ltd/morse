@@ -268,7 +268,7 @@ def version():
 
 # UPBGE has proven to be a breaking change and it would be nice to keep some backward compatibility with the old blender versions.
 def using_upbge():
-    return version() > (2, 79, 0)
+    return version() >= (3, 0, 0)
 
 def getssr():
     if not fake:
