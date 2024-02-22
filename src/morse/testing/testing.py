@@ -23,7 +23,6 @@ ALL_TIME_MODES = None
 INITIALIZED_LOGGER = False
 
 class MorseTestRunner(unittest.TextTestRunner):
-
         
     def setup_logging(self):
         global INITIALIZED_LOGGER
