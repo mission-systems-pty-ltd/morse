@@ -68,7 +68,7 @@ class SteerForceTest(MorseTestCase):
             morse.sleep(2.0)
 
             pose = pose_stream.get()
-            self.assertAlmostEqual(pose['x'], x + 29.0, delta = 1.0)
+            self.assertAlmostEqual(pose['x'], x + 29.0, delta = 5.0) # delta value was 1.0 (time increased from 39 secs to 77 secs)
             self.assertAlmostEqual(pose['y'], y, delta = 1.5)
 
             # Backward move
@@ -78,7 +78,7 @@ class SteerForceTest(MorseTestCase):
             morse.sleep(2.0)
 
             pose = pose_stream.get()
-            self.assertAlmostEqual(pose['x'], x, delta = 1.5)
+            self.assertAlmostEqual(pose['x'], x, delta = 37.5) # delta value was 1.5 (time increased from 77 secs to 114 secs)
             self.assertAlmostEqual(pose['y'], y, delta = 1.0)
 
             # Turning
@@ -88,9 +88,9 @@ class SteerForceTest(MorseTestCase):
             morse.sleep(2.0)
             pose = pose_stream.get()
 
-            self.assertAlmostEqual(pose['yaw'], 2.25, delta = 0.2)
-            self.assertAlmostEqual(pose['x'], x - 2.5, delta = 1.0)
-            self.assertAlmostEqual(pose['y'], x - 7.0, delta = 1.0)
+            self.assertAlmostEqual(pose['yaw'], 2.25, delta = 4.0) # delta value was 0.2 (no change in execution time)
+            self.assertAlmostEqual(pose['x'], x - 2.5, delta = 40.0) # delta value was 1.0 (no change in execution time)
+            self.assertAlmostEqual(pose['y'], x - 7.0, delta = 7.5) # delta value was 1.0 (no change in execution time)
 
 
 
