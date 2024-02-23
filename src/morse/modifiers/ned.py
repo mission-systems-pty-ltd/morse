@@ -1,6 +1,5 @@
 import logging; logger = logging.getLogger("morse." + __name__)
 import math
-from morse.middleware.ros import mathutils
 from morse.modifiers.abstract_modifier import AbstractModifier
 
 class NEDModifier(AbstractModifier):
