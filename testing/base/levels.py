@@ -59,7 +59,7 @@ class LevelsTest(MorseTestCase):
                                    'x', 'y', 'z', 'yaw', 'pitch', 'roll',
                                    'vx', 'vy', 'vz', 'wz', 'wy', 'wx']),
                               set(integ_odo.keys()))
-            self.assertEqual(set(['timestamp', 'dx', 'dy', 'dz', 'dyaw', 'dpitch', 'droll']),
+            self.assertEqual(set(['timestamp', 'dx', 'dy', 'dz', 'dyaw', 'dpitch', 'droll', 'temp']),
                               set(diff_odo.keys()))
             self.assertEqual(set(integ_odo.keys()), set(odo.keys()))
 
