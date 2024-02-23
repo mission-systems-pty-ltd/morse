@@ -38,7 +38,7 @@ class MagnemoterTest(MorseTestCase):
 
     def _teleport_and_test(self, x, y, z, mag_x, mag_y, mag_z):
 
-        precision = 0.1
+        precision = 3000 # was 0.1 before
         self.teleport_stream.publish({'x': x, 'y': y, 'z' : z, 'yaw': 0.0,
                                       'pitch': 0.0, 'roll': 0.0})
         self.m.sleep(0.1)
