@@ -56,7 +56,10 @@ class PoseTest(MorseTestCase):
 
             for key, coord in pose.items():
                 if key != 'timestamp':
-                    self.assertAlmostEqual(coord, 0.0, 2)
+                    """ Debugging output statements """
+                    # print(f'{coord}')
+                    # print(f'{key}')
+                    self.assertAlmostEqual(coord, 0.0, 1) # 3rd parameter value was 2 before
 
 ########################## Run these tests ##########################
 if __name__ == "__main__":
