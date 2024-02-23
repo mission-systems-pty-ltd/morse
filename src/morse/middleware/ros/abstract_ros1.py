@@ -1,5 +1,8 @@
 import logging; logger = logging.getLogger("morse.ros1")
 import re
+
+import rospy
+
 try:
     import roslib
 except ImportError as error:
@@ -7,7 +10,6 @@ except ImportError as error:
     logger.error("Please follow the installation instructions at:\n"
         "http://www.openrobots.org/morse/doc/latest/user/installation/mw/ros.html")
     raise error
-import rospy
 
 from std_msgs.msg import String, Header
 from geometry_msgs.msg import TransformStamped
