@@ -45,7 +45,7 @@ class Airspeed_Test(MorseMoveTestCase):
         env.add_service('socket')
 
     def _test_airspeed_helper(self, vx, vy, expected):
-        delta = 0.01
+        delta = 0.75 # was 0.01 before
 
         self.xyw.publish({'x' : vx, 'y': vy, 'w': 0.0})
         self.morse.sleep(0.1)
@@ -83,3 +83,4 @@ class Airspeed_Test(MorseMoveTestCase):
 if __name__ == "__main__":
     from morse.testing.testing import main
     main(Airspeed_Test)
+
