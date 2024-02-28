@@ -34,7 +34,6 @@ class Airspeed_Test(MorseMoveTestCase):
         airspeed.add_stream('socket')
         airspeed.properties(ComputationMode = 'Velocity')
         robot.append(airspeed)
-        
         airspeed_pos = Airspeed()
         airspeed_pos.rotate(z = math.pi / 2) # measure speed against Y
         airspeed_pos.add_stream('socket')
@@ -45,7 +44,7 @@ class Airspeed_Test(MorseMoveTestCase):
         env.add_service('socket')
 
     def _test_airspeed_helper(self, vx, vy, expected):
-        delta = 0.75 # was 0.01 before
+        delta = 0.01
 
         self.xyw.publish({'x' : vx, 'y': vy, 'w': 0.0})
         self.morse.sleep(0.1)
@@ -71,13 +70,13 @@ class Airspeed_Test(MorseMoveTestCase):
             self._test_airspeed_helper(1.0, 0.0, 0.0)
 
             # now measuring some diff_pressure
-            self._test_airspeed_helper(0.0, 1.0, 0.55)
+            self._test_airspeed_helper(0.0, 1.0, 0.6125)
 
             # scale by 4 if we increase speed by 2
-            self._test_airspeed_helper(0.0, 2.0, 2.30)
+            self._test_airspeed_helper(0.0, 2.0, 2.45)
 
             # Inversing speed, same differential_pressure
-            self._test_airspeed_helper(0.0, -2.0, 2.30)
+            self._test_airspeed_helper(0.0, -2.0, 2.45)
 
 ########################## Run these tests ##########################
 if __name__ == "__main__":
