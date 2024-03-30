@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 2.6)
+# requires 3.12 for FindPython3 module
+cmake_minimum_required( VERSION 3.12 )
 
 set(PACKAGE_NAME morse)
 set(PACKAGE_VERSION "1.4")
@@ -30,14 +31,7 @@ IF(NOT WIN32)
     find_package(PkgConfig REQUIRED)
 endif(NOT WIN32)
 
-set(PythonInterp_FIND_VERSION 3.3)
-find_package(PythonInterp REQUIRED)
-
-get_filename_component( PYTHON_EXECUTABLE_NAME ${PYTHON_EXECUTABLE} NAME )
-
-set(PythonLibs_FIND_VERSION "${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}")
-set(PythonLibs_FIND_VERSION_EXACT "${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}")
-find_package(PythonLibs REQUIRED)
+find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 
 set(ALL_C_PYTHON_MODULES "" CACHE STRING "" FORCE)
 
