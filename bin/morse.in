@@ -253,6 +253,10 @@ def set_prefixes(silent = False):
             #restoring initial logger level
             logger.setLevel(loglevel)
 
+# take a version string and return the major.minor components
+def version_major_minor( v ):
+    return '.'.join( v.split('.')[:2] )
+
 def check_setup():
 
     global blender_exec
@@ -319,7 +323,7 @@ def check_setup():
                     "Crossing fingers.")
     else:
         our_python_version = '.'.join((str(x) for x in sys.version_info[:3]))
-        if (python_version != our_python_version):
+        if( version_major_minor( python_version ) != version_major_minor( our_python_version )):
             logger.warning("Blender is compiled for Python " + python_version + \
                    " but MORSE has been compiled for Python " + \
                    our_python_version + "! Check your MORSE build configuration"
@@ -328,7 +332,7 @@ def check_setup():
             #    raise MorseError("Bad Python version")
         else:
             logger.info("Blender and Morse are using Python " + \
-            python_version + ". Alright.")
+            version_major_minor( python_version ) + ". Alright.")
 
 def get_config_file():
     config_path = os.path.expanduser("~/.morse")
