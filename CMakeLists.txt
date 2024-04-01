@@ -33,6 +33,8 @@ endif(NOT WIN32)
 
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 
+get_filename_component( PYTHON_EXECUTABLE_NAME ${PYTHON_EXECUTABLE} NAME )
+
 set(ALL_C_PYTHON_MODULES "" CACHE STRING "" FORCE)
 
 # Add python include and library directories
