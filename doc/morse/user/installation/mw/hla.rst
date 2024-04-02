@@ -28,7 +28,7 @@ for better performance::
 For pyHLA, remember to specify the precise Python version you
 want to build it for using::
 
-    $ cmake -DPYTHON_EXECUTABLE=/path/to/python3.{3,4} .
+    $ cmake -DPython_EXECUTABLE=/path/to/python3.{3,4} .
 
 Using robotpkg
 ++++++++++++++

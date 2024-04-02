@@ -15,7 +15,7 @@ mkdir -p ${MORSE_PREFIX}
 
 echo "Build and install MORSE"
 mkdir build && cd build
-cmake -DPYTHON_EXECUTABLE=$(which python3.4) -DCMAKE_INSTALL_PREFIX=${MORSE_PREFIX} ..
+cmake -DPython_EXECUTABLE=$(which python3.4) -DCMAKE_INSTALL_PREFIX=${MORSE_PREFIX} ..
 make install
 
 export PATH=${PATH}:${MORSE_PREFIX}/bin
