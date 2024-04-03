@@ -10,7 +10,7 @@ During installation
 - **Problem**: Python executables not found when configuring using ``cmake``::
 
     morse/build $ cmake ..
-    -- Could NOT find PythonInterp (missing:  Python_EXECUTABLE) 
+    -- Could NOT find PythonInterp (missing:  Python3_EXECUTABLE) 
     CMake Error at CMakeLists.txt:24 (MESSAGE):
     Can't find python 3.3 on your system
 
@@ -20,7 +20,7 @@ During installation
   installed in your system.  MORSE should try to find the location of the
   include files and libraries automatically::
 
-    $ cmake -DPython_EXECUTABLE=/usr/local/bin/python3.3 ..
+    $ cmake -DPython3_EXECUTABLE=/usr/local/bin/python3.3 ..
 
 
 
