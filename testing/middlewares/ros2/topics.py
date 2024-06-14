@@ -60,6 +60,10 @@ class Publisher(Node):
         msg.linear.z = w
         self.publisher.publish(msg)
 
+def spin_for(node, t):
+    start = time.time()
+    while time.time() < start+t: # spin for 1 second
+        rclpy.spin_once(node)
 class DataStreamTest(MorseTestCase):
 
     # Define the test environment and the test case
@@ -98,50 +102,32 @@ class DataStreamTest(MorseTestCase):
         self.assertAlmostEqual(sub.pos.pose.pose.position.y, 0.0, delta=precision)
         self.assertAlmostEqual(sub.pos.pose.pose.position.z, 0.0, delta=precision)
 
-        # Wait for motion to complete
-        sleep(1)
-
         # Drive forward
         send_speed(pub.publisher, 1.0, 0.0, 2.0)
 
         # Wait for motion to complete - sleep to make sure that the other peer can read it ...
-        sleep(1)
-
-        # Check new position
-        rclpy.spin_once(sub)
+        spin_for(sub, 1)
 
         self.assertAlmostEqual(sub.pos.pose.pose.position.x, 2.0, delta=precision)
         self.assertAlmostEqual(sub.pos.pose.pose.position.y, 0.0, delta=precision)
         self.assertAlmostEqual(sub.pos.pose.pose.position.z, 0.0, delta=precision)
 
-        # Wait for motion to complete
-        sleep(1)
-
         # Drive backward
         send_speed(pub.publisher, -1.0, 0.0, 2.0) # go back to where it was initially landed
 
         # Wait for motion to complete
-        sleep(1)
-
-        # Check new position
-        rclpy.spin_once(sub)
+        spin_for(sub, 1)
 
         # all x,y,z values should be 0.0 as it was initially
         self.assertAlmostEqual(sub.pos.pose.pose.position.x, 0.0, delta=precision)
         self.assertAlmostEqual(sub.pos.pose.pose.position.y, 0.0, delta=precision)
         self.assertAlmostEqual(sub.pos.pose.pose.position.z, 0.0, delta=precision)
 
-        # Wait for motion to complete
-        sleep(1)
-
         # Drive forward and rotate -math.pi/4.0
         send_speed(pub.publisher, 1.0, -math.pi/4.0, 2.0)
 
         # Wait for motion to complete
-        sleep(1)
-
-        # Check new position
-        rclpy.spin_once(sub)
+        spin_for(sub, 1)
 
         self.assertAlmostEqual(sub.pos.pose.pose.position.x, 4.0 / math.pi, delta=precision)
         self.assertAlmostEqual(sub.pos.pose.pose.position.y, -4.0 / math.pi, delta=precision)
