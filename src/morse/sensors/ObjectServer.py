@@ -399,6 +399,9 @@ class Objectserver(morse.core.sensor.Sensor):
         environment_light = world.light_settings
         self.ambient_lights = {}
 
+        # Check against capnnp for backwards compatiability <v 1.1.1
+        self.capnp_version = capnp.__version__
+
         if bpymorse.using_upbge(): 
             print("ENVIRONMENT LIGHTING IS NOT IMPLEMENTED")
         else:
@@ -481,18 +484,33 @@ class Objectserver(morse.core.sensor.Sensor):
         while not self.local_data['mesh_requests'].empty():
             self.mesh_request_set.add(self.local_data['mesh_requests'].get())
 
-        # Convert texture request queue to data structure for efficient implementation
-        while not self.local_data['texture_requests'].empty():
-            # Read the object request
-            texture_request = cortex.TextureRequest.from_bytes(self.local_data['texture_requests'].get())
-            for texture_description in texture_request.textureDescriptions:
-                tex_type = texture_description.textureType
-                if tex_type not in self.texture_request_sets:
-                    self.texture_request_sets[tex_type] = set()
-                self.texture_request_sets[tex_type].add(texture_description.textureIdentifier)
-                if tex_type not in self.uvs_request_sets:
-                    self.uvs_request_sets[tex_type] = set()
-                self.uvs_request_sets[tex_type].add(texture_description.uvsIdentifier)
+        # Capnp changed the return type of 'from_bytes' around version 1.1.1
+        # This version is a guess https://github.com/capnproto/pycapnp/issues/287
+        if self.capnp_version >= "1.1.1":
+            # Convert texture request queue to data structure for efficient implementation
+            while not self.local_data['texture_requests'].empty():
+                # Read the object request
+                with cortex.TextureRequest.from_bytes(self.local_data['texture_requests'].get()) as texture_request:
+                    for texture_description in texture_request.textureDescriptions:
+                        tex_type = texture_description.textureType
+                        if tex_type not in self.texture_request_sets:
+                            self.texture_request_sets[tex_type] = set()
+                        self.texture_request_sets[tex_type].add(texture_description.textureIdentifier)
+                        if tex_type not in self.uvs_request_sets:
+                            self.uvs_request_sets[tex_type] = set()
+                        self.uvs_request_sets[tex_type].add(texture_description.uvsIdentifier)
+        else:
+            while not self.local_data['texture_requests'].empty():
+                # Read the object request
+                texture_request = cortex.TextureRequest.from_bytes(self.local_data['texture_requests'].get())
+                for texture_description in texture_request.textureDescriptions:
+                    tex_type = texture_description.textureType
+                    if tex_type not in self.texture_request_sets:
+                        self.texture_request_sets[tex_type] = set()
+                    self.texture_request_sets[tex_type].add(texture_description.textureIdentifier)
+                    if tex_type not in self.uvs_request_sets:
+                        self.uvs_request_sets[tex_type] = set()
+                    self.uvs_request_sets[tex_type].add(texture_description.uvsIdentifier)
 
         bpy_objs = bpymorse.get_objects()
 
